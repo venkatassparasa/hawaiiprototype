@@ -1,0 +1,17 @@
+{
+    "name": "County of Hawaii Compliance Dashboard",
+    "short_name": "Compliance",
+    "description": "Digital Platform for Registration, Compliance Monitoring, and Enforcement of TVRs.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#075985",
+    "theme_color": "#075985",
+    "icons": [
+        {
+            "src": "favicon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ]
+}
