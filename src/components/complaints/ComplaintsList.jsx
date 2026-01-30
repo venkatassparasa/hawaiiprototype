@@ -17,7 +17,7 @@ const ComplaintsList = () => {
     const getStatusBadge = (status) => {
         const badges = {
             received: { color: 'bg-blue-100 text-blue-700 border-blue-200', icon: Clock, label: 'Received' },
-            investigating: { color: 'bg-yellow-100 text-yellow-700 border-yellow-200', icon: AlertTriangle, label: 'Investigating' },
+            investigating: { color: 'bg-[#F2E7A1] text-yellow-700 border-yellow-200', icon: AlertTriangle, label: 'Investigating' },
             resolved: { color: 'bg-green-100 text-green-700 border-green-200', icon: CheckCircle, label: 'Resolved' },
             closed: { color: 'bg-slate-100 text-slate-700 border-slate-200', icon: CheckCircle, label: 'Closed' },
         };
@@ -136,7 +136,7 @@ const ComplaintsList = () => {
                                     <td className="px-6 py-4 text-slate-700">{complaint.type}</td>
                                     <td className="px-6 py-4">
                                         <span className={`font-bold text-xs ${complaint.priority === 'High' ? 'text-red-600' :
-                                                complaint.priority === 'Medium' ? 'text-yellow-600' : 'text-green-600'
+                                            complaint.priority === 'Medium' ? 'text-yellow-600' : 'text-green-600'
                                             }`}>
                                             {complaint.priority.toUpperCase()}
                                         </span>

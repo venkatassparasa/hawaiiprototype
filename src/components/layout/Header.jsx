@@ -50,7 +50,7 @@ const Header = ({ user, onLogout, onMenuToggle }) => {
                             <p className="text-sm font-medium text-slate-700">{user?.name || 'Jane Doe'}</p>
                             <p className="text-xs text-slate-400">{user?.role || 'Enforcement Officer'}</p>
                         </div>
-                        <div className="w-9 h-9 rounded-full bg-hawaii-ocean flex items-center justify-center font-bold text-sm text-white">
+                        <div className="w-9 h-9 rounded-full bg-[#345b7e] flex items-center justify-center font-bold text-sm text-white">
                             {user?.avatar || 'JD'}
                         </div>
                         <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${showUserMenu ? 'rotate-180' : ''}`} />

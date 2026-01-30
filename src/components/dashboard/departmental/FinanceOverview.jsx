@@ -6,7 +6,7 @@ const FinanceOverview = () => {
         <div className="space-y-6 animate-fade-in">
             <div className="flex justify-between items-center">
                 <h2 className="text-xl font-bold text-slate-800">Finance Department Overview</h2>
-                <div className="px-4 py-2 bg-green-50 text-green-700 rounded-full border border-green-100 flex items-center gap-2">
+                <div className="px-4 py-2 bg-green-50 revenue rounded-full border border-green-100 flex items-center gap-2">
                     <TrendingUp className="w-4 h-4" />
                     <span className="text-sm font-bold uppercase">Revenue Tracking Active</span>
                 </div>

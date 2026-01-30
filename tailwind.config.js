@@ -26,8 +26,12 @@ export default {
                     coral: '#ff7f50', // Accent
                     forest: '#228b22', // Green
                     darkascent: '#345B7E', // Dark Ascent
-                    secondarybadge: '#6b6faf', // Secondary Badge
                     warmascent: '#e59a7a', // Warm Accent
+                    activelisting: '#50748E',
+                    revenue: '#527c30',
+                    resolutions: '#6b6faf',
+                    pendingviolations: '#f59e0b',
+                    compliantproperties: '#10b981',
                 },
                 status: {
                     success: '#10b981',

@@ -64,7 +64,7 @@ const PaymentTracking = () => {
 
     const getStatusBadge = (status) => {
         const badges = {
-            outstanding: { color: 'bg-yellow-100 text-yellow-700 border-yellow-200', icon: Clock, label: 'Outstanding' },
+            outstanding: { color: 'bg-[#F2E7A1] text-yellow-700 border-yellow-200', icon: Clock, label: 'Outstanding' },
             partial: { color: 'bg-blue-100 text-blue-700 border-blue-200', icon: TrendingUp, label: 'Partial Payment' },
             paid: { color: 'bg-green-100 text-green-700 border-green-200', icon: CheckCircle, label: 'Paid in Full' },
             overdue: { color: 'bg-red-100 text-red-700 border-red-200', icon: AlertTriangle, label: 'Overdue' },

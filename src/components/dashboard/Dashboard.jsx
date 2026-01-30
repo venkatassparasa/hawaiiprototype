@@ -28,10 +28,10 @@ const Dashboard = () => {
     };
 
     const stats = [
-        { title: 'Total Active Listings', value: '4,217', change: '+12%', trend: 'up', icon: Home, colorClass: 'darkascent bg-blue-600' },
+        { title: 'Total Active Listings', value: '4,217', change: '+12%', trend: 'up', icon: Home, colorClass: 'bg-[#50748e] activelisting' },
         { title: 'Compliant Properties', value: '3,842', change: '+5%', trend: 'up', icon: CheckCircle, colorClass: 'text-green-600 bg-green-600' },
         { title: 'Pending Violations', value: '312', change: '-8%', trend: 'down', icon: AlertTriangle, colorClass: 'text-yellow-600 bg-yellow-600' },
-        { title: 'Entity Resolutions', value: '89', change: '+24', trend: 'up', icon: Users, colorClass: 'secondarybadge bg-purple-600' },
+        { title: 'Entity Resolutions', value: '89', change: '+24', trend: 'up', icon: Users, colorClass: 'bg-[#6b6faf] resolutions' },
     ];
 
     const highRiskProperties = [
@@ -110,7 +110,7 @@ const Dashboard = () => {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${prop.status === 'Non-Compliant' ? 'bg-red-50 text-red-700 border border-red-100' :
-                                                prop.status === 'Under Review' ? 'highlight text-yellow-700 border border-yellow-100' :
+                                                prop.status === 'Under Review' ? ' bg-[#F2E7A1] text-yellow-700 border border-yellow-100' :
                                                     'bg-green-50 text-green-700 border border-green-100'
                                                 }`}>
                                                 {prop.status === 'Non-Compliant' && <AlertTriangle className="w-3 h-3" />}

@@ -96,7 +96,7 @@ const PropertiesList = () => {
                             <tr key={prop.id} className="hover:bg-slate-50 transition-colors">
                                 <td className="px-6 py-4">
                                     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${prop.status === 'Non-Compliant' ? 'bg-red-50 text-red-700 border border-red-100' :
-                                        prop.status === 'Under Review' ? 'highlight text-yellow-700 border border-yellow-100' :
+                                        prop.status === 'Under Review' ? 'bg-[#F2E7A1] text-yellow-700 border border-yellow-100' :
                                             'bg-green-50 text-green-700 border border-green-100'
                                         }`}>
                                         {prop.status === 'Non-Compliant' ? <AlertTriangle className="w-3 h-3" /> :

@@ -15,7 +15,7 @@ const AppealsList = () => {
 
     const getStatusBadge = (status) => {
         const badges = {
-            pending: { color: 'bg-yellow-100 text-yellow-700 border-yellow-200', icon: Clock, label: 'Pending Review' },
+            pending: { color: 'bg-[#F2E7A1] text-yellow-700 border-yellow-200', icon: Clock, label: 'Pending Review' },
             scheduled: { color: 'bg-blue-100 text-blue-700 border-blue-200', icon: Calendar, label: 'Hearing Scheduled' },
             heard: { color: 'bg-purple-100 text-purple-700 border-purple-200', icon: Scale, label: 'Heard' },
             decided: { color: 'bg-green-100 text-green-700 border-green-200', icon: CheckCircle, label: 'Decided' },

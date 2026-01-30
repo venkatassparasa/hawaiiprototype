@@ -15,7 +15,7 @@ const UserProfile = ({ user }) => {
                 </div>
                 <button
                     onClick={() => setIsEditing(!isEditing)}
-                    className="px-6 py-2 bg-hawaii-ocean text-white rounded-lg hover:bg-blue-800 flex items-center gap-2 font-medium shadow-sm"
+                    className="px-6 py-2 bg-[#B54848] text-white rounded-lg hover:bg-blue-800 flex items-center gap-2 font-medium shadow-sm"
                 >
                     {isEditing ? (
                         <>
@@ -31,7 +31,7 @@ const UserProfile = ({ user }) => {
             <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
 
                 {/* Cover Photo */}
-                <div className="h-32 bg-gradient-to-r from-hawaii-ocean to-blue-600 relative">
+                <div className="h-32 bg-[url('/bg-hawaii.jpg')] bg-cover bg-center relative">
                     <div className="absolute -bottom-16 left-8">
                         <div className="relative">
                             <div className="w-32 h-32 rounded-full bg-white p-2 shadow-xl">

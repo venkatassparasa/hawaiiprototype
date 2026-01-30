@@ -121,7 +121,7 @@ const ViolationCatalog = () => {
             )}
 
             {/* Guide Card */}
-            <div className="bg-blue-600 rounded-2xl p-8 text-white relative overflow-hidden">
+            <div className="bg-[url('/bg-hawaii.jpg')] bg-cover bg-center rounded-2xl p-8 text-white relative overflow-hidden">
                 <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className="space-y-2">
                         <h2 className="text-2xl font-bold">Comprehensive Guide</h2>

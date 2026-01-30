@@ -6,7 +6,8 @@ const PublicOverview = () => {
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
             {/* Hero Section */}
-            <div className="bg-gradient-to-r from-hawaii-ocean to-blue-600 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+            {/* <div className="bg-gradient-to-r from-hawaii-ocean to-blue-600 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden"> */}
+            <div className="bg-[url('/bg-hawaii.jpg')] bg-cover bg-center rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
                 <div className="relative z-10 max-w-2xl">
                     <h2 className="text-3xl font-bold mb-4">Welcome to the Public Compliance Portal</h2>
                     <p className="text-blue-100 text-lg mb-6">
@@ -16,7 +17,7 @@ const PublicOverview = () => {
                     <div className="flex flex-wrap gap-4">
                         <Link
                             to="/public-search"
-                            className="bg-hawaii-coral text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600 transition-colors flex items-center gap-2"
+                            className="bg-[#B54848] text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600 transition-colors flex items-center gap-2"
                         >
                             <Search className="w-5 h-5" /> Search Properties
                         </Link>

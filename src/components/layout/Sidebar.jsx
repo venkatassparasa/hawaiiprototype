@@ -82,12 +82,12 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
             {/* Mobile Overlay */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 lg:hidden"
+                    className="fixed inset-0 bg-hawaii-ocean backdrop-blur-sm z-50 lg:hidden"
                     onClick={onClose}
                 ></div>
             )}
 
-            <div className={`w-64 bg-hawaii-ocean text-white flex flex-col h-screen fixed left-0 top-0 shadow-2xl z-50 transition-transform duration-300 lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            <div className={`w-64 bg-[#345b7e] text-white flex flex-col h-screen fixed left-0 top-0 shadow-2xl z-50 transition-transform duration-300 lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div className="p-6 flex flex-col items-center border-b border-white/10">
                     <div className="w-full mb-2 relative h-12">
                         {/* Layer 1: Original map portion (left side) - Adjusted to 35% width */}
@@ -135,7 +135,7 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
 
                 <div className="p-4 border-t border-white/10">
                     <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
-                        <div className="w-8 h-8 rounded-full bg-hawaii-warmascent flex items-center justify-center font-bold text-sm">
+                        <div className="w-8 h-8 rounded-full bg-[#e59a7a] flex items-center justify-center font-bold text-sm">
                             {user?.avatar || 'JD'}
                         </div>
                         <div className="overflow-hidden">

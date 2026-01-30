@@ -16,7 +16,7 @@ const RegistrationList = () => {
 
     const getStatusBadge = (status) => {
         const badges = {
-            pending: { color: 'highlight text-yellow-700 border-yellow-200', icon: Clock, label: 'Pending' },
+            pending: { color: 'bg-[#F2E7A1] text-yellow-700 border-yellow-200', icon: Clock, label: 'Pending' },
             'under-review': { color: 'bg-blue-100 text-blue-700 border-blue-200', icon: Clock, label: 'Under Review' },
             approved: { color: 'bg-green-100 text-green-700 border-green-200', icon: CheckCircle, label: 'Approved' },
             rejected: { color: 'bg-red-100 text-red-700 border-red-200', icon: XCircle, label: 'Rejected' },

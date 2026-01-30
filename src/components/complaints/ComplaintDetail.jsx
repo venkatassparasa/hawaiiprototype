@@ -124,7 +124,7 @@ const ComplaintDetail = () => {
                         <p className="text-slate-500">Complaint #{complaint.number}</p>
                     </div>
                 </div>
-                <span className={`px-4 py-2 rounded-lg font-medium ${complaint.status === 'investigating' ? 'bg-yellow-100 text-yellow-700' : 'bg-blue-100 text-blue-700'
+                <span className={`px-4 py-2 rounded-lg font-medium ${complaint.status === 'investigating' ? 'bg-[#F2E7A1] text-yellow-700' : 'bg-blue-100 text-blue-700'
                     }`}>
                     {complaint.status === 'investigating' ? 'Under Investigation' : 'Received'}
                 </span>

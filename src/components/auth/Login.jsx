@@ -25,16 +25,16 @@ const Login = ({ onLogin }) => {
     };
 
     return (
-        <div className="min-h-screen relative flex items-center justify-center p-4 bg-cover bg-center" style={{ backgroundImage: 'url("/bg-login.jpg")' }}>
+        <div className="min-h-screen relative flex items-center justify-center p-4 bg-cover bg-center" style={{ backgroundImage: 'url("/bg-login.jpg")', filter: `brightness(1.1)` }}>
             {/* Background Overlay */}
             <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px]"></div>
 
             {/* Login Card */}
             <div className="relative w-full max-w-md">
-                <div className="bg-white rounded-2xl shadow-2xl p-8 space-y-8">
+                <div className="bg-white rounded-2xl shadow-2xl p-4 space-y-3">
 
                     {/* Header */}
-                    <div className="text-center space-y-4">
+                    <div className="text-center space-y-">
                         <div className="flex justify-center">
                             <div className="w-full max-w-[280px] px-2 py-4 bg-white/5 rounded-xl border border-slate-100/50">
                                 <img
@@ -45,44 +45,44 @@ const Login = ({ onLogin }) => {
                             </div>
                         </div>
                         <div>
-                            <h1 className="text-xl font-bold text-slate-800 tracking-tight">Compliance Intelligence Portal</h1>
-                            <p className="text-slate-500 text-sm font-medium">Digital Transformation Initiative</p>
+                            <h1 className="text-xl font-bold text-slate-800 tracking-tight">Compliance Portal</h1>
+                            <p className="text-slate-500 text-sm font-medium">County of Hawaii</p>
                         </div>
                     </div>
 
                     {/* Role Selection */}
-                    <div className="space-y-4">
+                    <div className="space-y-1">
                         <p className="text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Sign in as Department</p>
                         <div className="grid grid-cols-2 gap-3">
                             <button
                                 onClick={() => submitRole('Finance', 'Finance Director')}
-                                className="flex flex-col items-center justify-center p-4 border border-slate-100 rounded-xl hover:border-hawaii-ocean hover:bg-slate-50 transition-all text-center"
+                                className="flex flex-col items-center justify-center p-4 border border-slate-300 rounded-xl hover:border-hawaii-ocean hover:bg-slate-50 transition-all text-center"
                             >
-                                <div className="w-10 h-10 rounded-full bg-hawaii-ocean/10 flex items-center justify-center text-hawaii-ocean font-bold mb-2 text-lg">F</div>
+                                <div className="w-10 h-10 rounded-full bg-blue-600 bg-opacity-20 flex items-center justify-center text-hawaii-ocean font-bold mb-2 text-lg">F</div>
                                 <p className="font-bold text-slate-800 text-sm">Finance</p>
                             </button>
 
                             <button
                                 onClick={() => submitRole('Planning', 'Planning Director')}
-                                className="flex flex-col items-center justify-center p-4 border border-slate-100 rounded-xl hover:border-hawaii-ocean hover:bg-slate-50 transition-all text-center"
+                                className="flex flex-col items-center justify-center p-4 border border-slate-300 rounded-xl hover:border-hawaii-ocean hover:bg-slate-50 transition-all text-center"
                             >
-                                <div className="w-10 h-10 rounded-full bg-hawaii-coral/10 flex items-center justify-center text-hawaii-coral font-bold mb-2 text-lg">P</div>
+                                <div className="w-10 h-10 rounded-full bg-hawaii-coral bg-opacity-30 flex items-center justify-center text-hawaii-coral font-bold mb-2 text-lg">P</div>
                                 <p className="font-bold text-slate-800 text-sm">Planning</p>
                             </button>
 
                             <button
                                 onClick={() => submitRole('Legal', 'County Attorney')}
-                                className="flex flex-col items-center justify-center p-4 border border-slate-100 rounded-xl hover:border-hawaii-ocean hover:bg-slate-50 transition-all text-center"
+                                className="flex flex-col items-center justify-center p-4 border border-slate-300 rounded-xl hover:border-hawaii-ocean hover:bg-slate-50 transition-all text-center"
                             >
-                                <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold mb-2 text-lg">L</div>
+                                <div className="w-10 h-10 rounded-full bg-slate-400 bg-opacity-30 flex items-center justify-center text-slate-500 font-bold mb-2 text-lg">L</div>
                                 <p className="font-bold text-slate-800 text-sm">Legal</p>
                             </button>
 
                             <button
                                 onClick={() => submitRole('Public', 'Resident / Visitor')}
-                                className="flex flex-col items-center justify-center p-4 border border-slate-100 rounded-xl hover:border-hawaii-ocean hover:bg-slate-50 transition-all text-center"
+                                className="flex flex-col items-center justify-center p-4 border border-slate-300 rounded-xl hover:border-hawaii-ocean hover:bg-slate-50 transition-all text-center"
                             >
-                                <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center text-green-600 font-bold mb-2 text-lg">V</div>
+                                <div className="w-10 h-10 rounded-full bg-green-400 bg-opacity-20 flex items-center justify-center text-green-600 font-bold mb-2 text-lg">V</div>
                                 <p className="font-bold text-slate-800 text-sm">Public View</p>
                             </button>
                         </div>
@@ -94,7 +94,7 @@ const Login = ({ onLogin }) => {
                     </div>
 
                     {/* Form */}
-                    <form onSubmit={handleSubmit} className="space-y-5">
+                    <form onSubmit={handleSubmit} className="space-y-1">
 
                         {/* Email Field */}
                         <div className="space-y-2">

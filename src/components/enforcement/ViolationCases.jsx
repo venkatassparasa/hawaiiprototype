@@ -69,7 +69,7 @@ const ViolationCases = () => {
     const getStatusBadge = (status) => {
         const badges = {
             'under-investigation': { color: 'bg-blue-100 text-blue-700 border-blue-200', icon: Clock, label: 'Under Investigation' },
-            'warning-issued': { color: 'bg-yellow-100 text-yellow-700 border-yellow-200', icon: AlertTriangle, label: 'Warning Issued' },
+            'warning-issued': { color: 'bg-[#F2E7A1] text-yellow-700 border-yellow-200', icon: AlertTriangle, label: 'Warning Issued' },
             'fine-assessed': { color: 'bg-orange-100 text-orange-700 border-orange-200', icon: DollarSign, label: 'Fine Assessed' },
             'lien-filed': { color: 'bg-red-100 text-red-700 border-red-200', icon: FileText, label: 'Lien Filed' },
             'suspended': { color: 'bg-purple-100 text-purple-700 border-purple-200', icon: XCircle, label: 'Suspended' },

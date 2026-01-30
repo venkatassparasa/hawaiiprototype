@@ -17,7 +17,7 @@ const NCUCList = () => {
     const getStatusBadge = (status) => {
         switch (status) {
             case 'Active': return 'bg-green-100 text-green-700 border-green-200';
-            case 'Expiring Soon': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+            case 'Expiring Soon': return 'bg-[#F2E7A1] text-yellow-700 border-yellow-200';
             case 'Expired': return 'bg-red-100 text-red-700 border-red-200';
             default: return 'bg-slate-100 text-slate-700 border-slate-200';
         }
