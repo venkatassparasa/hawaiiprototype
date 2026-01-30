@@ -67,7 +67,8 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
         items.push({ label: 'SYSTEM', header: true });
 
         if (!isPublic) {
-            items.push({ icon: FileText, label: 'Reports', path: '/reports' });
+            items.push({ icon: FileText, label: 'Analytics Reports', path: '/reports' });
+            items.push({ icon: FileText, label: 'Custom Reports', path: '/custom-reports' });
         }
 
         items.push({ icon: Settings, label: 'Settings', path: '/settings' });

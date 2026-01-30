@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Reports</title>
+</head>
+<body>
+    <h1>Debug Reports</h1>
+    <button onclick="clearReports()">Clear Reports</button>
+    <button onclick="showReports()">Show Reports</button>
+    <button onclick="initializeDefaults()">Initialize Defaults</button>
+    <pre id="output"></pre>
+    
+    <script>
+        function clearReports() {
+            localStorage.removeItem('customReports');
+            document.getElementById('output').textContent = 'Reports cleared from localStorage';
+        }
+        
+        function showReports() {
+            const reports = localStorage.getItem('customReports');
+            document.getElementById('output').textContent = reports ? JSON.stringify(JSON.parse(reports), null, 2) : 'No reports found';
+        }
+        
+        function initializeDefaults() {
+            const defaultReports = [
+                {
+                    id: '1',
+                    name: 'Active TVR Registrations',
+                    description: 'All currently active TVR registrations',
+                    dataSource: 'tvr_registry',
+                    fields: [
+                        { id: 'property_id', label: 'Property ID' },
+                        { id: 'owner_name', label: 'Owner Name' },
+                        { id: 'property_address', label: 'Address' },
+                        { id: 'registration_date', label: 'Registration Date' },
+                        { id: 'expiry_date', label: 'Expiry Date' }
+                    ],
+                    filters: [
+                        { field: 'status', operator: 'equals', value: 'Active' }
+                    ],
+                    createdBy: 'Admin',
+                    createdAt: '2024-01-15',
+                    updatedAt: '2024-01-15'
+                },
+                {
+                    id: '2',
+                    name: 'High Priority Complaints',
+                    description: 'Complaints marked as high priority',
+                    dataSource: 'complaints',
+                    fields: [
+                        { id: 'complaint_id', label: 'Complaint ID' },
+                        { id: 'property_id', label: 'Property ID' },
+                        { id: 'complainant_name', label: 'Complainant' },
+                        { id: 'complaint_date', label: 'Date' },
+                        { id: 'complaint_type', label: 'Type' },
+                        { id: 'status', label: 'Status' }
+                    ],
+                    filters: [
+                        { field: 'priority', operator: 'equals', value: 'High' },
+                        { field: 'status', operator: 'notEquals', value: 'Closed' }
+                    ],
+                    createdBy: 'Enforcement Officer',
+                    createdAt: '2024-01-20',
+                    updatedAt: '2024-01-22'
+                }
+            ];
+            
+            localStorage.setItem('customReports', JSON.stringify(defaultReports));
+            document.getElementById('output').textContent = 'Default reports initialized';
+        }
+    </script>
+</body>
+</html>

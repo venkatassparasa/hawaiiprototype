@@ -7,6 +7,9 @@ import CaseReview from './components/dashboard/CaseReview';
 import PropertiesList from './components/properties/PropertiesList';
 import MapView from './components/map/MapView';
 import Reports from './components/reports/Reports';
+import ReportsDashboard from './components/reporting/ReportsDashboard';
+import ReportBuilder from './components/reporting/ReportBuilder';
+import ReportPreview from './components/reporting/ReportPreview';
 import Settings from './components/settings/Settings';
 import Login from './components/auth/Login';
 import UserProfile from './components/profile/UserProfile';
@@ -132,6 +135,29 @@ function App() {
               {/* Other Routes */}
               <Route path="/settings" element={<Settings />} />
               <Route path="/reports" element={<Reports />} />
+              
+              {/* Custom Reporting Routes */}
+              <Route path="/custom-reports" element={
+                <ProtectedRoute allowedRoles={['Admin', 'Enforcement Officer', 'Finance', 'Planning', 'Legal']}>
+                  <ReportsDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/reports/new" element={
+                <ProtectedRoute allowedRoles={['Admin', 'Enforcement Officer', 'Finance', 'Planning', 'Legal']}>
+                  <ReportBuilder />
+                </ProtectedRoute>
+              } />
+              <Route path="/reports/preview" element={
+                <ProtectedRoute allowedRoles={['Admin', 'Enforcement Officer', 'Finance', 'Planning', 'Legal']}>
+                  <ReportPreview />
+                </ProtectedRoute>
+              } />
+              <Route path="/reports/:id/edit" element={
+                <ProtectedRoute allowedRoles={['Admin', 'Enforcement Officer', 'Finance', 'Planning', 'Legal']}>
+                  <ReportBuilder />
+                </ProtectedRoute>
+              } />
+              
               <Route path="/case/new" element={<NewCaseForm />} />
               <Route path="/case/:id" element={<CaseReview />} />
               <Route path="/register" element={<RegistrationForm />} />
