@@ -34,6 +34,10 @@ import NCUCList from './components/enforcement/NCUCList';
 import ViolationCatalog from './components/enforcement/ViolationCatalog';
 import PublicPropertySearch from './components/public/PublicPropertySearch';
 import PublicResources from './components/public/PublicResources';
+import WorkflowDashboard from './components/workflows/WorkflowDashboard';
+import WorkflowDetail from './components/workflows/WorkflowDetail';
+import NewWorkflow from './components/workflows/NewWorkflow';
+import WorkflowBuilder from './components/workflows/WorkflowBuilder';
 import { RoleContext } from './context/RoleContext';
 
 // Protected Route Component
@@ -155,6 +159,28 @@ function App() {
               <Route path="/reports/:id/edit" element={
                 <ProtectedRoute allowedRoles={['Admin', 'Enforcement Officer', 'Finance', 'Planning', 'Legal']}>
                   <ReportBuilder />
+                </ProtectedRoute>
+              } />
+
+              {/* Workflow Management Routes */}
+              <Route path="/workflows" element={
+                <ProtectedRoute allowedRoles={['Admin', 'Planning', 'Legal', 'Enforcement Officer']}>
+                  <WorkflowDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/workflows/new" element={
+                <ProtectedRoute allowedRoles={['Admin', 'Planning', 'Legal']}>
+                  <NewWorkflow />
+                </ProtectedRoute>
+              } />
+              <Route path="/workflows/builder" element={
+                <ProtectedRoute allowedRoles={['Admin', 'Planning', 'Legal']}>
+                  <WorkflowBuilder />
+                </ProtectedRoute>
+              } />
+              <Route path="/workflows/:id" element={
+                <ProtectedRoute allowedRoles={['Admin', 'Planning', 'Legal', 'Enforcement Officer']}>
+                  <WorkflowDetail />
                 </ProtectedRoute>
               } />
               

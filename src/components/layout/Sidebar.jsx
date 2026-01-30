@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { LayoutDashboard, Building2, Map as MapIcon, FileText, Settings, ShieldCheck, ClipboardList, AlertTriangle, DollarSign, MessageSquare, LogOut, X } from 'lucide-react';
+import { LayoutDashboard, Building2, Map as MapIcon, FileText, Settings, ShieldCheck, ClipboardList, AlertTriangle, DollarSign, MessageSquare, LogOut, X, Activity } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { RoleContext } from '../../context/RoleContext';
 
@@ -69,6 +69,11 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
         if (!isPublic) {
             items.push({ icon: FileText, label: 'Analytics Reports', path: '/reports' });
             items.push({ icon: FileText, label: 'Custom Reports', path: '/custom-reports' });
+            
+            // Workflow Management - Only for Admin, Planning, Legal, Enforcement
+            if (['Admin', 'Planning', 'Legal', 'Enforcement Officer'].includes(user?.role)) {
+                items.push({ icon: Activity, label: 'Workflows', path: '/workflows' });
+            }
         }
 
         items.push({ icon: Settings, label: 'Settings', path: '/settings' });

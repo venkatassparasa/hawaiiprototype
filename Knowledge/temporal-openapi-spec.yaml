@@ -1,0 +1,1162 @@
+openapi: 3.0.3
+info:
+  title: TVR Compliance Temporal API
+  description: API for managing TVR compliance workflows using Temporal
+  version: 1.0.0
+  contact:
+    name: Hawaii County Planning Department
+    email: planning@hawaiicounty.gov
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.hawaiicounty.gov/temporal
+    description: Production server
+  - url: https://staging-api.hawaiicounty.gov/temporal
+    description: Staging server
+  - url: http://localhost:8080/temporal
+    description: Development server
+
+paths:
+  /workflows:
+    get:
+      tags:
+        - Workflow Management
+      summary: List workflows
+      description: Retrieve a paginated list of workflows with optional filtering
+      operationId: listWorkflows
+      parameters:
+        - name: status
+          in: query
+          description: Filter by workflow status
+          required: false
+          schema:
+            type: string
+            enum: [running, completed, failed, paused, waiting]
+        - name: type
+          in: query
+          description: Filter by workflow type
+          required: false
+          schema:
+            type: string
+            enum: [tvr-registration, complaint-investigation, violation-appeal, annual-inspection, ncuc-processing]
+        - name: assignee
+          in: query
+          description: Filter by assignee
+          required: false
+          schema:
+            type: string
+        - name: priority
+          in: query
+          description: Filter by priority
+          required: false
+          schema:
+            type: string
+            enum: [low, medium, high, critical]
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Items per page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: search
+          in: query
+          description: Search term for workflow ID or type
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /workflows/start:
+    post:
+      tags:
+        - Workflow Management
+      summary: Start new workflow
+      description: Start a new Temporal workflow execution
+      operationId: startWorkflow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartWorkflowRequest'
+      responses:
+        '201':
+          description: Workflow started successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StartWorkflowResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Workflow already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /workflows/{workflowId}:
+    get:
+      tags:
+        - Workflow Management
+      summary: Get workflow details
+      description: Retrieve detailed information about a specific workflow
+      operationId: getWorkflowDetails
+      parameters:
+        - name: workflowId
+          in: path
+          required: true
+          description: Workflow ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowDetailsResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - Workflow Management
+      summary: Terminate workflow
+      description: Terminate a running workflow
+      operationId: terminateWorkflow
+      parameters:
+        - name: workflowId
+          in: path
+          required: true
+          description: Workflow ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - reason
+              properties:
+                reason:
+                  type: string
+                  description: Reason for termination
+                terminatedBy:
+                  type: string
+                  description: User who terminated the workflow
+      responses:
+        '200':
+          description: Workflow terminated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowActionResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /workflows/{workflowId}/signal:
+    post:
+      tags:
+        - Workflow Management
+      summary: Signal workflow
+      description: Send a signal to a running workflow
+      operationId: signalWorkflow
+      parameters:
+        - name: workflowId
+          in: path
+          required: true
+          description: Workflow ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignalWorkflowRequest'
+      responses:
+        '200':
+          description: Signal sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowActionResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /workflows/{workflowId}/pause:
+    post:
+      tags:
+        - Workflow Management
+      summary: Pause workflow
+      description: Pause a running workflow
+      operationId: pauseWorkflow
+      parameters:
+        - name: workflowId
+          in: path
+          required: true
+          description: Workflow ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Workflow paused successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowActionResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Workflow is not running
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /workflows/{workflowId}/resume:
+    post:
+      tags:
+        - Workflow Management
+      summary: Resume workflow
+      description: Resume a paused workflow
+      operationId: resumeWorkflow
+      parameters:
+        - name: workflowId
+          in: path
+          required: true
+          description: Workflow ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Workflow resumed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowActionResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Workflow is not paused
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /workflows/templates:
+    get:
+      tags:
+        - Workflow Templates
+      summary: Get workflow templates
+      description: Retrieve available workflow templates
+      operationId: getWorkflowTemplates
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowTemplatesResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /workflows/definitions:
+    post:
+      tags:
+        - Workflow Templates
+      summary: Save workflow definition
+      description: Save a custom workflow definition
+      operationId: saveWorkflowDefinition
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowDefinition'
+      responses:
+        '201':
+          description: Workflow definition saved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: "custom-tvr-registration-001"
+                      createdAt:
+                        type: string
+                        format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /activities/{activityId}:
+    get:
+      tags:
+        - Activities
+      summary: Get activity details
+      description: Retrieve detailed information about a specific activity
+      operationId: getActivityDetails
+      parameters:
+        - name: activityId
+          in: path
+          required: true
+          description: Activity ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityDetailsResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /activities/{activityId}/complete:
+    post:
+      tags:
+        - Activities
+      summary: Complete activity
+      description: Mark an activity as completed with result
+      operationId: completeActivity
+      parameters:
+        - name: activityId
+          in: path
+          required: true
+          description: Activity ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - result
+              properties:
+                result:
+                  type: object
+                  description: Activity result data
+      responses:
+        '200':
+          description: Activity completed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      completedAt:
+                        type: string
+                        format: date-time
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /stats:
+    get:
+      tags:
+        - Statistics
+      summary: Get workflow statistics
+      description: Retrieve workflow execution statistics
+      operationId: getWorkflowStats
+      parameters:
+        - name: period
+          in: query
+          description: Time period for statistics
+          required: false
+          schema:
+            type: string
+            enum: [1h, 24h, 7d, 30d, 90d]
+            default: 24h
+        - name: workflowType
+          in: query
+          description: Filter by workflow type
+          required: false
+          schema:
+            type: string
+            enum: [tvr-registration, complaint-investigation, violation-appeal, annual-inspection, ncuc-processing]
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowStatsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    Workflow:
+      type: object
+      required:
+        - id
+        - type
+        - status
+        - progress
+        - startedAt
+        - currentStep
+        - assignee
+        - priority
+      properties:
+        id:
+          type: string
+          description: Unique workflow identifier
+          example: "tvr-registration-001"
+        type:
+          type: string
+          enum: [tvr-registration, complaint-investigation, violation-appeal, annual-inspection, ncuc-processing]
+          description: Workflow type
+        status:
+          type: string
+          enum: [running, completed, failed, paused, waiting]
+          description: Current workflow status
+        progress:
+          type: integer
+          minimum: 0
+          maximum: 100
+          description: Progress percentage
+          example: 65
+        startedAt:
+          type: string
+          format: date-time
+          description: Workflow start time
+        estimatedCompletion:
+          type: string
+          format: date-time
+          description: Estimated completion time
+        completedAt:
+          type: string
+          format: date-time
+          description: Actual completion time
+        currentStep:
+          type: string
+          description: Current workflow step
+          example: "NCUC Review"
+        assignee:
+          type: string
+          description: Current assignee
+          example: "Planning Department"
+        priority:
+          type: string
+          enum: [low, medium, high, critical]
+          description: Workflow priority
+        input:
+          type: object
+          description: Workflow input data
+        result:
+          type: object
+          description: Workflow result data
+        error:
+          type: string
+          description: Error message if failed
+
+    WorkflowListResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          required:
+            - workflows
+            - pagination
+          properties:
+            workflows:
+              type: array
+              items:
+                $ref: '#/components/schemas/Workflow'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+
+    Pagination:
+      type: object
+      required:
+        - page
+        - limit
+        - total
+        - totalPages
+      properties:
+        page:
+          type: integer
+          minimum: 1
+          description: Current page number
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+          description: Items per page
+        total:
+          type: integer
+          minimum: 0
+          description: Total number of items
+        totalPages:
+          type: integer
+          minimum: 0
+          description: Total number of pages
+
+    StartWorkflowRequest:
+      type: object
+      required:
+        - workflowType
+        - input
+      properties:
+        workflowType:
+          type: string
+          enum: [tvr-registration, complaint-investigation, violation-appeal, annual-inspection, ncuc-processing]
+          description: Type of workflow to start
+        workflowId:
+          type: string
+          description: Custom workflow ID (optional)
+        taskQueue:
+          type: string
+          description: Custom task queue (optional)
+        input:
+          type: object
+          description: Workflow input data
+          example:
+            applicationId: "APP-2024-001"
+            propertyId: "PROP-001"
+            applicantId: "USER-001"
+            property:
+              address: "123-4567 Kamehameha Hwy, Kailua-Kona, HI 96740"
+              tmk: "3-4-005-025-0000"
+              owner: "John Doe"
+              zone: "R-2"
+        options:
+          type: object
+          properties:
+            executionTimeout:
+              type: string
+              description: Execution timeout (e.g., "2592000s" for 30 days)
+            runTimeout:
+              type: string
+              description: Run timeout (e.g., "604800s" for 7 days)
+            retryPolicy:
+              $ref: '#/components/schemas/RetryPolicy'
+
+    RetryPolicy:
+      type: object
+      required:
+        - maximumAttempts
+        - initialInterval
+        - maximumInterval
+        - backoffCoefficient
+      properties:
+        maximumAttempts:
+          type: integer
+          minimum: 1
+          maximum: 10
+          description: Maximum retry attempts
+          example: 3
+        initialInterval:
+          type: string
+          description: Initial retry interval
+          example: "1s"
+        maximumInterval:
+          type: string
+          description: Maximum retry interval
+          example: "60s"
+        backoffCoefficient:
+          type: number
+          minimum: 1.0
+          maximum: 5.0
+          description: Backoff coefficient
+          example: 2.0
+
+    StartWorkflowResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          required:
+            - workflowId
+            - executionId
+            - status
+            - startedAt
+          properties:
+            workflowId:
+              type: string
+              description: Workflow ID
+            executionId:
+              type: string
+              description: Execution ID
+            runId:
+              type: string
+              description: Run ID
+            status:
+              type: string
+              enum: [running]
+              description: Initial status
+            startedAt:
+              type: string
+              format: date-time
+              description: Start time
+
+    WorkflowDetailsResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          allOf:
+            - $ref: '#/components/schemas/Workflow'
+            - type: object
+              properties:
+                history:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/WorkflowHistoryEvent'
+                activities:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Activity'
+
+    WorkflowHistoryEvent:
+      type: object
+      required:
+        - eventId
+        - eventType
+        - timestamp
+      properties:
+        eventId:
+          type: integer
+          description: Event ID
+        eventType:
+          type: string
+          description: Event type
+        timestamp:
+          type: string
+          format: date-time
+          description: Event timestamp
+        details:
+          type: object
+          description: Event details
+
+    Activity:
+      type: object
+      required:
+        - id
+        - name
+        - type
+        - status
+        - assignee
+        - duration
+      properties:
+        id:
+          type: string
+          description: Activity ID
+        name:
+          type: string
+          description: Activity name
+        type:
+          type: string
+          enum: [manual, automated, approval, notification]
+          description: Activity type
+        status:
+          type: string
+          enum: [pending, running, completed, failed]
+          description: Activity status
+        assignee:
+          type: string
+          description: Activity assignee
+        duration:
+          type: string
+          description: Expected duration
+        description:
+          type: string
+          description: Activity description
+        required:
+          type: boolean
+          description: Whether activity is required
+        startedAt:
+          type: string
+          format: date-time
+          description: Start time
+        completedAt:
+          type: string
+          format: date-time
+          description: Completion time
+        result:
+          type: object
+          description: Activity result
+
+    SignalWorkflowRequest:
+      type: object
+      required:
+        - signalName
+        - input
+      properties:
+        signalName:
+          type: string
+          description: Signal name
+          example: "updatePriority"
+        input:
+          type: object
+          description: Signal input data
+          example:
+            priority: "high"
+            reason: "Expedited processing requested"
+            requestedBy: "admin-user"
+
+    WorkflowActionResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          required:
+            - status
+            - timestamp
+          properties:
+            status:
+              type: string
+              description: New status
+            timestamp:
+              type: string
+              format: date-time
+              description: Action timestamp
+
+    WorkflowTemplate:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - category
+        - estimatedDuration
+        - steps
+      properties:
+        id:
+          type: string
+          description: Template ID
+        name:
+          type: string
+          description: Template name
+        description:
+          type: string
+          description: Template description
+        category:
+          type: string
+          enum: [registration, enforcement, inspection, legal]
+          description: Template category
+        estimatedDuration:
+          type: string
+          description: Estimated duration
+          example: "2-10 weeks"
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowStep'
+
+    WorkflowStep:
+      type: object
+      required:
+        - id
+        - name
+        - type
+        - required
+        - assignee
+        - duration
+      properties:
+        id:
+          type: string
+          description: Step ID
+        name:
+          type: string
+          description: Step name
+        type:
+          type: string
+          enum: [manual, automated, approval, notification]
+          description: Step type
+        required:
+          type: boolean
+          description: Whether step is required
+        assignee:
+          type: string
+          description: Step assignee
+        duration:
+          type: string
+          description: Expected duration
+        description:
+          type: string
+          description: Step description
+
+    WorkflowTemplatesResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          required:
+            - templates
+          properties:
+            templates:
+              type: array
+              items:
+                $ref: '#/components/schemas/WorkflowTemplate'
+
+    WorkflowDefinition:
+      type: object
+      required:
+        - name
+        - type
+        - description
+        - steps
+        - triggers
+        - notifications
+        - temporal
+      properties:
+        name:
+          type: string
+          description: Workflow definition name
+        type:
+          type: string
+          description: Workflow type
+        description:
+          type: string
+          description: Workflow description
+        priority:
+          type: string
+          enum: [low, medium, high, critical]
+          description: Default priority
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowStep'
+        triggers:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowTrigger'
+        notifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowNotification'
+        temporal:
+          type: object
+          required:
+            - workflowType
+            - taskQueue
+          properties:
+            workflowType:
+              type: string
+              description: Temporal workflow type
+            taskQueue:
+              type: string
+              description: Temporal task queue
+            executionTimeout:
+              type: string
+              description: Execution timeout
+            runTimeout:
+              type: string
+              description: Run timeout
+
+    WorkflowTrigger:
+      type: object
+      required:
+        - id
+        - name
+        - type
+        - enabled
+      properties:
+        id:
+          type: string
+          description: Trigger ID
+        name:
+          type: string
+          description: Trigger name
+        type:
+          type: string
+          enum: [webhook, manual, schedule, event]
+          description: Trigger type
+        description:
+          type: string
+          description: Trigger description
+        enabled:
+          type: boolean
+          description: Whether trigger is enabled
+        configuration:
+          type: object
+          description: Trigger configuration
+
+    WorkflowNotification:
+      type: object
+      required:
+        - id
+        - event
+        - recipients
+        - method
+      properties:
+        id:
+          type: string
+          description: Notification ID
+        event:
+          type: string
+          enum: [workflow_started, workflow_completed, step_completed, workflow_failed]
+          description: Event that triggers notification
+        recipients:
+          type: array
+          items:
+            type: string
+          description: Notification recipients
+        method:
+          type: array
+          items:
+            type: string
+            enum: [email, sms, webhook]
+          description: Notification methods
+        template:
+          type: string
+          description: Notification template
+
+    ActivityDetailsResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          allOf:
+            - $ref: '#/components/schemas/Activity'
+            - type: object
+              properties:
+                workflowId:
+                  type: string
+                  description: Parent workflow ID
+                input:
+                  type: object
+                  description: Activity input data
+                result:
+                  type: object
+                  description: Activity result data
+
+    WorkflowStatsResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          required:
+            - total
+            - byStatus
+            - byType
+            - averageDuration
+          properties:
+            total:
+              type: integer
+              description: Total number of workflows
+            byStatus:
+              type: object
+              description: Workflows grouped by status
+              example:
+                running: 15
+                completed: 45
+                failed: 3
+                paused: 2
+                waiting: 5
+            byType:
+              type: object
+              description: Workflows grouped by type
+              example:
+                "tvr-registration": 35
+                "complaint-investigation": 20
+                "violation-appeal": 10
+                "annual-inspection": 5
+            averageDuration:
+              type: string
+              description: Average workflow duration
+              example: "5 days 3 hours"
+            successRate:
+              type: number
+              description: Success rate percentage
+              example: 85.5
+
+    ErrorResponse:
+      type: object
+      required:
+        - success
+        - error
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          required:
+            - code
+            - message
+          properties:
+            code:
+              type: string
+              description: Error code
+              example: "WORKFLOW_NOT_FOUND"
+            message:
+              type: string
+              description: Error message
+              example: "Workflow with ID 'tvr-registration-999' not found"
+            details:
+              type: object
+              description: Additional error details
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Workflow Management
+    description: Core workflow management operations
+  - name: Workflow Templates
+    description: Workflow template and definition management
+  - name: Activities
+    description: Activity management operations
+  - name: Statistics
+    description: Workflow statistics and monitoring

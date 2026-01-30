@@ -6,6 +6,9 @@ import Chatbot from '../chatbot/Chatbot';
 const Layout = ({ children, user, onLogout }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
+    // Only show chatbot for public users
+    const isPublicUser = user?.role === 'Public';
+
     return (
         <div className="min-h-screen bg-slate-50 font-sans">
             <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} onLogout={onLogout} />
@@ -15,7 +18,7 @@ const Layout = ({ children, user, onLogout }) => {
                     {children}
                 </div>
             </main>
-            <Chatbot />
+            {isPublicUser && <Chatbot />}
         </div>
     );
 };

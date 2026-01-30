@@ -6,6 +6,7 @@ const Login = ({ onLogin }) => {
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
     const navigate = useNavigate();
 
     const handleSubmit = (e) => {
@@ -14,14 +15,60 @@ const Login = ({ onLogin }) => {
         submitRole('Enforcement Officer', 'Jane Doe');
     };
 
+    const validateCredentials = () => {
+        if (!email.trim()) {
+            setError('Email is required');
+            return false;
+        }
+        if (!password.trim()) {
+            setError('Password is required');
+            return false;
+        }
+        if (!email.includes('@')) {
+            setError('Please enter a valid email address');
+            return false;
+        }
+        setError('');
+        return true;
+    };
+
+    const handleEmailChange = (e) => {
+        setEmail(e.target.value);
+        if (error) setError(''); // Clear error when user starts typing
+    };
+
+    const handlePasswordChange = (e) => {
+        setPassword(e.target.value);
+        if (error) setError(''); // Clear error when user starts typing
+    };
+
     const submitRole = (role, name) => {
-        onLogin({
-            name: name,
-            email: `${name.toLowerCase().replace(' ', '.')}@hawaiicounty.gov`,
-            role: role,
-            avatar: name.split(' ').map(n => n[0]).join('')
-        });
-        navigate('/dashboard');
+        // Validate credentials for Finance, Legal, and Planning departments
+        if (['Finance', 'Legal', 'Planning'].includes(role)) {
+            if (!validateCredentials()) {
+                return;
+            }
+        }
+        
+        // For Public View, don't create a user session - just set role for navigation
+        if (role === 'Public') {
+            onLogin({
+                name: null, // No name for public users
+                email: null, // No email for public users
+                role: role,
+                avatar: null // No avatar for public users
+            });
+            navigate('/dashboard');
+        } else {
+            // For all other roles, create full user session
+            onLogin({
+                name: name,
+                email: email || `${name.toLowerCase().replace(' ', '.')}@hawaiicounty.gov`,
+                role: role,
+                avatar: name.split(' ').map(n => n[0]).join('')
+            });
+            navigate('/dashboard');
+        }
     };
 
     return (
@@ -95,6 +142,12 @@ const Login = ({ onLogin }) => {
 
                     {/* Form */}
                     <form onSubmit={handleSubmit} className="space-y-1">
+                        {/* Error Display */}
+                        {error && (
+                            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                                <p className="text-sm text-red-600">{error}</p>
+                            </div>
+                        )}
 
                         {/* Email Field */}
                         <div className="space-y-2">
@@ -104,9 +157,13 @@ const Login = ({ onLogin }) => {
                                 <input
                                     type="email"
                                     value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
+                                    onChange={handleEmailChange}
                                     placeholder="your.name@hawaiicounty.gov"
-                                    className="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean/20 focus:border-hawaii-ocean transition-all"
+                                    className={`w-full pl-11 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean/20 transition-all ${
+                                        error && !email.trim() 
+                                            ? 'border-red-300 focus:border-red-500' 
+                                            : 'border-slate-200 focus:border-hawaii-ocean'
+                                    }`}
                                 />
                             </div>
                         </div>
@@ -119,9 +176,13 @@ const Login = ({ onLogin }) => {
                                 <input
                                     type={showPassword ? 'text' : 'password'}
                                     value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
+                                    onChange={handlePasswordChange}
                                     placeholder="Enter your password"
-                                    className="w-full pl-11 pr-12 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean/20 focus:border-hawaii-ocean transition-all"
+                                    className={`w-full pl-11 pr-12 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean/20 transition-all ${
+                                        error && !password.trim() 
+                                            ? 'border-red-300 focus:border-red-500' 
+                                            : 'border-slate-200 focus:border-hawaii-ocean'
+                                    }`}
                                 />
                                 <button
                                     type="button"
