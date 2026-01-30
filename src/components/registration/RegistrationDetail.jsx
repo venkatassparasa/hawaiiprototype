@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, CheckCircle, XCircle, FileText, Download, Calendar, DollarSign, Home, User } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import WorkflowDetailPanel from '../workflows/WorkflowDetailPanel';
 
 const RegistrationDetail = () => {
     const { id } = useParams();
@@ -259,6 +260,15 @@ const RegistrationDetail = () => {
                             ))}
                         </div>
                     </div>
+
+                    {/* Workflow Progress */}
+                    <WorkflowDetailPanel 
+                        recordId={registration.number}
+                        recordType="tvr-registration"
+                        title="TVR Registration Workflow"
+                        showFullDetails={true}
+                        className="mb-6"
+                    />
 
                     {/* Actions */}
                     {status === 'under-review' && (

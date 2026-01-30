@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Filter, MessageSquare, CheckCircle, Clock, AlertTriangle, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import WorkflowStatusBadge from '../workflows/WorkflowStatusBadge';
 
 const ComplaintsList = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -117,6 +118,7 @@ const ComplaintsList = () => {
                             <th className="px-6 py-4">Type</th>
                             <th className="px-6 py-4">Priority</th>
                             <th className="px-6 py-4">Status</th>
+                            <th className="px-6 py-4">Workflow Progress</th>
                             <th className="px-6 py-4">Submitted</th>
                             <th className="px-6 py-4">Action</th>
                         </tr>
@@ -146,6 +148,14 @@ const ComplaintsList = () => {
                                             <statusBadge.icon className="w-3 h-3" />
                                             {statusBadge.label}
                                         </span>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <WorkflowStatusBadge 
+                                            recordId={complaint.number}
+                                            recordType="complaint-investigation"
+                                            compact={false}
+                                            showProgress={true}
+                                        />
                                     </td>
                                     <td className="px-6 py-4 text-slate-500">{new Date(complaint.submitted).toLocaleDateString()}</td>
                                     <td className="px-6 py-4">

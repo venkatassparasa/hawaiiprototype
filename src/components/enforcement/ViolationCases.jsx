@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Filter, Clock, AlertTriangle, CheckCircle, XCircle, FileText, Calendar, DollarSign, Eye, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import WorkflowStatusBadge from '../workflows/WorkflowStatusBadge';
 
 const ViolationCases = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -207,6 +208,7 @@ const ViolationCases = () => {
                             <th className="px-6 py-4">Violation Type</th>
                             <th className="px-6 py-4">Status</th>
                             <th className="px-6 py-4">Priority</th>
+                            <th className="px-6 py-4">Workflow Progress</th>
                             <th className="px-6 py-4">SLA</th>
                             <th className="px-6 py-4">Fine</th>
                             <th className="px-6 py-4">Due Date</th>
@@ -235,6 +237,14 @@ const ViolationCases = () => {
                                         <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getPriorityBadge(caseItem.priority)}`}>
                                             {caseItem.priority.toUpperCase()}
                                         </span>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <WorkflowStatusBadge 
+                                            recordId={caseItem.caseNumber}
+                                            recordType="violation-appeal"
+                                            compact={true}
+                                            showProgress={true}
+                                        />
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className={`text-xs font-medium ${slaBadge.color}`}>
