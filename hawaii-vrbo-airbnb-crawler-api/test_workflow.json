@@ -1,0 +1,9 @@
+{
+  "workflowType": "TVRRegistrationWorkflow",
+  "input": {
+    "applicationId": "APP-12345",
+    "propertyId": "PROP-12345",
+    "applicantName": "John Doe",
+    "propertyAddress": "123 Test St, Kailua-Kona, HI 96740"
+  }
+}

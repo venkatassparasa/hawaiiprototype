@@ -1,58 +1,60 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, CheckCircle, AlertCircle, Pause, Play, RotateCcw, FileText, Users, Calendar, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import temporalService from '../../services/temporalService';
 
 const WorkflowDashboard = () => {
   const navigate = useNavigate();
-  const [workflows, setWorkflows] = useState([
-    {
-      id: 'tvr-registration-001',
-      type: 'TVR Registration',
-      status: 'running',
-      progress: 65,
-      startedAt: '2024-01-15T10:30:00Z',
-      estimatedCompletion: '2024-02-20T17:00:00Z',
-      currentStep: 'NCUC Review',
-      assignee: 'Planning Department',
-      priority: 'high'
-    },
-    {
-      id: 'complaint-investigation-002',
-      type: 'Complaint Investigation',
-      status: 'waiting',
-      progress: 30,
-      startedAt: '2024-01-18T14:15:00Z',
-      estimatedCompletion: '2024-01-25T17:00:00Z',
-      currentStep: 'Evidence Collection',
-      assignee: 'Enforcement Officer',
-      priority: 'medium'
-    },
-    {
-      id: 'violation-appeal-003',
-      type: 'Violation Appeal',
-      status: 'completed',
-      progress: 100,
-      startedAt: '2024-01-10T09:00:00Z',
-      completedAt: '2024-01-22T16:30:00Z',
-      currentStep: 'Completed',
-      assignee: 'Legal Department',
-      priority: 'low'
-    },
-    {
-      id: 'inspection-scheduling-004',
-      type: 'Annual Inspection',
-      status: 'failed',
-      progress: 45,
-      startedAt: '2024-01-12T11:00:00Z',
-      currentStep: 'Scheduling Conflict',
-      assignee: 'Planning Department',
-      priority: 'high',
-      error: 'Property owner unavailable on scheduled dates'
-    }
-  ]);
+  const [workflows, setWorkflows] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Load workflows from Temporal
+  useEffect(() => {
+    loadWorkflows();
+  }, [filter]);
+
+  const loadWorkflows = async () => {
+    try {
+      setLoading(true);
+      const response = await temporalService.listWorkflows(
+        filter !== 'all' ? { status: filter } : {}
+      );
+      setWorkflows(response.workflows || []);
+      setError(null);
+    } catch (err) {
+      console.error('Failed to load workflows:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleWorkflowAction = async (workflowId, action) => {
+    try {
+      switch (action) {
+        case 'terminate':
+          await temporalService.terminateWorkflow(workflowId, 'User requested termination');
+          break;
+        case 'signal':
+          // Add signal handling as needed
+          break;
+        case 'query':
+          // Add query handling as needed
+          break;
+        default:
+          break;
+      }
+      // Reload workflows after action
+      loadWorkflows();
+    } catch (err) {
+      console.error(`Failed to ${action} workflow:`, err);
+      setError(err.message);
+    }
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -116,6 +118,30 @@ const WorkflowDashboard = () => {
           New Workflow
         </button>
       </div>
+
+      {/* Error Display */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex items-center">
+            <AlertCircle className="w-5 h-5 text-red-600 mr-2" />
+            <span className="text-red-800">{error}</span>
+            <button 
+              onClick={loadWorkflows}
+              className="ml-auto text-red-600 hover:text-red-800"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Loading State */}
+      {loading && (
+        <div className="flex justify-center items-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-hawaii-ocean"></div>
+          <span className="ml-2 text-slate-600">Loading workflows...</span>
+        </div>
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
@@ -253,15 +279,27 @@ const WorkflowDashboard = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center gap-2">
-                      <button className="text-hawaii-ocean hover:text-blue-800">View</button>
+                      <button 
+                        onClick={() => navigate(`/workflows/${workflow.id}`)}
+                        className="text-hawaii-ocean hover:text-blue-800"
+                      >
+                        View
+                      </button>
                       {workflow.status === 'running' && (
-                        <button className="text-yellow-600 hover:text-yellow-800">Pause</button>
-                      )}
-                      {workflow.status === 'paused' && (
-                        <button className="text-green-600 hover:text-green-800">Resume</button>
+                        <button 
+                          onClick={() => handleWorkflowAction(workflow.id, 'terminate')}
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          Terminate
+                        </button>
                       )}
                       {workflow.status === 'failed' && (
-                        <button className="text-blue-600 hover:text-blue-800">Retry</button>
+                        <button 
+                          onClick={() => handleWorkflowAction(workflow.id, 'retry')}
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          Retry
+                        </button>
                       )}
                     </div>
                   </td>

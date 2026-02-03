@@ -1,0 +1,26 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY tsconfig.json ./
+
+# Install dependencies
+RUN npm ci --only=production
+
+# Copy source code
+COPY src/ ./src/
+
+# Install temporal CLI
+RUN npm install -g @temporalio/cli
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S temporal -u 1001
+
+USER temporal
+
+EXPOSE 7233
+
+CMD ["npm", "run", "worker"]
