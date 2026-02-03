@@ -56,8 +56,8 @@ module.exports = async function handler(req, res) {
   try {
     console.log(`🔄 Fetching workflows from worker: ${WORKER_URL}`);
     
-    // Try to get workflows from our enhanced mock worker
-    const workerResponse = await fetchFromWorker('/api/workflows');
+    // Try to get workflows from our Java worker
+    const workerResponse = await fetchFromWorker('/api/temporal/workflows');
     
     if (workerResponse.workflows) {
       // Transform worker data to match frontend expectations
