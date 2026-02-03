@@ -21,6 +21,6 @@
     "TEMPORAL_NAMESPACE": "default",
     "POSTGRES_URI": "@postgres_url",
     "JWT_SECRET": "@jwt_secret",
-    "WORKER_URL": "https://hawaii-temporal-worker-v2.onrender.com"
+    "WORKER_URL": "https://hawaii-temporal-worker-java.onrender.com"
   }
 }
