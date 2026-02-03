@@ -1,1 +1,26 @@
-{"version": 2, "builds": [{"src": "package.json", "use": "@vercel/static-build", "config": {"distDir": "dist"}}, {"src": "api/**/*.cjs", "use": "@vercel/node", "config": {"maxDuration": 30}}], "env": {"TEMPORAL_ADDRESS": "ap-south-1.aws.api.temporal.io:7233", "TEMPORAL_NAMESPACE": "default", "POSTGRES_URI": "@postgres_url", "JWT_SECRET": "@jwt_secret"}}
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    },
+    {
+      "src": "api/**/*.cjs",
+      "use": "@vercel/node",
+      "config": {
+        "maxDuration": 30
+      }
+    }
+  ],
+  "env": {
+    "TEMPORAL_ADDRESS": "ap-south-1.aws.api.temporal.io:7233",
+    "TEMPORAL_NAMESPACE": "default",
+    "POSTGRES_URI": "@postgres_url",
+    "JWT_SECRET": "@jwt_secret",
+    "WORKER_URL": "https://hawaii-temporal-worker.onrender.com"
+  }
+}

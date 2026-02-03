@@ -1,19 +1,46 @@
-const { Connection, Client } = require('@temporalio/client');
+const https = require('https');
 
-let temporalClient;
+// Configuration
+const WORKER_URL = process.env.WORKER_URL || 'http://localhost:8080';
 
-async function getTemporalClient() {
-  if (!temporalClient) {
-    const connection = await Connection.connect({
-      address: process.env.TEMPORAL_ADDRESS || 'localhost:7233',
-    });
+async function fetchFromWorker(endpoint) {
+  return new Promise((resolve, reject) => {
+    const url = new URL(endpoint, WORKER_URL);
     
-    temporalClient = new Client({
-      connection,
-      namespace: process.env.TEMPORAL_NAMESPACE || 'default',
+    const options = {
+      hostname: url.hostname,
+      port: url.port || (url.protocol === 'https:' ? 443 : 80),
+      path: url.pathname,
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'User-Agent': 'Vercel-API'
+      }
+    };
+
+    const req = https.request(options, (res) => {
+      let data = '';
+      
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
+      
+      res.on('end', () => {
+        try {
+          const jsonData = JSON.parse(data);
+          resolve(jsonData);
+        } catch (error) {
+          reject(error);
+        }
+      });
     });
-  }
-  return temporalClient;
+
+    req.on('error', (error) => {
+      reject(error);
+    });
+
+    req.end();
+  });
 }
 
 module.exports = async function handler(req, res) {
@@ -27,48 +54,77 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const client = await getTemporalClient();
-    const handle = client.workflow.list();
-    const workflows = [];
-
-    for await (const workflow of handle) {
-      let workflowType = 'Unknown';
-      try {
-        const workflowHandle = client.workflow.getHandle(workflow.workflowId);
-        const description = await workflowHandle.describe();
-        workflowType = description.type || 'Unknown';
-      } catch (err) {
-        console.warn(`Could not get workflow type for ${workflow.workflowId}:`, err);
-      }
-
-      workflows.push({
-        id: workflow.workflowId,
-        type: workflowType,
-        status: workflow.status.name.toLowerCase(),
-        progress: calculateProgress(workflow),
-        startedAt: workflow.startTime?.toISOString() || new Date().toISOString(),
-        completedAt: workflow.closeTime?.toISOString() || null,
-        currentStep: getCurrentStep(workflow),
-        assignee: extractAssignee(workflow),
-        priority: extractPriority(workflow)
-      });
-    }
-
-    return res.status(200).json({ workflows });
-  } catch (error) {
-    console.error('Error listing workflows:', error);
+    console.log(`🔄 Fetching workflows from worker: ${WORKER_URL}`);
     
-    // Fallback to mock data if Temporal connection fails
+    // Try to get workflows from our enhanced mock worker
+    const workerResponse = await fetchFromWorker('/api/workflows');
+    
+    if (workerResponse.workflows) {
+      // Transform worker data to match frontend expectations
+      const transformedWorkflows = workerResponse.workflows.map(workflow => ({
+        id: workflow.workflowId,
+        type: workflow.workflowType.replace('Workflow', ''),
+        status: workflow.status.toLowerCase(),
+        progress: calculateProgress(workflow.status),
+        startedAt: workflow.startTime,
+        completedAt: workflow.endTime || null,
+        currentStep: getCurrentStep(workflow.status),
+        assignee: extractAssignee(workflow),
+        priority: extractPriority(workflow),
+        input: workflow.input
+      }));
+
+      console.log(`✅ Successfully fetched ${transformedWorkflows.length} workflows from worker`);
+      return res.status(200).json({ workflows: transformedWorkflows });
+    }
+  } catch (error) {
+    console.error('❌ Error fetching from worker:', error.message);
+    
+    // Fallback to mock data if worker is unavailable
+    console.log('🔄 Using fallback mock data');
     const mockWorkflows = [
       {
         id: 'tvr-registration-demo',
         type: 'TVR Registration',
         status: 'running',
         progress: 65,
-        startedAt: new Date().toISOString(),
+        startedAt: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
         currentStep: 'NCUC Review',
         assignee: 'Planning Department',
-        priority: 'high'
+        priority: 'high',
+        input: {
+          applicationId: 'APP-001',
+          propertyId: 'PROP-001',
+          applicantName: 'John Doe'
+        }
+      },
+      {
+        id: 'complaint-investigation-demo',
+        type: 'Complaint Investigation',
+        status: 'completed',
+        progress: 100,
+        startedAt: new Date(Date.now() - 7200000).toISOString(), // 2 hours ago
+        completedAt: new Date(Date.now() - 1800000).toISOString(), // 30 minutes ago
+        currentStep: 'Completed',
+        assignee: 'Compliance Officer',
+        priority: 'medium',
+        input: {
+          complaintId: 'COMP-001',
+          priority: 2
+        }
+      },
+      {
+        id: 'violation-appeal-demo',
+        type: 'Violation Appeal',
+        status: 'pending',
+        progress: 25,
+        startedAt: new Date(Date.now() - 1800000).toISOString(), // 30 minutes ago
+        currentStep: 'Document Review',
+        assignee: 'Legal Department',
+        priority: 'low',
+        input: {
+          appealId: 'APPEAL-001'
+        }
       }
     ];
     
@@ -76,8 +132,8 @@ module.exports = async function handler(req, res) {
   }
 };
 
-function calculateProgress(workflow) {
-  switch (workflow.status.name) {
+function calculateProgress(status) {
+  switch (status.toUpperCase()) {
     case 'RUNNING': return 50;
     case 'COMPLETED': return 100;
     case 'FAILED':
@@ -87,8 +143,8 @@ function calculateProgress(workflow) {
   }
 }
 
-function getCurrentStep(workflow) {
-  switch (workflow.status.name) {
+function getCurrentStep(status) {
+  switch (status.toUpperCase()) {
     case 'RUNNING': return 'In Progress';
     case 'COMPLETED': return 'Completed';
     case 'FAILED': return 'Failed';
@@ -98,15 +154,29 @@ function getCurrentStep(workflow) {
 }
 
 function extractAssignee(workflow) {
-  if (workflow.memo && workflow.memo.assignee) {
-    return workflow.memo.assignee;
+  // Try to extract assignee from workflow input or use defaults
+  if (workflow.input && workflow.input.applicantName) {
+    return 'Processing Department';
+  }
+  if (workflow.workflowType && workflow.workflowType.includes('TVR')) {
+    return 'Planning Department';
+  }
+  if (workflow.workflowType && workflow.workflowType.includes('Complaint')) {
+    return 'Compliance Officer';
+  }
+  if (workflow.workflowType && workflow.workflowType.includes('Appeal')) {
+    return 'Legal Department';
   }
   return 'Unassigned';
 }
 
 function extractPriority(workflow) {
-  if (workflow.memo && workflow.memo.priority) {
-    return workflow.memo.priority;
+  // Try to extract priority from workflow input
+  if (workflow.input && workflow.input.priority) {
+    return workflow.input.priority === 1 ? 'high' : workflow.input.priority === 2 ? 'medium' : 'low';
+  }
+  if (workflow.workflowType && workflow.workflowType.includes('TVR')) {
+    return 'high';
   }
   return 'medium';
 }
