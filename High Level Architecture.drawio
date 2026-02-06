@@ -1,0 +1,58 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.0.3 Chrome/140.0.7339.249 Electron/38.7.0 Safari/537.36" version="29.0.3">
+  <diagram name="STR Platform - EPIC/KFR View" id="WhL54dCm4RK7H4dkMl2Q">
+    <mxGraphModel dx="1106" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="oi_H4Z9Wd_s1egrpWq6z-2" value="Trust Boundary: Public Zone" style="shape=rectangle;strokeColor=#9673A6;fillColor=none;rounded=1;fontStyle=1;verticalAlign=top;align=center;spacingLeft=10;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="18" y="116" width="560" height="380" as="geometry" />
+        </mxCell>
+        <mxCell id="oi_H4Z9Wd_s1egrpWq6z-3" value="Trust Boundary: DMZ / Access Zone" style="shape=rectangle;strokeColor=#9673A6;fillColor=none;rounded=1;fontStyle=1;verticalAlign=top;align=center;spacingLeft=10;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="597" y="96" width="560" height="424" as="geometry" />
+        </mxCell>
+        <mxCell id="oi_H4Z9Wd_s1egrpWq6z-4" value="Trust Boundary: Secure App Zone" style="shape=rectangle;strokeColor=#9673A6;fillColor=none;rounded=1;fontStyle=1;verticalAlign=top;align=center;spacingLeft=10;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1178" y="96" width="452" height="424" as="geometry" />
+        </mxCell>
+        <mxCell id="oi_H4Z9Wd_s1egrpWq6z-5" value="Trust Boundary: Restricted Data Zone" style="shape=rectangle;strokeColor=#9673A6;fillColor=none;rounded=1;fontStyle=1;verticalAlign=top;align=center;spacingLeft=10;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="637" y="539" width="452" height="460" as="geometry" />
+        </mxCell>
+        <mxCell id="oi_H4Z9Wd_s1egrpWq6z-6" value="Trust Boundary: Observability" style="shape=rectangle;strokeColor=#9673A6;fillColor=none;rounded=1;fontStyle=1;verticalAlign=top;align=center;spacingLeft=10;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="18" y="516" width="560" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="oi_H4Z9Wd_s1egrpWq6z-7" value="Owners/Hosts/Agents (EPIC-PUBLIC KFR-5A)" style="rounded=1;fillColor=#FFF2CC;strokeColor=#D6B656" vertex="1" parent="1">
+          <mxGeometry x="38" y="156" width="250" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="oi_H4Z9Wd_s1egrpWq6z-8" value="Hosting Platforms (EPIC-HPR KFR-3A)" style="rounded=1;fillColor=#FFF2CC;strokeColor=#D6B656" vertex="1" parent="1">
+          <mxGeometry x="308" y="156" width="250" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="oi_H4Z9Wd_s1egrpWq6z-9" value="Public Portal &amp; Registry (KFR-5A/5B)&#xa;Complaint Intake (KFR-5C/5D)&#xa;Guided Help/Chatbot (KFR-5E/5F)" style="rounded=1;fillColor=#FFF2CC;strokeColor=#D6B656;whiteSpace=wrap" vertex="1" parent="1">
+          <mxGeometry x="38" y="246" width="520" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="oi_H4Z9Wd_s1egrpWq6z-10" value="WAF / Reverse Proxy" style="rounded=1;fillColor=#FCE4D6;strokeColor=#D79B00" vertex="1" parent="1">
+          <mxGeometry x="628" y="136" width="230" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="oi_H4Z9Wd_s1egrpWq6z-11" value="API Gateway" style="rounded=1;fillColor=#FCE4D6;strokeColor=#D79B00" vertex="1" parent="1">
+          <mxGeometry x="898" y="136" width="230" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="oi_H4Z9Wd_s1egrpWq6z-12" value="Controlled Crawling Enclave&#xa;Apify (Crawlee + Playwright) (KFR-2A/2C)&#xa;De-dup via OpenSearch" style="rounded=1;fillColor=#FCE4D6;strokeColor=#D79B00;whiteSpace=wrap" vertex="1" parent="1">
+          <mxGeometry x="628" y="226" width="500" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="oi_H4Z9Wd_s1egrpWq6z-13" value="EPIC-REG: Registration &amp; Renewal (KFR-1A..1L)&#xa;.NET/Spring APIs&#xa;Rules Engine&#xa;Payments Adapter" style="rounded=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontStyle=1;whiteSpace=wrap" vertex="1" parent="1">
+          <mxGeometry x="1198" y="136" width="400" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="oi_H4Z9Wd_s1egrpWq6z-14" value="EPIC-ENF: Compliance &amp; Enforcement (KFR-2A..2N)&#xa;Case Mgmt (Camunda/Temporal)&#xa;Notice/Fine Engine" style="rounded=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontStyle=1;whiteSpace=wrap" vertex="1" parent="1">
+          <mxGeometry x="1198" y="306" width="400" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="oi_H4Z9Wd_s1egrpWq6z-15" value="PostgreSQL + PostGIS&#xa;Registrations, cases, audit digests" style="rounded=1;fillColor=#F8CECC;strokeColor=#B85450;whiteSpace=wrap" vertex="1" parent="1">
+          <mxGeometry x="714" y="636" width="301" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="oi_H4Z9Wd_s1egrpWq6z-16" value="MinIO (S3) WORM/Retention&#xa;Evidence: screenshots, HTML, PDFs" style="rounded=1;fillColor=#F8CECC;strokeColor=#B85450;whiteSpace=wrap" vertex="1" parent="1">
+          <mxGeometry x="712" y="771" width="300" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="oi_H4Z9Wd_s1egrpWq6z-17" style="endArrow=block;strokeColor=#666666" edge="1" parent="1" source="oi_H4Z9Wd_s1egrpWq6z-9" target="oi_H4Z9Wd_s1egrpWq6z-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

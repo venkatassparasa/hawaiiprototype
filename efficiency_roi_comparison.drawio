@@ -1,0 +1,70 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Before vs After">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- BEFORE container -->
+        <mxCell id="before" value="BEFORE: Manual Process (&gt; 30 Mins)" style="swimlane;fillColor=#fbe9e7;strokeColor=#bf360c;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="20" y="20" width="420" height="460" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="epic_before" value="EPIC (Permits)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="before">
+          <mxGeometry x="20" y="60" width="160" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="rpt_before" value="RPT (Taxes)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="before">
+          <mxGeometry x="20" y="130" width="160" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ias_before" value="iaSWorld (Specs)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="before">
+          <mxGeometry x="20" y="200" width="160" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="staff" value="Frustrated Staff" style="rounded=1;fillColor=#fff3e0;whiteSpace=wrap;html=1;" vertex="1" parent="before">
+          <mxGeometry x="220" y="120" width="160" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="result1" value="&gt; 30 Mins / Application" style="rounded=1;fillColor=#ffebee;whiteSpace=wrap;html=1;" vertex="1" parent="before">
+          <mxGeometry x="220" y="220" width="160" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- AFTER container -->
+        <mxCell id="after" value="AFTER: Our Platform (&gt; 80% Faster)" style="swimlane;fillColor=#e8f5e9;strokeColor=#1b5e20;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="480" y="20" width="460" height="460" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="epic_after" value="EPIC" style="rounded=1;" vertex="1" parent="after">
+          <mxGeometry x="20" y="60" width="120" height="40" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="rpt_after" value="RPT" style="rounded=1;" vertex="1" parent="after">
+          <mxGeometry x="160" y="60" width="120" height="40" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ias_after" value="iaSWorld" style="rounded=1;" vertex="1" parent="after">
+          <mxGeometry x="300" y="60" width="120" height="40" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="engine" value="Verification Engine" style="rounded=1;fillColor=#e1f5fe;strokeColor=#01579b;strokeWidth=2;" vertex="1" parent="after">
+          <mxGeometry x="150" y="140" width="180" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="dashboard" value="Compliance Dashboard" style="rounded=1;fillColor=#e1f5fe;strokeColor=#01579b;strokeWidth=2;" vertex="1" parent="after">
+          <mxGeometry x="150" y="230" width="180" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="result2" value="&gt; 80% Time Savings" style="rounded=1;fillColor=#e8f5e9;" vertex="1" parent="after">
+          <mxGeometry x="150" y="320" width="180" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- Cross result arrow -->
+        <mxCell id="gain" value="Significant Efficiency Gain" style="dashed=1;endArrow=classic;" edge="1" parent="1" source="result1" target="result2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

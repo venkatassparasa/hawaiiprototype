@@ -1,0 +1,91 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.0.3 Chrome/140.0.7339.249 Electron/38.7.0 Safari/537.36" version="29.0.3">
+  <diagram name="Threat Model – Solution Architecture (Slide 15)" id="qgPmL618OjoHZMyIVZX7">
+    <mxGraphModel dx="1475" dy="1016" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="at7nixOtcY6ibLLE5u0G-25" value="" style="group;align=left;rounded=0;" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="95" y="61" width="1440" height="830" as="geometry" />
+        </mxCell>
+        <mxCell id="at7nixOtcY6ibLLE5u0G-1" value="Threat Model – Solution Architecture" style="text;whiteSpace=wrap;html=1;fontSize=24;fontStyle=1;align=left;" vertex="1" parent="at7nixOtcY6ibLLE5u0G-25">
+          <mxGeometry x="-2" width="1200" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="at7nixOtcY6ibLLE5u0G-2" value="Public Internet (Trust Boundary)" style="swimlane;fontStyle=1;startSize=28;horizontal=0;fillColor=#f5f5f5;strokeColor=#005493;" vertex="1" parent="at7nixOtcY6ibLLE5u0G-25">
+          <mxGeometry y="60" width="360" height="650" as="geometry" />
+        </mxCell>
+        <mxCell id="at7nixOtcY6ibLLE5u0G-3" value="Users&#xa;• Staff Portal&#xa;• Public Portal&#xa;• Hosting Platforms" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#005493;fillColor=#eaeaea;fontStyle=1;" vertex="1" parent="at7nixOtcY6ibLLE5u0G-2">
+          <mxGeometry x="42" y="40" width="300" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="at7nixOtcY6ibLLE5u0G-4" value="External Systems&#xa;• EnerGov (EPIC)&#xa;• RPT / iaSWorld&#xa;• ArcGIS&#xa;• Payments" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#005493;fillColor=#eaeaea;fontStyle=1;" vertex="1" parent="at7nixOtcY6ibLLE5u0G-2">
+          <mxGeometry x="40" y="513" width="300" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="at7nixOtcY6ibLLE5u0G-5" value="Edge: Azure Front Door / DNS / WAF" style="swimlane;fontStyle=1;startSize=28;horizontal=0;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="at7nixOtcY6ibLLE5u0G-25">
+          <mxGeometry x="360" y="60" width="360" height="650" as="geometry" />
+        </mxCell>
+        <mxCell id="at7nixOtcY6ibLLE5u0G-6" value="Azure Front Door&#xa;TLS 1.2+ / WAF / DDoS" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#005493;fillColor=#eaeaea;fontStyle=1;" vertex="1" parent="at7nixOtcY6ibLLE5u0G-5">
+          <mxGeometry x="42" y="80" width="300" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="at7nixOtcY6ibLLE5u0G-7" value="Azure Entra ID + MFA (Auth)" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#005493;fillColor=#eaeaea;fontStyle=1;" vertex="1" parent="at7nixOtcY6ibLLE5u0G-5">
+          <mxGeometry x="39" y="209" width="300" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="at7nixOtcY6ibLLE5u0G-8" value="App Tier: Services &amp; APIs" style="swimlane;fontStyle=1;startSize=28;horizontal=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="at7nixOtcY6ibLLE5u0G-25">
+          <mxGeometry x="720" y="60" width="360" height="650" as="geometry" />
+        </mxCell>
+        <mxCell id="at7nixOtcY6ibLLE5u0G-9" value="Application Services&#xa;• Platform Service&#xa;• Compliance Service&#xa;• Ordinance Service" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#005493;fillColor=#eaeaea;fontStyle=1;" vertex="1" parent="at7nixOtcY6ibLLE5u0G-8">
+          <mxGeometry x="47" y="59" width="300" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="at7nixOtcY6ibLLE5u0G-10" value="Azure Service Bus (Optional)" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#005493;fillColor=#eaeaea;fontStyle=1;" vertex="1" parent="at7nixOtcY6ibLLE5u0G-8">
+          <mxGeometry x="44" y="273" width="300" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="at7nixOtcY6ibLLE5u0G-11" value="Azure Monitor / Activity Logs" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#005493;fillColor=#eaeaea;fontStyle=1;" vertex="1" parent="at7nixOtcY6ibLLE5u0G-8">
+          <mxGeometry x="44" y="397" width="300" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="at7nixOtcY6ibLLE5u0G-12" value="Data Tier: DB / Blobs / Keys" style="swimlane;fontStyle=1;startSize=28;horizontal=0;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="at7nixOtcY6ibLLE5u0G-25">
+          <mxGeometry x="1080" y="60" width="360" height="650" as="geometry" />
+        </mxCell>
+        <mxCell id="at7nixOtcY6ibLLE5u0G-13" value="PostgreSQL (per service)" style="shape=process;rounded=1;whiteSpace=wrap;html=1;strokeColor=#005493;fillColor=#eaeaea;fontStyle=1;" vertex="1" parent="at7nixOtcY6ibLLE5u0G-12">
+          <mxGeometry x="48" y="76" width="300" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="at7nixOtcY6ibLLE5u0G-14" value="Azure Key Vault (Secrets/Keys)" style="shape=process;rounded=1;whiteSpace=wrap;html=1;strokeColor=#005493;fillColor=#eaeaea;fontStyle=1;" vertex="1" parent="at7nixOtcY6ibLLE5u0G-12">
+          <mxGeometry x="48" y="201" width="300" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="at7nixOtcY6ibLLE5u0G-15" value="Azure Blob Storage (Evidence, Docs)" style="shape=process;rounded=1;whiteSpace=wrap;html=1;strokeColor=#005493;fillColor=#eaeaea;fontStyle=1;" vertex="1" parent="at7nixOtcY6ibLLE5u0G-12">
+          <mxGeometry x="51" y="377" width="300" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="at7nixOtcY6ibLLE5u0G-16" style="endArrow=block;strokeColor=#005493;strokeWidth=2;" edge="1" parent="at7nixOtcY6ibLLE5u0G-25" source="at7nixOtcY6ibLLE5u0G-3" target="at7nixOtcY6ibLLE5u0G-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="at7nixOtcY6ibLLE5u0G-17" style="endArrow=block;strokeColor=#005493;strokeWidth=2;" edge="1" parent="at7nixOtcY6ibLLE5u0G-25" source="at7nixOtcY6ibLLE5u0G-6" target="at7nixOtcY6ibLLE5u0G-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="at7nixOtcY6ibLLE5u0G-18" style="endArrow=block;dashed=1;dashPattern=8 4;strokeColor=#005493;strokeWidth=2;" edge="1" parent="at7nixOtcY6ibLLE5u0G-25" source="at7nixOtcY6ibLLE5u0G-7" target="at7nixOtcY6ibLLE5u0G-9">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="900" y="300" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="at7nixOtcY6ibLLE5u0G-19" style="endArrow=block;strokeColor=#005493;strokeWidth=2;" edge="1" parent="at7nixOtcY6ibLLE5u0G-25" source="at7nixOtcY6ibLLE5u0G-9" target="at7nixOtcY6ibLLE5u0G-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="at7nixOtcY6ibLLE5u0G-20" style="endArrow=block;dashed=1;dashPattern=8 4;strokeColor=#005493;strokeWidth=2;" edge="1" parent="at7nixOtcY6ibLLE5u0G-25" source="at7nixOtcY6ibLLE5u0G-9" target="at7nixOtcY6ibLLE5u0G-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="at7nixOtcY6ibLLE5u0G-21" style="endArrow=block;strokeColor=#005493;strokeWidth=2;" edge="1" parent="at7nixOtcY6ibLLE5u0G-25" source="at7nixOtcY6ibLLE5u0G-9" target="at7nixOtcY6ibLLE5u0G-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="at7nixOtcY6ibLLE5u0G-22" style="endArrow=block;strokeColor=#005493;strokeWidth=2;" edge="1" parent="at7nixOtcY6ibLLE5u0G-25" source="at7nixOtcY6ibLLE5u0G-4" target="at7nixOtcY6ibLLE5u0G-9">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="585" y="479" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="at7nixOtcY6ibLLE5u0G-23" value="Legend&#xa;• Solid arrows: HTTPS (TLS 1.2+) data flow&#xa;• Dashed arrows: AuthZ/AuthN tokens / secrets access&#xa;• Swimlanes = Trust Boundaries" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#666666;fillColor=#f5f5f5;align=left;fontColor=#333333;fontStyle=1" vertex="1" parent="at7nixOtcY6ibLLE5u0G-25">
+          <mxGeometry x="1080" y="730" width="360" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="at7nixOtcY6ibLLE5u0G-24" value="STRIDE Highlights&#xa;• Spoofing: Phishing/session theft → Entra ID + MFA, conditional access&#xa;• Tampering: Req/resp, data-at-rest → TLS 1.2+, RBAC, signed webhooks, enc @ rest&#xa;• Repudiation: Action denial → Azure Monitor + Activity Logs (immutable/retained)&#xa;• Info Disclosure: PII/evidence → least privilege, masking, private endpoints, Key Vault&#xa;• DoS: Edge/App/DB → Front Door WAF/DDoS, autoscale, optional queue buffering&#xa;• EoP: Role bypass → RBAC per env, workload identities, secure SDLC" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#6c8ebf;fillColor=#dae8fc;align=left;fontStyle=1" vertex="1" parent="at7nixOtcY6ibLLE5u0G-25">
+          <mxGeometry y="730" width="1050" height="100" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
