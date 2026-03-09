@@ -1,0 +1,242 @@
+# Terraform variables configuration for Hawaii TVR Compliance Dashboard
+# Copy this file to terraform.tfvars and update with your values
+
+# Azure Configuration
+azure_region = "West US 2"
+environment = "dev"
+app_service_plan_sku = "B1"
+
+# Crawler API Configuration
+crawler_api_url = "https://crawler-api.hawaiicounty.gov"
+crawler_api_key = "your-crawler-api-key-here"
+
+# Temporal Configuration
+enable_temporal = true
+temporal_version = "v1.20.0"
+temporal_ui_version = "v2.20.0"
+temporal_namespace = "default"
+temporal_history_shards = 4
+
+# Temporal Service Scaling
+temporal_min_replicas = 1
+temporal_max_replicas = 3
+temporal_worker_min_replicas = 1
+temporal_worker_max_replicas = 5
+
+# Temporal Service Resources
+temporal_frontend_cpu = "0.5"
+temporal_frontend_memory = "1Gi"
+temporal_history_cpu = "1.0"
+temporal_history_memory = "2Gi"
+temporal_matching_cpu = "0.5"
+temporal_matching_memory = "1Gi"
+temporal_worker_cpu = "0.5"
+temporal_worker_memory = "1Gi"
+temporal_ui_cpu = "0.25"
+temporal_ui_memory = "512Mi"
+
+# PostgreSQL Configuration for Temporal
+postgresql_version = "14"
+postgresql_admin_login = "temporaladmin"
+postgresql_storage_mb = 32768
+postgresql_sku = "B_Standard_B2ms"
+postgresql_backup_retention_days = 7
+postgresql_geo_redundant_backup = false
+postgresql_ha_mode = "ZoneRedundant"
+postgresql_maintenance_day = 0
+postgresql_maintenance_hour = 2
+postgresql_maintenance_minute = 0
+
+# Container Registry Configuration
+container_registry_sku = "Basic"
+
+# Monitoring and Alerts
+alert_email = "admin@hawaiicounty.gov"
+
+# Network Configuration
+vnet_address_space = ["10.0.0.0/16"]
+public_subnet_address_prefixes = ["10.0.1.0/24"]
+private_subnet_address_prefixes = ["10.0.2.0/24"]
+database_subnet_address_prefixes = ["10.0.3.0/24"]
+
+# Storage Configuration
+storage_account_tier = "Standard"
+storage_account_replication_type = "LRS"
+
+# Cosmos DB Configuration
+cosmos_db_offer_type = "Standard"
+cosmos_db_kind = "MongoDB"
+cosmos_db_consistency_level = "Session"
+cosmos_db_max_throughput = 4000
+
+# Redis Configuration
+redis_capacity = 1
+redis_family = "C"
+redis_sku = "Standard"
+
+# Application Gateway Configuration
+application_gateway_sku = "WAF_v2"
+application_gateway_tier = "WAF"
+application_gateway_capacity = 2
+enable_waf = true
+waf_mode = "Detection"
+waf_rule_set_type = "OWASP"
+waf_rule_set_version = "3.2"
+
+# Log Analytics Configuration
+log_analytics_sku = "PerGB2018"
+log_retention_days = 30
+
+# SSL Configuration
+ssl_certificate_name = "hawaiicounty-gov-ssl"
+ssl_certificate_path = "./ssl/hawaiicounty-gov.crt"
+ssl_key_path = "./ssl/hawaiicounty-gov.key"
+
+# Custom Domain Configuration
+custom_domain_name = "dashboard.hawaiicounty.gov"
+enable_custom_domain = false
+
+# Auto Scaling Configuration
+enable_auto_scale = true
+min_instances = 1
+max_instances = 5
+
+# Backup Configuration
+enable_backup = true
+backup_retention_days = 30
+backup_retention_count = 10
+
+# CDN Configuration
+enable_cdn = false
+cdn_sku = "Standard_AzureFrontDoor"
+
+# Feature Flags
+enable_monitoring = true
+enable_application_insights = true
+enable_log_analytics = true
+enable_key_vault = true
+enable_private_endpoints = false
+enable_dns_zone = false
+
+# Performance Configuration
+enable_auto_heal = true
+enable_local_cache = true
+enable_session_affinity = false
+
+# Security Configuration
+enable_https_only = true
+enable_client_certificate = false
+enable_identity = false
+
+# Database Configuration
+database_consistency_level = "Session"
+database_max_throughput = 4000
+
+# Performance Tuning
+enable_auto_tune = true
+enable_performance_monitoring = true
+
+# Development Configuration
+enable_development_mode = false
+enable_debug_mode = false
+
+# Integration Configuration
+enable_crawler_integration = true
+enable_temporal_integration = true
+enable_email_notifications = true
+enable_sms_notifications = false
+
+# File Upload Configuration
+max_file_size_mb = 10
+allowed_file_types = ["jpg", "jpeg", "png", "pdf", "doc", "docx"]
+
+# Session Configuration
+session_timeout_minutes = 30
+enable_session_persistence = true
+
+# Email Configuration
+smtp_host = "smtp.hawaiicounty.gov"
+smtp_port = 587
+smtp_username = "dashboard@hawaiicounty.gov"
+smtp_password = "your-smtp-password"
+smtp_from_email = "noreply@hawaiicounty.gov"
+smtp_from_name = "Hawaii TVR Dashboard"
+
+# SMS Configuration (optional)
+sms_provider = "twilio"
+sms_account_sid = "your-twilio-account-sid"
+sms_auth_token = "your-twilio-auth-token"
+sms_from_number = "+1234567890"
+
+# API Configuration
+api_rate_limit_requests_per_minute = 1000
+api_timeout_seconds = 30
+enable_api_caching = true
+
+# Frontend Configuration
+frontend_timeout_seconds = 60
+enable_frontend_caching = true
+frontend_cache_ttl_seconds = 300
+
+# Backend Configuration
+backend_timeout_seconds = 120
+enable_backend_caching = true
+backend_cache_ttl_seconds = 600
+
+# Error Handling Configuration
+enable_error_logging = true
+enable_error_notifications = true
+error_notification_threshold = 5
+
+# Health Check Configuration
+health_check_interval_seconds = 30
+health_check_timeout_seconds = 10
+health_check_unhealthy_threshold = 3
+
+# Maintenance Configuration
+maintenance_mode_enabled = false
+maintenance_message = "System is under maintenance. Please try again later."
+
+# Testing Configuration
+enable_testing_mode = false
+test_data_enabled = false
+
+# Compliance Configuration
+enable_audit_logging = true
+audit_log_retention_days = 365
+enable_gdpr_compliance = true
+enable_hipaa_compliance = false
+
+# Cost Management Configuration
+cost_management_enabled = true
+budget_alert_threshold = 0.8
+monthly_budget_amount = 1000
+
+# Disaster Recovery Configuration
+enable_geo_redundancy = false
+enable_backup_replication = false
+recovery_point_objective_minutes = 60
+
+# Multi-Region Configuration (optional)
+enable_multi_region = false
+secondary_region = "East US"
+enable_active_active = false
+
+# CI/CD Configuration
+enable_ci_cd = false
+github_repo_url = "https://github.com/hawaii-county/tvr-dashboard"
+github_branch = "main"
+enable_auto_deployment = false
+
+# Tags for all resources
+tags = {
+    Environment = "dev"
+    Project = "hawaii-tvr-dashboard"
+    Department = "Planning and Permitting"
+    CostCenter = "TVR-001"
+    Owner = "IT Department"
+    ManagedBy = "terraform"
+    CreatedBy = "hawaii-tvr-team"
+    Compliance = "internal"
+    DataClassification = "confidential"
+}

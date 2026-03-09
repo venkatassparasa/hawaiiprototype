@@ -1,0 +1,197 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: hawaii-tvr-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: hawaii-tvr-dashboard
+    volumes:
+      - mongodb_data:/data/db
+      - ./scripts/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - ./scripts/seed-data.js:/docker-entrypoint-initdb.d/seed-data.js:ro
+    networks:
+      - hawaii-tvr-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: hawaii-tvr-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --requirepass redis123
+    volumes:
+      - redis_data:/data
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    networks:
+      - hawaii-tvr-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Azure Blob Storage Emulator
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite:3.20.0
+    container_name: hawaii-tvr-azurite
+    restart: unless-stopped
+    ports:
+      - "10000:10000"  # Blob service
+      - "10001:10001"  # Queue service
+      - "10002:10002"  # Table service
+    environment:
+      AZURITE_ACCOUNTS: hawaiitvrdev:hawaiitvrkey123
+    volumes:
+      - azurite_data:/data
+    networks:
+      - hawaii-tvr-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:10000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Dashboard Backend API
+  dashboard-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend.dev
+    container_name: hawaii-tvr-dashboard-backend
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      MONGODB_URI: mongodb://admin:password123@mongodb:27017/hawaii-tvr-dashboard?authSource=admin
+      REDIS_URL: redis://:redis123@redis:6379
+      JWT_SECRET: dev-jwt-secret-key
+      CRAWLER_API_URL: http://crawler-api:3002
+      CRAWLER_API_KEY: dev-crawler-api-key
+      AZURE_STORAGE_CONNECTION_STRING: DefaultEndpointsProtocol=http;AccountName=hawaiitvrdev;AccountKey=hawaiitvrkey123;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;
+      AZURE_STORAGE_CONTAINER_NAME: dashboard-evidence
+      LOG_LEVEL: debug
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      azurite:
+        condition: service_healthy
+    networks:
+      - hawaii-tvr-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Dashboard Frontend
+  dashboard-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend.dev
+    container_name: hawaii-tvr-dashboard-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      REACT_APP_API_BASE_URL: http://localhost:3001
+      REACT_APP_CRAWLER_API_URL: http://localhost:3002
+      REACT_APP_CRAWLER_API_KEY: dev-crawler-api-key
+      CHOKIDAR_USEPOLLING: true
+      GENERATE_SOURCEMAP: true
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+      - /app/node_modules
+    depends_on:
+      - dashboard-backend
+    networks:
+      - hawaii-tvr-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: hawaii-tvr-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - dashboard-frontend
+      - dashboard-backend
+    networks:
+      - hawaii-tvr-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Development Tools
+  dev-tools:
+    image: adminer:latest
+    container_name: hawaii-tvr-adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: mongodb
+    depends_on:
+      - mongodb
+    networks:
+      - hawaii-tvr-network
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: hawaii-tvr-redis-commander
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    environment:
+      REDIS_HOSTS: local:redis:6379:0:redis123
+    depends_on:
+      - redis
+    networks:
+      - hawaii-tvr-network
+
+volumes:
+  mongodb_data:
+    driver: local
+  redis_data:
+    driver: local
+  azurite_data:
+    driver: local
+
+networks:
+  hawaii-tvr-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

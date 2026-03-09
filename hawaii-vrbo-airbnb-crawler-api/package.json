@@ -29,6 +29,7 @@
   "author": "Hawaii County Government",
   "license": "MIT",
   "dependencies": {
+    "@azure/storage-blob": "^12.17.0",
     "@temporalio/activity": "^1.14.1",
     "@temporalio/client": "^1.14.1",
     "@temporalio/common": "^1.14.1",

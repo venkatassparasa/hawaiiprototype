@@ -1,0 +1,78 @@
+# Terraform Variables Configuration Example
+# Copy this file to terraform.tfvars and update with your values
+
+# Azure Configuration
+azure_region = "West US 2"
+environment = "dev"
+
+# App Service Configuration
+app_service_plan_sku = "B1"
+
+# Apify Configuration (Required)
+apify_token = "your_apify_token_here"
+apify_user_id = "your_apify_user_id_here"
+
+# AWS Configuration (Optional - for S3 evidence storage)
+aws_access_key_id = "your_aws_access_key_id"
+aws_secret_access_key = "your_aws_secret_access_key"
+aws_region = "us-west-1"
+aws_s3_bucket = "hawaii-vr-evidence-prod"
+
+# Monitoring and Alerts
+alert_email = "admin@hawaiicounty.gov"
+
+# Network Configuration
+vnet_address_space = "10.0.0.0/16"
+application_gateway_subnet = "10.0.1.0/24"
+private_endpoint_subnet = "10.0.2.0/24"
+
+# Storage Configuration
+storage_account_tier = "Standard"
+storage_replication_type = "LRS"
+
+# Cosmos DB Configuration
+cosmos_db_throughput = 400
+cosmos_db_consistency_level = "Session"
+
+# Redis Configuration
+redis_capacity = 1
+redis_family = "C"
+redis_sku_name = "Basic"
+
+# Application Gateway Configuration
+application_gateway_capacity = 2
+application_gateway_sku = "Standard_v2"
+
+# Log Analytics Configuration
+log_retention_days = 30
+
+# Feature Flags
+enable_application_gateway = true
+enable_private_endpoints = true
+enable_monitoring = true
+enable_backup = false
+
+# Backup Configuration (if enable_backup = true)
+backup_retention_days = 30
+
+# Scaling Configuration
+enable_auto_scale = false
+min_instances = 1
+max_instances = 3
+
+# SSL/TLS Configuration
+enable_ssl = true
+ssl_certificate_name = ""
+
+# Custom Domain Configuration
+custom_domain = "crawler-api.hawaiicounty.gov"
+enable_custom_domain = false
+
+# Tags
+tags = {
+  Project     = "hawaii-vr-crawler"
+  ManagedBy   = "terraform"
+  Environment = "dev"
+  Department  = "Planning"
+  CostCenter  = "12345"
+}

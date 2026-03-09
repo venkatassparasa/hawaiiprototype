@@ -6,18 +6,19 @@ WORKDIR /app
 COPY package*.json ./
 COPY tsconfig.json ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Install dependencies with optimizations
+RUN npm config set registry https://registry.npmjs.org/ && \
+    npm install --production --no-audit --no-fund --loglevel=error
 
 # Copy source code
 COPY src/ ./src/
 
-# Install temporal CLI
-RUN npm install -g @temporalio/cli
+# Install temporal CLI globally (lighter version)
+RUN npm install -g @temporalio/cli --no-audit --no-fund --loglevel=error
 
 # Create non-root user
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S temporal -u 1001
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S temporal -u 1001
 
 USER temporal
 

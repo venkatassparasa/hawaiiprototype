@@ -1,5 +1,11 @@
-import { query } from '../config/database';
+import { Actor } from 'apify';
+import { RequestQueue } from 'apify/build/storages/request_queue';
+import { Dataset } from 'apify/build/storages/dataset';
+import { Property, IProperty } from '../models/Property';
+import { Violation, IViolation } from '../models/Violation';
 import { logger } from '../utils/logger';
+import { AzureStorageService } from './azureStorageService';
+import { ViolationDetector } from './ViolationDetector';
 
 export interface AirbnbListing {
   id: string;
