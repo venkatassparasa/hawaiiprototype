@@ -44,7 +44,8 @@ const NCUCList = () => {
                     <button className="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 flex items-center gap-2 text-sm font-medium">
                         <Download className="w-4 h-4" /> Export
                     </button>
-                    <button className="px-4 py-2 bg-hawaii-ocean text-white rounded-lg hover:bg-blue-800 flex items-center gap-2 text-sm font-medium">
+                    <button className="px-4 py-2 bg-hawaii-ocean text-white rounded-lg hover:bg-blue-800 flex items-center gap-2 text-sm font-medium"
+                    style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
                         + Issue New NCUC
                     </button>
                 </div>

@@ -644,6 +644,7 @@ const RegistrationForm = () => {
                     <button
                         onClick={handleNext}
                         className="px-6 py-3 bg-hawaii-ocean text-white rounded-lg font-medium hover:bg-blue-800 flex items-center gap-2"
+                        style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
                     >
                         Next
                         <ArrowRight className="w-4 h-4" />

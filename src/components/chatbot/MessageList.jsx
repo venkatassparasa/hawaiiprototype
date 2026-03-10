@@ -64,7 +64,8 @@ const MessageList = ({ messages, isTyping }) => {
             {message.sender === 'user' ? (
               <User className="w-4 h-4" />
             ) : (
-              <Bot className="w-4 h-4" />
+              // <Bot className="w-4 h-4" />
+              <img src="/chat_icon.png" alt="Chatbot Icon" className="w-8 h-8" />
             )}
           </div>
 

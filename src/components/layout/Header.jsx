@@ -8,7 +8,8 @@ const Header = ({ user, onLogout, onMenuToggle }) => {
     return (
         <header
             role="banner"
-            className="h-16 bg-white border-b border-slate-200 fixed top-0 right-0 left-0 lg:left-64 z-40 flex items-center justify-between px-4 md:px-8 shadow-sm"
+            style={{background: '#36A7AD 0% 0% no-repeat padding-box'}}
+            className="h-16 border-b border-slate-200 fixed top-0 right-0 left-0 lg:left-64 z-40 flex items-center justify-between px-4 md:px-8 shadow-sm"
         >
             <div className="flex items-center gap-4">
                 <button
@@ -48,8 +49,8 @@ const Header = ({ user, onLogout, onMenuToggle }) => {
                             className="flex items-center gap-3 pl-3 pr-2 py-1.5 hover:bg-slate-100 rounded-lg transition-colors"
                         >
                             <div className="text-right hidden md:block">
-                                <p className="text-sm font-medium text-slate-700">{user?.name || 'Jane Doe'}</p>
-                                <p className="text-xs text-slate-400">{user?.role || 'Enforcement Officer'}</p>
+                                <p className="text-sm font-medium text-slate-700 text-white">{user?.name || 'Jane Doe'}</p>
+                                <p className="text-xs text-slate-400 text-white">{user?.role || 'Enforcement Officer'}</p>
                             </div>
                             <div className="w-9 h-9 rounded-full bg-[#345b7e] flex items-center justify-center font-bold text-sm text-white">
                                 {user?.avatar || 'JD'}
@@ -107,6 +108,7 @@ const Header = ({ user, onLogout, onMenuToggle }) => {
                     <button
                         onClick={onLogout}
                         className="px-4 py-2 text-sm bg-hawaii-ocean text-white rounded-lg hover:bg-blue-800 transition-colors flex items-center gap-2"
+                        style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
                     >
                         <LogOut className="w-4 h-4" />
                         Login

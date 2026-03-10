@@ -12,10 +12,11 @@ const ChatButton = ({ isOpen, onToggle, unreadCount = 0 }) => {
           onClick={onToggle}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
-          className="relative flex items-center justify-center w-14 h-14 bg-hawaii-ocean text-white rounded-full shadow-lg hover:bg-blue-800 hover:shadow-xl transition-all duration-200 group"
+          className="relative flex items-center justify-center w-14 h-14 bg-white-50 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 group"
+          style={{ backgroundImage: 'url("/chat_icon.png")', backgroundPosition: 'center', backgroundSize: 'contain' }}
           aria-label="Open chat"
         >
-          <MessageCircle className="w-6 h-6" />
+          {/* <MessageCircle className="w-6 h-6" /> */}
           
           {/* Unread indicator */}
           {unreadCount > 0 && (

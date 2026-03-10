@@ -27,6 +27,13 @@ module.exports = async function handler(req, res) {
   }
 
   try {
+    if (process.env.TEMPORAL_ENABLED === 'false') {
+      return res.status(503).json({
+        workflows: [],
+        message: 'Temporal integration is disabled'
+      });
+    }
+
     const client = await getTemporalClient();
     const handle = client.workflow.list();
     const workflows = [];

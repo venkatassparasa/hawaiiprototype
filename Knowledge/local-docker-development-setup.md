@@ -783,6 +783,16 @@ docker-compose exec redis redis-cli -a redis123
 - **Backup Strategies** - Database backup procedures
 
 This updated guide provides everything needed for local development with the complete Temporal-enabled Hawaii TVR Compliance stack.
+LOG_LEVEL=warn
+```
+
+### Scaling Considerations
+```yaml
+# Production docker-compose.yml
+services:
+  crawler-api:
+    deploy:
+      replicas: 3
       update_config:
         parallelism: 1
         delay: 10s

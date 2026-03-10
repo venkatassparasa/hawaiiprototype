@@ -97,8 +97,9 @@ const ChatPanel = ({ isOpen, onClose, onMinimize }) => {
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-hawaii-ocean text-white rounded-t-lg">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-            <div className="w-4 h-4 bg-white rounded-sm"></div>
+          <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+            {/* <div className="w-4 h-4 bg-white rounded-sm"></div> */}
+            <img src="/chat_icon.png" alt="Chatbot Icon" className="w-12 h-12" />
           </div>
           <div>
             <h3 className="font-semibold">TVR/STR Assistant</h3>

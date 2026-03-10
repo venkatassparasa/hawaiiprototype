@@ -5,6 +5,39 @@ import { authMiddleware } from '../middleware/auth';
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /api/crawl/airbnb:
+ *   post:
+ *     summary: Start Airbnb crawl
+ *     tags: [Crawl]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               locations:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               maxListings:
+ *                 type: integer
+ *               checkIn:
+ *                 type: string
+ *                 format: date
+ *               checkOut:
+ *                 type: string
+ *                 format: date
+ *               guests:
+ *                 type: integer
+ *             required:
+ *               - locations
+ *     responses:
+ *       200:
+ *         description: Airbnb crawl started
+ */
 // POST /api/crawl/airbnb - Crawl Airbnb listings
 router.post('/airbnb', authMiddleware, async (req: Request, res: Response): Promise<Response> => {
   try {
@@ -49,6 +82,31 @@ router.post('/airbnb', authMiddleware, async (req: Request, res: Response): Prom
   }
 });
 
+/**
+ * @swagger
+ * /api/crawl/vrbo:
+ *   post:
+ *     summary: Start VRBO crawl
+ *     tags: [Crawl]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               locations:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               maxListings:
+ *                 type: integer
+ *             required:
+ *               - locations
+ *     responses:
+ *       200:
+ *         description: VRBO crawl started
+ */
 // POST /api/crawl/vrbo - Crawl VRBO listings
 router.post('/vrbo', authMiddleware, async (req: Request, res: Response): Promise<Response> => {
   try {
@@ -93,6 +151,31 @@ router.post('/vrbo', authMiddleware, async (req: Request, res: Response): Promis
   }
 });
 
+/**
+ * @swagger
+ * /api/crawl/all:
+ *   post:
+ *     summary: Start Airbnb and VRBO crawls
+ *     tags: [Crawl]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               locations:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               maxListings:
+ *                 type: integer
+ *             required:
+ *               - locations
+ *     responses:
+ *       200:
+ *         description: Both crawls started
+ */
 // POST /api/crawl/all - Crawl both platforms
 router.post('/all', authMiddleware, async (req: Request, res: Response): Promise<Response> => {
   try {
@@ -141,6 +224,24 @@ router.post('/all', authMiddleware, async (req: Request, res: Response): Promise
   }
 });
 
+/**
+ * @swagger
+ * /api/crawl/status/{jobId}:
+ *   get:
+ *     summary: Get crawl job status
+ *     tags: [Crawl]
+ *     parameters:
+ *       - in: path
+ *         name: jobId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Job status
+ *       404:
+ *         description: Job not found
+ */
 // GET /api/crawl/status/:jobId - Get crawl job status
 router.get('/status/:jobId', authMiddleware, async (req: Request, res: Response): Promise<Response> => {
   try {
@@ -185,6 +286,27 @@ router.get('/status/:jobId', authMiddleware, async (req: Request, res: Response)
   }
 });
 
+/**
+ * @swagger
+ * /api/crawl/history:
+ *   get:
+ *     summary: Get crawl history
+ *     tags: [Crawl]
+     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 50
+ *       - in: query
+ *         name: platform
+ *         schema:
+ *           type: string
+ *           enum: [all, airbnb, vrbo]
+ *     responses:
+ *       200:
+ *         description: Crawl history list
+ */
 // GET /api/crawl/history - Get crawl history
 router.get('/history', authMiddleware, async (req: Request, res: Response): Promise<Response> => {
   try {
@@ -220,6 +342,16 @@ router.get('/history', authMiddleware, async (req: Request, res: Response): Prom
   }
 });
 
+/**
+ * @swagger
+ * /api/crawl/statistics:
+ *   get:
+ *     summary: Get crawl statistics
+ *     tags: [Crawl]
+ *     responses:
+ *       200:
+ *         description: Aggregate crawl statistics
+ */
 // GET /api/crawl/statistics - Get crawl statistics
 router.get('/statistics', authMiddleware, async (req: Request, res: Response): Promise<Response> => {
   try {

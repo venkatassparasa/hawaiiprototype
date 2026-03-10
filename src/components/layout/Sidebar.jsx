@@ -93,30 +93,18 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
                 ></div>
             )}
 
-            <div className={`w-64 bg-[#345b7e] text-white flex flex-col h-screen fixed left-0 top-0 shadow-2xl z-50 transition-transform duration-300 lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            <div style={{background: 'transparent linear-gradient(180deg, #2D6065 0%, #19484D 100%) 0% 0% no-repeat padding-box'}} className={`w-64 text-white flex flex-col h-screen fixed left-0 top-0 shadow-2xl z-50 transition-transform duration-300 lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div className="p-6 flex flex-col items-center border-b border-white/10">
-                    <div className="w-full mb-2 relative h-12">
-                        {/* Layer 1: Original map portion (left side) - Adjusted to 35% width */}
+                    <div className="w-full mb-4 relative h-8 flex items-center justify-center gap-3">
                         <img
-                            src="/logo.png"
-                            alt=""
-                            className="absolute inset-0 w-full h-full object-contain"
-                            style={{ clipPath: 'inset(0 65% 0 0)' }}
+                            src="/h_logo.png"
+                            alt="County of Hawaii"
+                            className="h-32 w-32 object-contain filter sepia-[30%] saturate-150 brightness-110 contrast-105"
                         />
-                        {/* Layer 2: Inverted text portion (right side) - Adjusted to cover remaining 65% */}
-                        <img
-                            src="/logo.png"
-                            alt="County of Hawaii Planning Department"
-                            className="absolute inset-0 w-full h-full object-contain brightness-0 invert"
-                            style={{ clipPath: 'inset(0 0 0 35%)' }}
-                        />
-                    </div>
-                    <div className="text-center">
-                        <p className="text-[10px] font-bold text-white/50 uppercase tracking-[0.2em]">Compliance Matrix</p>
                     </div>
                 </div>
 
-                <nav className="flex-1 py-6 px-3 space-y-1 overflow-y-auto custom-scrollbar" aria-label="Main Navigation">
+                <nav className="flex-1 py-6 px-3 space-y-0 overflow-y-auto custom-scrollbar" aria-label="Main Navigation">
                     {navItems.map((item, idx) => (
                         item.header ? (
                             <p key={idx} className="px-4 pt-4 pb-2 text-[10px] font-bold text-white/40 uppercase tracking-widest">

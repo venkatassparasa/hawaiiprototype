@@ -37,7 +37,8 @@ const InspectionScheduler = () => {
                     <h1 className="text-2xl font-bold text-slate-800">Inspection Scheduler</h1>
                     <p className="text-slate-500">Schedule and manage property inspections</p>
                 </div>
-                <button className="px-6 py-3 bg-hawaii-ocean text-white rounded-lg font-medium hover:bg-blue-800">
+                <button className="px-6 py-3 bg-hawaii-ocean text-white rounded-lg font-medium hover:bg-blue-800"
+                style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
                     Schedule Inspection
                 </button>
             </div>
@@ -76,6 +77,7 @@ const InspectionScheduler = () => {
                             onClick={() => setViewMode('list')}
                             className={`px-4 py-2 rounded-lg font-medium ${viewMode === 'list' ? 'bg-hawaii-ocean text-white' : 'bg-slate-100 text-slate-600'
                                 }`}
+                                style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
                         >
                             List View
                         </button>

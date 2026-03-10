@@ -3,6 +3,10 @@ import { Clock, CheckCircle, AlertCircle, Pause, Play, RotateCcw, FileText, User
 import { useNavigate } from 'react-router-dom';
 import temporalService from '../../services/temporalService';
 
+const TEMPORAL_ENABLED =
+  typeof process !== 'undefined' &&
+  process.env.REACT_APP_TEMPORAL_ENABLED === 'true';
+
 const WorkflowDashboard = () => {
   const navigate = useNavigate();
   const [workflows, setWorkflows] = useState([]);
@@ -12,9 +16,13 @@ const WorkflowDashboard = () => {
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Load workflows from Temporal
+  // Load workflows from Temporal when enabled
   useEffect(() => {
-    loadWorkflows();
+    if (TEMPORAL_ENABLED) {
+      loadWorkflows();
+    } else {
+      setLoading(false);
+    }
   }, [filter]);
 
   const loadWorkflows = async () => {
@@ -26,8 +34,10 @@ const WorkflowDashboard = () => {
       setWorkflows(response.workflows || []);
       setError(null);
     } catch (err) {
-      console.error('Failed to load workflows:', err);
-      setError(err.message);
+      if (TEMPORAL_ENABLED) {
+        console.error('Failed to load workflows:', err);
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -114,6 +124,7 @@ const WorkflowDashboard = () => {
         <button 
           onClick={() => navigate('/workflows/new')}
           className="px-4 py-2 bg-hawaii-ocean text-white rounded-lg hover:bg-blue-800 transition-colors"
+          style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
         >
           New Workflow
         </button>

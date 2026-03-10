@@ -16,19 +16,13 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install all dependencies (including devDependencies)
-RUN npm ci && npm cache clean --force
+RUN npm install && npm cache clean --force
 
 # Copy source code
 COPY . .
 
 # Create necessary directories
-RUN mkdir -p logs uploads && \
-    chown -R node:node /app
-
-# Switch to non-root user
-RUN addgroup -g 1001 -S node && \
-    adduser -S node -u 1001
-USER node
+RUN mkdir -p logs uploads
 
 # Expose port
 EXPOSE 3000

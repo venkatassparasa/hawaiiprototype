@@ -42,6 +42,7 @@ const PropertiesList = () => {
                     <Link
                         to="/register"
                         className="px-4 py-2 bg-hawaii-ocean text-white rounded-lg hover:bg-blue-800 flex items-center gap-2 text-sm font-medium shadow-sm"
+                        style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
                     >
                         + Register New
                     </Link>

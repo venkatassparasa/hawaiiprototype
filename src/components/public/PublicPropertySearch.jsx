@@ -58,6 +58,7 @@ const PublicPropertySearch = () => {
                     <button
                         type="submit"
                         className="px-8 py-5 bg-hawaii-ocean text-white rounded-xl font-bold hover:bg-blue-800 transition-all shadow-lg active:scale-95"
+                            style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
                     >
                         Search
                     </button>

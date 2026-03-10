@@ -81,13 +81,13 @@ const Login = ({ onLogin }) => {
                 <div className="bg-white rounded-2xl shadow-2xl p-4 space-y-3">
 
                     {/* Header */}
-                    <div className="text-center space-y-">
+                    <div className="text-center space-y-4">
                         <div className="flex justify-center">
-                            <div className="w-full max-w-[280px] px-2 py-4 bg-white/5 rounded-xl border border-slate-100/50">
+                            <div className="w-full max-w-[280px] px-4 py-6 bg-white rounded-xl border border-slate-200 shadow-lg">
                                 <img
-                                    src="/logo.png"
+                                    src="/h_logo.png"
                                     alt="County of Hawaii Planning Department"
-                                    className="w-full h-auto"
+                                    className="w-full h-auto object-contain filter invert brightness-110"
                                 />
                             </div>
                         </div>

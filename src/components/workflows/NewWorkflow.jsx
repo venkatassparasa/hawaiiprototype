@@ -606,6 +606,7 @@ const NewWorkflow = () => {
               onClick={handleNext}
               disabled={!isStepValid()}
               className="px-4 py-2 bg-hawaii-ocean text-white rounded-lg hover:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
             >
               Next
             </button>

@@ -206,7 +206,7 @@ const ReportBuilder = () => {
               </>
             ) : (
               <>
-                <Save className="w-4 h-4" />
+                <Save className="w-4 h-4" style={{background: '#4D7833 0% 0% no-repeat padding-box'}}/>
                 {isEditing ? 'Update' : 'Save'} Report
               </>
             )}

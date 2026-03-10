@@ -3,7 +3,7 @@ import { Scale, ShieldCheck, AlertTriangle, FileText, Clock, ArrowRight } from '
 
 const LegalOverview = () => {
     return (
-        <div className="space-y-6 animate-fade-in">
+        <div className="space-y-6 animate-fade-in" >
             <div className="flex justify-between items-center">
                 <h2 className="text-xl font-bold text-slate-800">Legal & Enforcement Overview</h2>
                 <div className="px-4 py-2 bg-red-50 text-red-700 rounded-full border border-red-100 flex items-center gap-2">

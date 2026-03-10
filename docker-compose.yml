@@ -51,7 +51,7 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: temporal
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: temporal
       POSTGRES_DB: temporal
     volumes:
@@ -73,13 +73,14 @@ services:
       - "7233:7233"  # gRPC
       - "8233:8233"  # HTTP
     environment:
-      - DB=postgresql
-      - DB_PORT=5432
-      - DB_USER=temporal
+      - DB=postgres12
+      - DB_USER=postgres
       - DB_PASSWORD=temporal
       - DB_HOST=postgres
+      - DB_PORT=5432
       - DB_NAME=temporal
       - DEFAULT_NAMESPACE=default
+      - POSTGRES_SEEDS=postgres
     depends_on:
       postgres:
         condition: service_healthy
@@ -100,9 +101,10 @@ services:
       - "8088:8088"
     environment:
       - TEMPORAL_ADDRESS=temporal:7233
-      - TEMPORAL_PORT=7233
+      - TEMPORAL_UI_PORT=8088
     depends_on:
-      - temporal
+      temporal:
+        condition: service_healthy
     networks:
       - hawaii-tvr-network
     healthcheck:
@@ -167,16 +169,13 @@ services:
       MONGODB_URI: mongodb://admin:password123@mongodb:27017/hawaii-tvr-dashboard?authSource=admin
       REDIS_URL: redis://:redis123@redis:6379
       JWT_SECRET: dev-jwt-secret-key
-      CRAWLER_API_URL: http://crawler-api:3002
+      CRAWLER_API_URL: http://crawler-api:3000
       CRAWLER_API_KEY: dev-crawler-api-key
       TEMPORAL_ADDRESS: temporal:7233
       TEMPORAL_NAMESPACE: default
       AZURE_STORAGE_CONNECTION_STRING: DefaultEndpointsProtocol=http;AccountName=hawaiitvrdev;AccountKey=hawaiitvrkey123;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;
       AZURE_STORAGE_CONTAINER_NAME: dashboard-evidence
       LOG_LEVEL: debug
-    volumes:
-      - .:/app
-      - /app/node_modules
     depends_on:
       postgres:
         condition: service_healthy
@@ -190,6 +189,33 @@ services:
       timeout: 10s
       retries: 3
 
+  # Crawler API (Apify-backed VRBO/Airbnb crawler)
+  crawler-api:
+    build:
+      context: ./hawaii-vrbo-airbnb-crawler-api
+      dockerfile: Dockerfile.dev
+    container_name: hawaii-tvr-crawler-api
+    restart: unless-stopped
+    ports:
+      - "3002:3000"
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      # Reuse shared MongoDB and Redis from main stack
+      MONGODB_URI: mongodb://admin:password123@mongodb:27017/hawaii-vr-crawler?authSource=admin
+      REDIS_URL: redis://:redis123@redis:6379
+      POSTGRES_URI: postgresql://postgres:temporal@postgres:5432/temporal
+      # Apify / auth can be wired for real later
+      APIFY_TOKEN: dev-apify-token
+      JWT_SECRET: dev-crawler-jwt-secret
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - hawaii-tvr-network
+
   # Dashboard Frontend
   dashboard-frontend:
     build:
@@ -198,23 +224,25 @@ services:
     container_name: hawaii-tvr-dashboard-frontend
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "5173:5173"
     environment:
       NODE_ENV: development
       REACT_APP_API_BASE_URL: http://localhost:3001
       REACT_APP_CRAWLER_API_URL: http://localhost:3002
       REACT_APP_CRAWLER_API_KEY: dev-crawler-api-key
       REACT_APP_TEMPORAL_ENABLED: true
+      REACT_APP_TEMPORAL_UI_URL: http://localhost:8088
       CHOKIDAR_USEPOLLING: true
       GENERATE_SOURCEMAP: true
-    volumes:
-      - ./src:/app/src
-      - ./public:/app/public
-      - /app/node_modules
+      HOST: 0.0.0.0
+      PORT: 5173
     depends_on:
       - dashboard-backend
     networks:
       - hawaii-tvr-network
+    volumes:
+      - .:/app
+      - /app/node_modules
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000"]
       interval: 30s

@@ -1,5 +1,9 @@
 import axios from 'axios';
 
+const TEMPORAL_ENABLED =
+  typeof process !== 'undefined' &&
+  process.env.REACT_APP_TEMPORAL_ENABLED === 'true';
+
 // Temporal API configuration
 const TEMPORAL_CONFIG = {
   // For Vercel deployment
@@ -35,6 +39,9 @@ class TemporalWorkflowService {
   // Workflow Management
   async listWorkflows(filters = {}) {
     try {
+      if (!TEMPORAL_ENABLED) {
+        return { workflows: [] };
+      }
       const response = await this.client.get('/workflows', { params: filters });
       return response.data;
     } catch (error) {
@@ -45,6 +52,9 @@ class TemporalWorkflowService {
 
   async getWorkflowDetails(workflowId) {
     try {
+      if (!TEMPORAL_ENABLED) {
+        throw new Error('Temporal integration is disabled');
+      }
       const response = await this.client.get(`/workflows/${workflowId}`);
       return response.data;
     } catch (error) {
@@ -55,6 +65,9 @@ class TemporalWorkflowService {
 
   async startWorkflow(workflowType, input, options = {}) {
     try {
+      if (!TEMPORAL_ENABLED) {
+        throw new Error('Temporal integration is disabled');
+      }
       const response = await this.client.post('/workflows/start', {
         workflowType,
         input,
@@ -69,6 +82,9 @@ class TemporalWorkflowService {
 
   async terminateWorkflow(workflowId, reason) {
     try {
+      if (!TEMPORAL_ENABLED) {
+        throw new Error('Temporal integration is disabled');
+      }
       const response = await this.client.post(`/workflows/${workflowId}/terminate`, {
         reason
       });
@@ -81,6 +97,9 @@ class TemporalWorkflowService {
 
   async signalWorkflow(workflowId, signalName, data) {
     try {
+      if (!TEMPORAL_ENABLED) {
+        throw new Error('Temporal integration is disabled');
+      }
       const response = await this.client.post(`/workflows/${workflowId}/signal`, {
         signalName,
         signalInput: data
@@ -94,6 +113,9 @@ class TemporalWorkflowService {
 
   async queryWorkflow(workflowId, queryType, args = {}) {
     try {
+      if (!TEMPORAL_ENABLED) {
+        throw new Error('Temporal integration is disabled');
+      }
       const response = await this.client.post(`/workflows/${workflowId}/query`, {
         queryName: queryType,
         queryInput: args
@@ -107,6 +129,9 @@ class TemporalWorkflowService {
 
   async getWorkflowHistory(workflowId) {
     try {
+      if (!TEMPORAL_ENABLED) {
+        throw new Error('Temporal integration is disabled');
+      }
       const response = await this.client.get(`/workflows/${workflowId}/history`);
       return response.data;
     } catch (error) {
@@ -118,6 +143,9 @@ class TemporalWorkflowService {
   // Task Queue Management
   async listTaskQueues() {
     try {
+      if (!TEMPORAL_ENABLED) {
+        return [];
+      }
       const response = await this.client.get('/task-queues');
       return response.data;
     } catch (error) {
@@ -129,6 +157,9 @@ class TemporalWorkflowService {
   // Workflow Templates/Definitions
   async getWorkflowDefinitions() {
     try {
+      if (!TEMPORAL_ENABLED) {
+        return [];
+      }
       const response = await this.client.get('/workflow-definitions');
       return response.data;
     } catch (error) {
@@ -139,6 +170,9 @@ class TemporalWorkflowService {
 
   async createWorkflowDefinition(definition) {
     try {
+      if (!TEMPORAL_ENABLED) {
+        throw new Error('Temporal integration is disabled');
+      }
       const response = await this.client.post('/workflow-definitions', definition);
       return response.data;
     } catch (error) {
@@ -150,6 +184,9 @@ class TemporalWorkflowService {
   // Statistics and Monitoring
   async getWorkflowStats(timeRange = '24h') {
     try {
+      if (!TEMPORAL_ENABLED) {
+        return {};
+      }
       const response = await this.client.get('/stats', { 
         params: { timeRange } 
       });

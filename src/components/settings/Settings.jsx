@@ -10,7 +10,8 @@ const Settings = () => {
                     <h1 className="text-2xl font-bold text-slate-800">System Settings</h1>
                     <p className="text-slate-500">Global configuration for compliance rules and integrations.</p>
                 </div>
-                <button className="px-6 py-2 bg-hawaii-ocean text-white rounded-lg hover:bg-blue-800 flex items-center gap-2 font-medium shadow-sm">
+                <button className="px-6 py-2 bg-hawaii-ocean text-white rounded-lg hover:bg-blue-800 flex items-center gap-2 font-medium shadow-sm"
+                  style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
                     <Save className="w-4 h-4" /> Save Changes
                 </button>
             </div>

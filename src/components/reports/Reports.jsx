@@ -33,7 +33,8 @@ const Reports = () => {
                     <button className="px-4 py-2 border border-slate-200 bg-white rounded-lg flex items-center gap-2 text-sm text-slate-600 hover:bg-slate-50">
                         <Calendar className="w-4 h-4" /> Last 6 Months
                     </button>
-                    <button className="px-4 py-2 bg-hawaii-ocean text-white rounded-lg hover:bg-blue-800 flex items-center gap-2 text-sm shadow-sm">
+                    <button className="px-4 py-2 bg-hawaii-ocean text-white rounded-lg hover:bg-blue-800 flex items-center gap-2 text-sm shadow-sm"
+                     style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
                         <Download className="w-4 h-4" /> Export PDF
                     </button>
                 </div>

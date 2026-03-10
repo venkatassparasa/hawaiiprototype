@@ -42,10 +42,10 @@ const Dashboard = () => {
 
     return (
         <div className="space-y-8">
-            <div>
+            {/* <div>
                 <h1 className="text-2xl font-bold text-slate-800">Command Center</h1>
                 <p className="text-slate-500">Overview of Short-Term Rental Compliance</p>
-            </div>
+            </div> */}
 
             {renderDepartmentalOverview()}
 
@@ -59,16 +59,18 @@ const Dashboard = () => {
 
             {user?.role !== 'Public' && (
                 <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-                    <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                    <div 
+                    style={{background:'#1A4A4F 0% 0% no-repeat padding-box'}}
+                    className="p-6 border-b border-slate-100 flex items-center justify-between">
                         <div>
-                            <h2 className="text-lg font-bold text-slate-800">Priority Action Items</h2>
-                            <p className="text-sm text-slate-500">Properties requiring immediate attention</p>
+                            <h2 className="text-lg font-bold text-slate-800 text-white">Priority Action Items</h2>
+                            <p className="text-sm text-slate-500 text-white">Properties requiring immediate attention</p>
                         </div>
                         <div className="flex gap-2">
                             <button className="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 flex items-center gap-2">
                                 <Filter className="w-4 h-4" /> Filter
                             </button>
-                            <button className="px-4 py-2 text-sm font-medium text-white bg-hawaii-ocean rounded-lg hover:bg-blue-800">
+                            <button className="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-50 rounded-lg">
                                 View All
                             </button>
                         </div>

@@ -96,6 +96,7 @@ const ReportsDashboard = () => {
         <Link
           to="/reports/new"
           className="px-4 py-2 bg-hawaii-ocean text-white rounded-lg hover:bg-blue-800 flex items-center gap-2 text-sm shadow-sm transition-colors"
+          style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
         >
           <Plus className="w-4 h-4" />
           Create New Report
