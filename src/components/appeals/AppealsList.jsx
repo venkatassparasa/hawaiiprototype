@@ -51,7 +51,7 @@ const AppealsList = () => {
                         <p className="text-3xl font-bold text-slate-800">{appeals.length}</p>
                     </div>
                     <div className="w-28 h-16 rounded-2xl flex items-center justify-center text-hawaii-ocean">
-                        <img src="/appeals.png" alt="View all" className="w-20 h-16" />
+                        <img src="/appeals.png" alt="View all" className="w-12 h-12" />
                     </div>
                 </div>
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-2">
@@ -62,7 +62,7 @@ const AppealsList = () => {
                     </p>
                     </div>
                     <div className="w-28 h-16 rounded-2xl flex items-center justify-center text-hawaii-ocean">
-                        <img src="/pending_review.png" alt="Pending" className="w-20 h-16" />
+                        <img src="/pending_review.png" alt="Pending" className="w-12 h-12" />
                     </div>
                 </div>
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-2">
@@ -73,7 +73,7 @@ const AppealsList = () => {
                     </p>
                     </div>
                     <div className="w-28 h-16 rounded-2xl flex items-center justify-center text-hawaii-ocean">
-                        <img src="/hearing.png" alt="Hearings Scheduled" className="w-20 h-16" />
+                        <img src="/hearing.png" alt="Hearings Scheduled" className="w-12 h-12" />
                     </div>
                 </div>
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-2">
@@ -84,7 +84,7 @@ const AppealsList = () => {
                     </p>
                     </div>
                     <div className="w-28 h-16 rounded-2xl flex items-center justify-center text-hawaii-ocean">
-                        <img src="/decided.png" alt="Decided" className="w-20 h-16" />
+                        <img src="/decided.png" alt="Decided" className="w-12 h-12" />
                     </div>
                 </div>
             </div>
