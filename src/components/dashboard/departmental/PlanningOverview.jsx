@@ -15,19 +15,36 @@ const PlanningOverview = () => {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Zoned</p>
-                    <p className="text-xl font-bold text-slate-800">14,842</p>
+                    <div className="flex items-center justify-between mb-2">
+                        <p className="text-xl font-bold text-slate-800">14,842</p>
+                        <img src="/zoned.png" alt="Zoning" className="w-12 h-full" />
+                    </div>
+                    <p className="text-xs text-slate-500 mt-1">Zoning classifications</p>
+
                 </div>
                 <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">NCUC Active</p>
-                    <p className="text-xl font-bold text-hawaii-ocean">1,215</p>
+                    <div className="flex items-center justify-between mb-2">
+                        <p className="text-xl font-bold text-hawaii-ocean">1,215</p>
+                        <img src="/active.png" alt="NCUC" className="w-12 h-full" />
+                    </div>
+                    <p className="text-xs text-slate-500 mt-1">NCUC active</p>
                 </div>
                 <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">New ST Appls</p>
-                    <p className="text-xl font-bold text-slate-800">42</p>
+                    <div className="flex items-center justify-between mb-2">
+                        <p className="text-xl font-bold text-slate-800">42</p>
+                        <img src="/st_appeals.png" alt="New ST Appls" className="w-12 h-full" />
+                    </div>
+                    <p className="text-xs text-slate-500 mt-1">New ST applications</p>
                 </div>
                 <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 border-l-4 border-hawaii-coral">
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Zoning Variance</p>
-                    <p className="text-xl font-bold text-hawaii-coral">84</p>
+                    <div className="flex items-center justify-between mb-2">
+                        <p className="text-xl font-bold text-hawaii-coral">84</p>
+                        <img src="/zoning_variance.png" alt="Zoning Variance" className="w-12 h-full" />
+                    </div>
+                    <p className="text-xs text-slate-500 mt-1">Zoning variance applications</p>
                 </div>
             </div>
 

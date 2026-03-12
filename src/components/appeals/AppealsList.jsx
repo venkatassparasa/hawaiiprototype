@@ -44,28 +44,48 @@ const AppealsList = () => {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+            <div className="grid grid-cols-12 md:grid-cols-4 gap-2">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-2">
+                    <div className="flex-1">
                     <p className="text-sm text-slate-500 mb-1">Total Appeals</p>
-                    <p className="text-3xl font-bold text-slate-800">{appeals.length}</p>
+                        <p className="text-3xl font-bold text-slate-800">{appeals.length}</p>
+                    </div>
+                    <div className="w-28 h-16 rounded-2xl flex items-center justify-center text-hawaii-ocean">
+                        <img src="/appeals.png" alt="View all" className="w-20 h-16" />
+                    </div>
                 </div>
-                <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-2">
+                    <div className="flex-1">
                     <p className="text-sm text-slate-500 mb-1">Pending Review</p>
                     <p className="text-3xl font-bold text-yellow-600">
                         {appeals.filter(a => a.status === 'pending').length}
                     </p>
+                    </div>
+                    <div className="w-28 h-16 rounded-2xl flex items-center justify-center text-hawaii-ocean">
+                        <img src="/pending_review.png" alt="Pending" className="w-20 h-16" />
+                    </div>
                 </div>
-                <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-2">
+                    <div className="flex-1">
                     <p className="text-sm text-slate-500 mb-1">Hearings Scheduled</p>
                     <p className="text-3xl font-bold text-blue-600">
                         {appeals.filter(a => a.status === 'scheduled').length}
                     </p>
+                    </div>
+                    <div className="w-28 h-16 rounded-2xl flex items-center justify-center text-hawaii-ocean">
+                        <img src="/hearing.png" alt="Hearings Scheduled" className="w-20 h-16" />
+                    </div>
                 </div>
-                <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-2">
+                    <div className="flex-1">
                     <p className="text-sm text-slate-500 mb-1">Decided</p>
                     <p className="text-3xl font-bold text-green-600">
                         {appeals.filter(a => a.status === 'decided').length}
                     </p>
+                    </div>
+                    <div className="w-28 h-16 rounded-2xl flex items-center justify-center text-hawaii-ocean">
+                        <img src="/decided.png" alt="Decided" className="w-20 h-16" />
+                    </div>
                 </div>
             </div>
 

@@ -104,37 +104,45 @@ const PaymentTracking = () => {
                 <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
                     <div className="flex items-center justify-between mb-2">
                         <p className="text-sm text-slate-500">Total Outstanding</p>
-                        <DollarSign className="w-5 h-5 text-yellow-600" />
                     </div>
                     <p className="text-3xl font-bold text-slate-800">${totalOutstanding.toLocaleString()}</p>
-                    <p className="text-xs text-slate-500 mt-1">{payments.filter(p => p.balance > 0).length} cases</p>
+                    <div className="flex items-center justify-between mb-2">
+                        <p className="text-xs text-slate-500 mt-1">{payments.filter(p => p.balance > 0).length} cases</p>
+                        <DollarSign className="w-5 h-5 text-yellow-600" />
+                    </div>
                 </div>
 
                 <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
                     <div className="flex items-center justify-between mb-2">
                         <p className="text-sm text-slate-500">Total Collected</p>
-                        <CheckCircle className="w-5 h-5 text-green-600" />
                     </div>
                     <p className="text-3xl font-bold text-green-600">${totalPaid.toLocaleString()}</p>
-                    <p className="text-xs text-slate-500 mt-1">{payments.filter(p => p.status === 'paid').length} paid in full</p>
+                    <div className="flex items-center justify-between mb-2">
+                        <p className="text-xs text-slate-500 mt-1">{payments.filter(p => p.status === 'paid').length} paid in full</p>
+                        <CheckCircle className="w-5 h-5 text-green-600" />
+                    </div>
                 </div>
 
                 <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
                     <div className="flex items-center justify-between mb-2">
                         <p className="text-sm text-slate-500">Overdue</p>
-                        <AlertTriangle className="w-5 h-5 text-red-600" />
                     </div>
                     <p className="text-3xl font-bold text-red-600">${totalOverdue.toLocaleString()}</p>
-                    <p className="text-xs text-slate-500 mt-1">{payments.filter(p => p.status === 'overdue').length} cases</p>
+                    <div className="flex items-center justify-between mb-2">
+                        <p className="text-xs text-slate-500 mt-1">{payments.filter(p => p.status === 'overdue').length} cases</p>
+                        <AlertTriangle className="w-5 h-5 text-red-600" />
+                    </div>
                 </div>
 
                 <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
                     <div className="flex items-center justify-between mb-2">
                         <p className="text-sm text-slate-500">Payment Plans</p>
-                        <TrendingUp className="w-5 h-5 text-blue-600" />
                     </div>
                     <p className="text-3xl font-bold text-blue-600">{payments.filter(p => p.paymentPlan).length}</p>
-                    <p className="text-xs text-slate-500 mt-1">Active agreements</p>
+                    <div className="flex items-center justify-between mb-2">
+                        <p className="text-xs text-slate-500 mt-1">Active agreements</p>
+                        <TrendingUp className="w-5 h-5 text-blue-600" />
+                    </div>
                 </div>
             </div>
 

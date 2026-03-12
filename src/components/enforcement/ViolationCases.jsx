@@ -171,31 +171,46 @@ const ViolationCases = () => {
             <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
                 <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
                     <p className="text-sm text-slate-500 mb-1">Total Cases</p>
-                    <p className="text-3xl font-bold text-slate-800">{cases.length}</p>
+                    <div className="flex items-center justify-between mb-2">
+                        <p className="text-3xl font-bold text-slate-800">{cases.length}</p>
+                        <img src="/total_count.png" alt="Total Cases" className="w-12 h-full" />
+                    </div>
                 </div>
                 <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
                     <p className="text-sm text-slate-500 mb-1">Active</p>
-                    <p className="text-3xl font-bold text-blue-600">
-                        {cases.filter(c => c.status !== 'resolved').length}
-                    </p>
+                    <div className="flex items-center justify-between mb-2">
+                        <p className="text-3xl font-bold text-blue-600">
+                            {cases.filter(c => c.status !== 'resolved').length}
+                        </p>
+                        <img src="/active_cases.png" alt="Active Cases" className="w-12 h-full" />
+                    </div>
                 </div>
                 <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
                     <p className="text-sm text-slate-500 mb-1">Overdue</p>
-                    <p className="text-3xl font-bold text-red-600">
-                        {cases.filter(c => c.slaStatus === 'overdue').length}
-                    </p>
+                    <div className="flex items-center justify-between mb-2">
+                        <p className="text-3xl font-bold text-red-600">
+                            {cases.filter(c => c.slaStatus === 'overdue').length}
+                        </p>
+                        <img src="/pending_cases.png" alt="Overdue Cases" className="w-12 h-full" />
+                    </div>
                 </div>
                 <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
                     <p className="text-sm text-slate-500 mb-1">Fines Assessed</p>
-                    <p className="text-3xl font-bold text-orange-600">
-                        {cases.filter(c => c.status === 'fine-assessed').length}
-                    </p>
+                    <div className="flex items-center justify-between mb-2">
+                        <p className="text-3xl font-bold text-orange-600">
+                            {cases.filter(c => c.status === 'fine-assessed').length}
+                        </p>
+                        <img src="/fine_dollars.png" alt="Fines Assessed" className="w-12 h-full" />
+                    </div>
                 </div>
                 <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
                     <p className="text-sm text-slate-500 mb-1">Resolved</p>
-                    <p className="text-3xl font-bold text-green-600">
-                        {cases.filter(c => c.status === 'resolved').length}
-                    </p>
+                    <div className="flex items-center justify-between mb-2">
+                        <p className="text-3xl font-bold text-green-600">
+                            {cases.filter(c => c.status === 'resolved').length}
+                        </p>
+                        <img src="/decided.png" alt="Resolved" className="w-12 h-full" />
+                    </div>
                 </div>
             </div>
 

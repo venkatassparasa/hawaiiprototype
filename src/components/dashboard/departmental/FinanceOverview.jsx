@@ -12,33 +12,39 @@ const FinanceOverview = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-6">
-                    <div className="w-14 h-14 rounded-2xl bg-hawaii-ocean/10 flex items-center justify-center text-hawaii-ocean">
-                        <DollarSign className="w-8 h-8" />
-                    </div>
-                    <div>
+            <div className="grid grid-cols-12 md:grid-cols-3 gap-2">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-2">
+                    <div className="flex-1">
                         <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Total Collections</p>
                         <p className="text-2xl font-bold text-slate-800">$842,500</p>
                     </div>
+                    <div className="w-28 h-20 rounded-2xl flex items-center justify-center text-hawaii-ocean">
+                        <img src="/fine_collected.png" alt="Dollar Sign" className="w-32 h-32" />
+                        {/* <DollarSign className="w-8 h-8" /> */}
+                    </div>
+
                 </div>
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-6">
-                    <div className="w-14 h-14 rounded-2xl bg-hawaii-coral/10 flex items-center justify-center text-hawaii-coral">
-                        <AlertCircle className="w-8 h-8" />
-                    </div>
-                    <div>
+                    <div className="flex-1">
                         <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Pending Assessments</p>
                         <p className="text-2xl font-bold text-slate-800">124</p>
                     </div>
+                    <div className="w-32 h-20 rounded-2xl flex items-center justify-center text-hawaii-coral">
+                        <img src="/pending_count.png" alt="Pending Assessments" className="w-full h-32" />
+                        {/* <AlertCircle className="w-8 h-8" /> */}
+                    </div>
+
                 </div>
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-6">
-                    <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-600">
-                        <PieChart className="w-8 h-8" />
-                    </div>
-                    <div>
+                    <div className="flex-1">
                         <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Audit Match Rate</p>
                         <p className="text-2xl font-bold text-slate-800">94.2%</p>
                     </div>
+                    <div className="w-32 h-20 rounded-2xl flex items-center justify-center text-slate-600">
+                        {/* <PieChart className="w-8 h-8" /> */}
+                        <img src="/audit.png" alt="Audit Match Rate" className="w-full h-32" />
+                    </div>
+
                 </div>
             </div>
 

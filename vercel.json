@@ -19,8 +19,6 @@
   "env": {
     "TEMPORAL_ADDRESS": "ap-south-1.aws.api.temporal.io:7233",
     "TEMPORAL_NAMESPACE": "default",
-    "POSTGRES_URI": "@postgres_url",
-    "JWT_SECRET": "@jwt_secret",
     "WORKER_URL": "https://hawaii-temporal-worker-java.onrender.com"
   }
 }

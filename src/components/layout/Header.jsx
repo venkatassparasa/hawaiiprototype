@@ -46,7 +46,7 @@ const Header = ({ user, onLogout, onMenuToggle }) => {
                     <div className="relative">
                         <button
                             onClick={() => setShowUserMenu(!showUserMenu)}
-                            className="flex items-center gap-3 pl-3 pr-2 py-1.5 hover:bg-slate-100 rounded-lg transition-colors"
+                            className="flex items-center gap-3 pl-3 pr-2 py-1.5 rounded-lg transition-colors"
                         >
                             <div className="text-right hidden md:block">
                                 <p className="text-sm font-medium text-slate-700 text-white">{user?.name || 'Jane Doe'}</p>

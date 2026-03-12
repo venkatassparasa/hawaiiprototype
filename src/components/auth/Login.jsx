@@ -72,24 +72,37 @@ const Login = ({ onLogin }) => {
     };
 
     return (
-        <div className="min-h-screen relative flex items-center justify-center p-4 bg-cover bg-center" style={{ backgroundImage: 'url("/bg-login.jpg")', filter: `brightness(1.1)` }}>
-            {/* Background Overlay */}
-            <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px]"></div>
+        <div className="h-screen flex items-center justify-center bg-cover bg-center relative overflow-hidden" style={{ backgroundImage: 'url("/bg-login.jpg")' }}>
+            {/* Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-900/70 via-slate-800/50 to-emerald-900/60"></div>
+            
+            {/* Split Layout */}
+            <div className="relative z-10 flex w-full h-full">
+                {/* Left Side - Image */}
+                <div className="hidden lg:flex lg:w-3/5 relative items-center justify-center p-8">
+                    <div className="w-full h-[80vh] max-w-[600px] rounded-2xl shadow-2xl overflow-hidden backdrop-blur-sm bg-white/10 border border-white/20">
+                        <img
+                            src="/login-bg.png"
+                            alt="County of Hawaii"
+                            className="w-full h-full object-cover opacity-100 mix-blend-normal brightness-125 contrast-110 saturate-120"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 via-transparent to-emerald-400/20"></div>
+                    </div>
+                </div>
 
-            {/* Login Card */}
-            <div className="relative w-full max-w-md">
-                <div className="bg-white rounded-2xl shadow-2xl p-4 space-y-3">
+                {/* Right Side - Login Card */}
+                <div className="flex-1 lg:flex-none lg:w-2/5 flex items-center justify-center p-8">
+                    <div className="w-full max-w-md">
+                        <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-6 space-y-4 border border-white/20">
 
                     {/* Header */}
                     <div className="text-center space-y-4">
                         <div className="flex justify-center">
-                            <div className="w-full max-w-[280px] px-4 py-6 bg-white rounded-xl border border-slate-200 shadow-lg">
-                                <img
-                                    src="/h_logo.png"
-                                    alt="County of Hawaii Planning Department"
-                                    className="w-full h-auto object-contain filter invert brightness-110"
-                                />
-                            </div>
+                            <img
+                                src="/h_logo.png"
+                                alt="County of Hawaii Planning Department"
+                                className="w-full max-w-[280px] h-auto object-contain filter invert brightness-110"
+                            />
                         </div>
                         <div>
                             <h1 className="text-xl font-bold text-slate-800 tracking-tight">Compliance Portal</h1>
@@ -207,6 +220,7 @@ const Login = ({ onLogin }) => {
                         <button
                             type="submit"
                             className="w-full bg-hawaii-ocean text-white py-3 rounded-lg font-medium hover:bg-blue-800 transition-colors shadow-lg hover:shadow-xl"
+                            style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
                         >
                             Sign In
                         </button>
@@ -221,6 +235,8 @@ const Login = ({ onLogin }) => {
                 {/* Decorative Elements */}
                 <div className="absolute -top-4 -right-4 w-24 h-24 bg-hawaii-coral rounded-full opacity-20 blur-2xl"></div>
                 <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-blue-400 rounded-full opacity-20 blur-2xl"></div>
+                    </div>
+                </div>
             </div>
         </div>
     );

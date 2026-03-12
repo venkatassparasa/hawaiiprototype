@@ -16,6 +16,7 @@ const UserProfile = ({ user }) => {
                 <button
                     onClick={() => setIsEditing(!isEditing)}
                     className="px-6 py-2 bg-[#B54848] text-white rounded-lg hover:bg-blue-800 flex items-center gap-2 font-medium shadow-sm"
+                    style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
                 >
                     {isEditing ? (
                         <>
@@ -31,11 +32,12 @@ const UserProfile = ({ user }) => {
             <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
 
                 {/* Cover Photo */}
-                <div className="h-32 bg-[url('/bg-hawaii.jpg')] bg-cover bg-center relative">
+                <div className="h-32 bg-[url('/p_dashboard.png')] bg-cover bg-center relative">
                     <div className="absolute -bottom-16 left-8">
                         <div className="relative">
                             <div className="w-32 h-32 rounded-full bg-white p-2 shadow-xl">
-                                <div className="w-full h-full rounded-full bg-hawaii-ocean flex items-center justify-center text-white text-3xl font-bold">
+                                <div className="w-full h-full rounded-full bg-hawaii-ocean flex items-center justify-center text-white text-3xl font-bold"
+                                 style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
                                     {user?.avatar || 'JD'}
                                 </div>
                             </div>
