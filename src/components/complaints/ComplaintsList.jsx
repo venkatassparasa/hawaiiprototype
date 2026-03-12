@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Filter, MessageSquare, CheckCircle, Clock, AlertTriangle, Eye } from 'lucide-react';
+import { Search, Filter, MessageSquare, CheckCircle, Clock, AlertTriangle, Eye, OctagonAlert } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import WorkflowStatusBadge from '../workflows/WorkflowStatusBadge';
 
@@ -55,25 +55,39 @@ const ComplaintsList = () => {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
                     <p className="text-sm text-slate-500 mb-1">Total Complaints</p>
-                    <p className="text-3xl font-bold text-slate-800">{complaints.length}</p>
+                    <div className="flex items-center justify-between mb-2">
+                        <p className="text-3xl font-bold text-slate-800">{complaints.length}</p>
+                        <img src="/total_count.png" alt="Total complaints" className="w-12 h-full" />
+                    </div>
                 </div>
                 <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
                     <p className="text-sm text-slate-500 mb-1">Under Investigation</p>
-                    <p className="text-3xl font-bold text-yellow-600">
-                        {complaints.filter(c => c.status === 'investigating').length}
-                    </p>
+                    <div className="flex items-center justify-between mb-2">
+                        <p className="text-3xl font-bold text-blue-600">
+                            {complaints.filter(c => c.status !== 'investigating').length}
+                        </p>
+                        <img src="/active_cases.png" alt="Active Cases" className="w-12 h-full" />
+                    </div>
                 </div>
                 <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
                     <p className="text-sm text-slate-500 mb-1">Resolved</p>
-                    <p className="text-3xl font-bold text-green-600">
-                        {complaints.filter(c => c.status === 'resolved').length}
-                    </p>
+                    <div className="flex items-center justify-between mb-2">
+                        <p className="text-3xl font-bold text-green-600">
+                            {complaints.filter(c => c.status === 'resolved').length}
+                        </p>
+                        <img src="/decided.png" alt="Resolved" className="w-12 h-full" />
+                    </div>
+
                 </div>
                 <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
                     <p className="text-sm text-slate-500 mb-1">High Priority</p>
-                    <p className="text-3xl font-bold text-red-600">
-                        {complaints.filter(c => c.priority === 'High').length}
-                    </p>
+                    <div className="flex items-center justify-between mb-2">
+                        <p className="text-3xl font-bold text-red-600">
+                            {complaints.filter(c => c.priority === 'High').length}
+                        </p>
+                        <OctagonAlert className='w-12 h-full text-red-600' />
+                    </div>
+
                 </div>
             </div>
 

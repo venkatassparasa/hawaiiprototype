@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, Search, Filter, Clock, CheckCircle, AlertTriangle, User } from 'lucide-react';
+import { Calendar, Search, Filter, Clock, CheckCircle, AlertTriangle, User, Binoculars, CalendarCheck, CheckLine } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const InspectionScheduler = () => {
@@ -45,27 +45,48 @@ const InspectionScheduler = () => {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
-                    <p className="text-sm text-slate-500 mb-1">Total Inspections</p>
-                    <p className="text-3xl font-bold text-slate-800">{inspections.length}</p>
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-2">
+                    <div className='flex-1'>
+                        <p className="text-sm text-slate-500 mb-1">Total Inspections</p>
+                        <p className="text-3xl font-bold text-slate-800">{inspections.length}</p>
+                    </div>
+                    <div className="w-28 h-16 rounded-2xl flex items-center justify-center text-hawaii-ocean">
+                        <Binoculars className="w-full h-16"/>
+                    </div>
                 </div>
-                <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-2">
+                    <div className='flex-1'>
                     <p className="text-sm text-slate-500 mb-1">Scheduled</p>
                     <p className="text-3xl font-bold text-blue-600">
                         {inspections.filter(i => i.status === 'scheduled').length}
                     </p>
+                    </div>
+                    <div className="w-28 h-16 rounded-2xl flex items-center justify-center text-blue-600">
+                        <CalendarCheck className="w-full h-16"/>
+                    </div>
                 </div>
-                <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-2">
+                    <div className='flex-1'>
                     <p className="text-sm text-slate-500 mb-1">In Progress</p>
                     <p className="text-3xl font-bold text-yellow-600">
                         {inspections.filter(i => i.status === 'in-progress').length}
                     </p>
+                    </div>
+                    <div className="w-28 h-16 rounded-2xl flex items-center justify-center text-yellow-600">
+                        <Clock className="w-full h-16"/>
+                    </div>
                 </div>
-                <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-2">
+                    <div className='flex-1'> 
                     <p className="text-sm text-slate-500 mb-1">Completed</p>
                     <p className="text-3xl font-bold text-green-600">
                         {inspections.filter(i => i.status === 'completed').length}
                     </p>
+                    </div>
+                    <div className="w-28 h-16 rounded-2xl flex items-center justify-center text-green-600">
+                        <CheckLine className="w-full h-16"/>
+                    </div>
+
                 </div>
             </div>
 
