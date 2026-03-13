@@ -19,7 +19,7 @@ const CaseReview = () => {
 
             {/* Header */}
             <div className="bg-hawaii-ocean text-white p-4 rounded-xl shadow-lg flex items-center justify-between"
-                style={{background: '#25575C 0% 0% no-repeat padding-box'}}>
+                style={{ background: '#25575C 0% 0% no-repeat padding-box' }}>
                 <div className="flex items-center gap-3">
                     <Link to="/dashboard" className="p-2 hover:bg-white/10 rounded-lg transition-colors">
                         <ArrowLeft className="w-5 h-5" />
@@ -29,7 +29,7 @@ const CaseReview = () => {
                 <button
                     onClick={handleSaveAndContinue}
                     className="px-6 py-2 bg-white text-white rounded-lg font-medium hover:bg-slate-50 transition-colors"
-                    style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
+                    style={{ background: '#4D7833 0% 0% no-repeat padding-box' }}
                 >
                     Save & Continue
                 </button>
@@ -51,6 +51,7 @@ const CaseReview = () => {
                                 alt="Property"
                                 className="w-full h-32 object-cover rounded-lg"
                             />
+
 
                             <div className="space-y-2 text-sm">
                                 <div>
@@ -90,13 +91,13 @@ const CaseReview = () => {
 
                     {/* Linked Listings */}
                     <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-                        <div className="p-4 bg-hawaii-ocean text-white" style={{background: '#2C5F64 0% 0% no-repeat padding-box'}}>
+                        <div className="p-4 bg-hawaii-ocean text-white" style={{ background: '#2C5F64 0% 0% no-repeat padding-box' }}>
                             <h2 className="font-bold">Linked Listings</h2>
                         </div>
 
                         <div className="p-4">
                             <div className="bg-slate-50 rounded-lg p-4 border border-slate-200"
-                                 >
+                            >
                                 <h3 className="font-bold text-slate-800 mb-3">Merged Record - Multi-Platform Activity</h3>
 
                                 <div className="flex items-center justify-between gap-4">
@@ -116,7 +117,7 @@ const CaseReview = () => {
 
                                     <div className="flex-1 bg-white rounded-lg p-3 border border-slate-200">
                                         <div className="flex items-center gap-3 mb-2">
-                                            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center"  style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
+                                            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center" style={{ background: '#4D7833 0% 0% no-repeat padding-box' }}>
                                                 <span className="text-white font-bold text-lg">V</span>
                                             </div>
                                             <div>
@@ -199,7 +200,7 @@ const CaseReview = () => {
 
                 {/* Right Sidebar - Fine Calculator */}
                 <div className="lg:col-span-3">
-                    <div className="bg-blue-50 rounded-xl shadow-sm border border-blue-100 overflow-hidden sticky top-20" style={{background: '#2C5F64 0% 0% no-repeat padding-box'}}>
+                    <div className="bg-blue-50 rounded-xl shadow-sm border border-blue-100 overflow-hidden sticky top-20" style={{ background: '#2C5F64 0% 0% no-repeat padding-box' }}>
                         <div className="p-4 border-b border-blue-100">
                             <h2 className="font-bold text-white">Fine Calculator</h2>
                         </div>
@@ -247,7 +248,7 @@ const CaseReview = () => {
                                     Recalculate
                                 </button>
                                 <button className="flex-1 px-4 py-2 bg-hawaii-ocean text-white rounded-lg text-sm font-medium hover:bg-blue-800 transition-colors"
-                                 style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
+                                    style={{ background: '#4D7833 0% 0% no-repeat padding-box' }}>
                                     Approve Fine
                                 </button>
                             </div>
