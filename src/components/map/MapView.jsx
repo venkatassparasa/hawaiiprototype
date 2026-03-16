@@ -5,33 +5,30 @@ import { Link } from 'react-router-dom';
 const MapView = () => {
     // Mock property data for pins
     const properties = [
-        { id: 1, top: '40%', left: '45%', status: 'Non-Compliant', count: 12 },
-        { id: 2, top: '35%', left: '55%', status: 'Compliant' },
-        { id: 3, top: '42%', left: '48%', status: 'Non-Compliant' },
-        { id: 4, top: '50%', left: '40%', status: 'Under Review' },
-        { id: 5, top: '38%', left: '52%', status: 'Compliant' },
-        { id: 6, top: '45%', left: '43%', status: 'Non-Compliant' },
+        { id: 1, top: '40%', left: '45%', status: 'Non-Compliant', count: 12, address: '74-5599 Alii Dr, Kailua-Kona, HI 96740' },
+        { id: 2, top: '35%', left: '55%', status: 'Compliant', count: 8, address: '69-425 Waikoloa Beach Dr, Kailua-Kona, HI 96740' },
+        { id: 3, top: '42%', left: '48%', status: 'Non-Compliant', count: 15, address: '77-6425 Alii Dr, Kailua-Kona, HI 96740' },
+        { id: 4, top: '50%', left: '40%', status: 'Under Review', count: 5, address: '75-1234 Kuakini Hwy, Kailua-Kona, HI 96740' },
+        { id: 5, top: '38%', left: '52%', status: 'Compliant', count: 22, address: '78-4567 Mamalahoa Bay Dr, Kailua-Kona, HI 96740' },
+        { id: 6, top: '45%', left: '43%', status: 'Non-Compliant', count: 18, address: '79-2001 Kamehameha Hwy, Kailua-Kona, HI 96740' },
     ];
 
     return (
         <div className="h-[calc(100vh-8rem)] relative rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shadow-inner group">
-
-            {/* Mock Map Background - Using a placeholder pattern to simulate map texture */}
-            <div className="absolute inset-0 bg-[#e5e9ec] opacity-60"
-                style={{ backgroundImage: 'radial-gradient(#d1d5db 1px, transparent 1px)', backgroundSize: '20px 20px' }}>
+            {/* OpenStreetMap Iframe - Hilo, Hawaii */}
+            <div className="absolute inset-0">
+                <iframe
+                    src="https://www.openstreetmap.org/export/embed.html?bbox=-155.1500%2C19.6500%2C-154.9500%2C19.7500&layer=mapnik"
+                    className="w-full h-full border-0"
+                    title="Hilo District Map"
+                    style={{ minHeight: '400px' }}
+                />
             </div>
-
-            {/* Simulation of Island Shape/Features - Abstract */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 opacity-20 pointer-events-none">
-                <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                    <path fill="#93c5fd" d="M45.7,-76.3C58.9,-69.3,69.1,-58.3,77.3,-46.2C85.5,-34.1,91.7,-20.9,90.4,-8.2C89.1,4.5,80.3,16.7,70.9,27.3C61.5,37.9,51.5,46.9,40.7,54.8C29.9,62.7,18.3,69.5,5.6,71.3C-7.1,73.1,-20.8,69.9,-33.6,63.1C-46.4,56.3,-58.3,45.9,-66.8,33.2C-75.3,20.5,-80.4,5.5,-78.9,-8.8C-77.4,-23.1,-69.3,-36.7,-58.4,-46.8C-47.5,-56.9,-33.8,-63.5,-20.4,-70.3C-7,-77.1,6.1,-84.1,32.5,-83.3L45.7,-76.3Z" transform="translate(100 100)" />
-                </svg>
-            </div>
-
+            
             {/* Map Pins */}
             {properties.map((prop) => {
                 const isCluster = prop.count !== undefined;
-
+                
                 if (isCluster) {
                     // Cluster - navigate to properties list
                     const bgColor = prop.status === 'Compliant' ? 'bg-green-500' :
@@ -41,11 +38,11 @@ const MapView = () => {
                         <Link
                             key={prop.id}
                             to="/properties"
-                            className={`absolute w-8 h-8 rounded-full ${bgColor}/90 text-white flex items-center justify-center font-bold text-xs shadow-lg ring-4 ${bgColor.replace('bg-', 'ring-')}/20 cursor-pointer hover:scale-110 transition-transform`}
+                            className={`absolute w-12 h-12 rounded-full ${bgColor}/90 text-slate-900 flex items-center justify-center font-bold text-sm shadow-lg ring-4 ${bgColor.replace('bg-', 'ring-')}/20 cursor-pointer hover:scale-110 transition-transform`}
                             style={{ top: prop.top, left: prop.left }}
                             title={`${prop.count} ${prop.status} properties - Click to view all`}
                         >
-                            {prop.count}
+                            <span className="text-2xl font-bold">{prop.count}</span>
                         </Link>
                     );
                 } else {
@@ -58,10 +55,12 @@ const MapView = () => {
                         <Link
                             key={prop.id}
                             to={linkTo}
-                            className={`absolute w-4 h-4 rounded-full ${bgColor} border-2 border-white shadow-md cursor-pointer hover:scale-125 transition-transform`}
+                            className={`absolute w-6 h-6 rounded-full ${bgColor} border-2 border-white shadow-md cursor-pointer hover:scale-125 transition-transform`}
                             style={{ top: prop.top, left: prop.left }}
                             title={prop.status}
-                        />
+                        >
+                            <span className="text-2xl font-bold text-slate-900">{prop.count}</span>
+                        </Link>
                     );
                 }
             })}
@@ -76,17 +75,8 @@ const MapView = () => {
                 </button>
             </div>
 
-            <div className="absolute bottom-8 right-4 flex flex-col gap-1 bg-white rounded-lg shadow-md overflow-hidden">
-                <button className="p-2 hover:bg-slate-100 text-slate-700 border-b border-slate-100">
-                    <Plus className="w-4 h-4" />
-                </button>
-                <button className="p-2 hover:bg-slate-100 text-slate-700">
-                    <Minus className="w-4 h-4" />
-                </button>
-            </div>
-
             {/* Legend */}
-            <div className="absolute bottom-8 left-4 bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-lg border border-slate-100">
+            <div className="absolute bottom-8 right-4 bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-lg border border-slate-100">
                 <h3 className="font-bold text-slate-800 mb-2 text-sm">Zone Status</h3>
                 <div className="space-y-2 text-xs">
                     <div className="flex items-center gap-2">
@@ -104,11 +94,11 @@ const MapView = () => {
                 </div>
             </div>
 
+            {/* Location Info */}
             <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-md border border-slate-100">
                 <h1 className="font-bold text-slate-800 text-lg">Geospatial Enforcement</h1>
-                <p className="text-xs text-slate-500">Kailua-Kona District</p>
+                <p className="text-xs text-slate-500">Hilo District</p>
             </div>
-
         </div>
     );
 };

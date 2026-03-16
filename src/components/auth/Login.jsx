@@ -60,12 +60,32 @@ const Login = ({ onLogin }) => {
             });
             navigate('/dashboard');
         } else {
-            // For all other roles, create full user session
+            // For all other roles, check email domain for RBAC
+            const userEmail = email || '';
+            let userRole = role;
+            let userName = name;
+            
+            // Determine role based on exact email domain match
+            if (userEmail === 'finance@uhcc.com') {
+                userRole = 'Finance';
+                userName = 'Finance Director';
+            } else if (userEmail === 'legal@uhcc.com') {
+                userRole = 'Legal';
+                userName = 'County Attorney';
+            } else if (userEmail === 'planning@uhcc.com') {
+                userRole = 'Planning';
+                userName = 'Planning Director';
+            } else if (userEmail === 'enforcement@uhcc.com') {
+                userRole = 'Enforcement';
+                userName = 'Enforcement Officer';
+            }
+            
+            // Create full user session
             onLogin({
-                name: name,
-                email: email || `${name.toLowerCase().replace(' ', '.')}@hawaiicounty.gov`,
-                role: role,
-                avatar: name.split(' ').map(n => n[0]).join('')
+                name: userName,
+                email: userEmail || `${userName.toLowerCase().replace(' ', '.')}@hawaiicounty.gov`,
+                role: userRole,
+                avatar: userName ? userName.split(' ').map(n => n[0]).join('') : ''
             });
             navigate('/dashboard');
         }
@@ -109,51 +129,8 @@ const Login = ({ onLogin }) => {
                     <div className="w-full max-w-md">
                         <div className="bg-white/95 backdrop-blur-md rounded-2xl p-6 space-y-4 border border-white/20">
 
-                            {/* Role Selection */}
-                            <div className="space-y-1">
-                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Sign in as Department</p>
-                                <div className="grid grid-cols-2 gap-3">
-                                    <button
-                                        onClick={() => submitRole('Finance', 'Finance Director')}
-                                        className="flex flex-col items-center justify-center p-4 border border-slate-300 rounded-xl hover:border-hawaii-ocean hover:bg-slate-50 transition-all text-center"
-                                    >
-                                        <div className="w-10 h-10 rounded-full bg-blue-600 bg-opacity-20 flex items-center justify-center text-hawaii-ocean font-bold mb-2 text-lg">F</div>
-                                        <p className="font-bold text-slate-800 text-sm">Finance</p>
-                                    </button>
-
-                                    <button
-                                        onClick={() => submitRole('Planning', 'Planning Director')}
-                                        className="flex flex-col items-center justify-center p-4 border border-slate-300 rounded-xl hover:border-hawaii-ocean hover:bg-slate-50 transition-all text-center"
-                                    >
-                                        <div className="w-10 h-10 rounded-full bg-hawaii-coral bg-opacity-30 flex items-center justify-center text-hawaii-coral font-bold mb-2 text-lg">P</div>
-                                        <p className="font-bold text-slate-800 text-sm">Planning</p>
-                                    </button>
-
-                                    <button
-                                        onClick={() => submitRole('Legal', 'County Attorney')}
-                                        className="flex flex-col items-center justify-center p-4 border border-slate-300 rounded-xl hover:border-hawaii-ocean hover:bg-slate-50 transition-all text-center"
-                                    >
-                                        <div className="w-10 h-10 rounded-full bg-slate-400 bg-opacity-30 flex items-center justify-center text-slate-500 font-bold mb-2 text-lg">L</div>
-                                        <p className="font-bold text-slate-800 text-sm">Legal</p>
-                                    </button>
-
-                                    <button
-                                        onClick={() => submitRole('Public', 'Resident / Visitor')}
-                                        className="flex flex-col items-center justify-center p-4 border border-slate-300 rounded-xl hover:border-hawaii-ocean hover:bg-slate-50 transition-all text-center"
-                                    >
-                                        <div className="w-10 h-10 rounded-full bg-green-400 bg-opacity-20 flex items-center justify-center text-green-600 font-bold mb-2 text-lg">V</div>
-                                        <p className="font-bold text-slate-800 text-sm">Public View</p>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div className="relative">
-                                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-100"></div></div>
-                                <div className="relative flex justify-center text-xs"><span className="px-3 bg-white text-slate-400 capitalize">Or standard login</span></div>
-                            </div>
-
-                            {/* Form */}
-                            <form onSubmit={handleSubmit} className="space-y-1">
+                            {/* Email and Password Fields */}
+                            <form onSubmit={handleSubmit} className="space-y-4">
                                 {/* Error Display */}
                                 {error && (
                                     <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
@@ -226,6 +203,23 @@ const Login = ({ onLogin }) => {
                             {/* Footer */}
                             <div className="text-center text-xs text-slate-400 pt-4 border-t border-slate-100">
                                 <p>Authorized personnel only. Unauthorized access is prohibited.</p>
+                                <div className="mt-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            onLogin({
+                                                name: null,
+                                                email: null,
+                                                role: 'Public',
+                                                avatar: null
+                                            });
+                                            navigate('/dashboard');
+                                        }}
+                                        className="text-hawaii-ocean hover:underline font-medium"
+                                    >
+                                        Continue as Public/Guest
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
