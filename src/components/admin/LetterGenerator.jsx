@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FileText, Send, Download, Eye, Edit2, Trash2, Plus, Search, Filter, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 
 const LetterGenerator = () => {
     const [activeTab, setActiveTab] = useState('templates');
@@ -7,6 +8,15 @@ const LetterGenerator = () => {
     const [recipients, setRecipients] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
+    const [searchParams] = useSearchParams();
+
+    // Set active tab based on URL parameter
+    useEffect(() => {
+        const tab = searchParams.get('tab');
+        if (tab) {
+            setActiveTab(tab);
+        }
+    }, [searchParams]);
 
     // Letter Templates
     const [templates, setTemplates] = useState([

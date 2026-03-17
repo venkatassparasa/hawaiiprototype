@@ -87,7 +87,7 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
             // Workflow Management - Only for Admin, Planning, Legal, Enforcement
             if (['Admin', 'Planning', 'Legal', 'Enforcement Officer'].includes(user?.role)) {
                 items.push({ icon: Activity, label: 'Workflows', path: '/workflows' });
-                items.push({ icon: FileText, label: 'Letter Generator', path: '/letter-generator' });
+                items.push({ icon: FileText, label: 'Letter Generator', path: '/letter-generator?tab=generator' });
             }
             
             // Configuration & Admin Controls - Only for Admin
