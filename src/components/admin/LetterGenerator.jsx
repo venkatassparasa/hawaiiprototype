@@ -82,9 +82,9 @@ const LetterGenerator = () => {
     ]);
 
     const tabs = [
-        { id: 'templates', label: 'Letter Templates', icon: FileText },
         { id: 'generator', label: 'Generate Letters', icon: Send },
         { id: 'history', label: 'Letter History', icon: Clock },
+        { id: 'templates', label: 'Letter Templates', icon: FileText }
     ];
 
     const handleCreateTemplate = () => {
@@ -175,67 +175,6 @@ const LetterGenerator = () => {
                     ))}
                 </nav>
             </div>
-
-            {/* Letter Templates Tab */}
-            {activeTab === 'templates' && (
-                <div>
-                    <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-xl font-semibold text-slate-800">Letter Templates</h2>
-                        <button
-                            onClick={handleCreateTemplate}
-                            className="flex items-center gap-2 px-4 py-2 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
-                            style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
-                        >
-                            <Plus className="w-4 h-4" />
-                            Create Template
-                        </button>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {templates.map((template) => (
-                            <div key={template.id} className="bg-white border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                                <div className="flex justify-between items-start mb-3">
-                                    <div className="flex-1">
-                                        <h3 className="font-medium text-slate-800 mb-1">{template.name}</h3>
-                                        <p className="text-sm text-slate-600">{template.subject}</p>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <button
-                                            onClick={() => handleToggleTemplate(template.id)}
-                                            className={`p-2 rounded transition-colors ${
-                                                template.active 
-                                                    ? 'text-green-600 hover:bg-green-50' 
-                                                    : 'text-slate-400 hover:bg-slate-50'
-                                            }`}
-                                        >
-                                            {template.active ? <CheckCircle className="w-4 h-4" /> : <AlertTriangle className="w-4 h-4" />}
-                                        </button>
-                                        <button
-                                            onClick={() => handleEditTemplate(template.id)}
-                                            className="p-2 text-slate-600 hover:text-hawaii-ocean hover:bg-hawaii-ocean/10 rounded transition-colors"
-                                        >
-                                            <Edit2 className="w-4 h-4" />
-                                        </button>
-                                        <button
-                                            onClick={() => handleDeleteTemplate(template.id)}
-                                            className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <div className="flex justify-between items-center text-sm">
-                                    <span className="px-2 py-1 bg-slate-100 text-slate-700 rounded">
-                                        {template.type}
-                                    </span>
-                                    <span className="text-slate-500">Used {template.usageCount} times</span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
 
             {/* Generate Letters Tab */}
             {activeTab === 'generator' && (
@@ -383,6 +322,69 @@ const LetterGenerator = () => {
                     </div>
                 </div>
             )}
+            
+            {/* Letter Templates Tab */}
+            {activeTab === 'templates' && (
+                <div>
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-xl font-semibold text-slate-800">Letter Templates</h2>
+                        <button
+                            onClick={handleCreateTemplate}
+                            className="flex items-center gap-2 px-4 py-2 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+                            style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
+                        >
+                            <Plus className="w-4 h-4" />
+                            Create Template
+                        </button>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {templates.map((template) => (
+                            <div key={template.id} className="bg-white border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                                <div className="flex justify-between items-start mb-3">
+                                    <div className="flex-1">
+                                        <h3 className="font-medium text-slate-800 mb-1">{template.name}</h3>
+                                        <p className="text-sm text-slate-600">{template.subject}</p>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={() => handleToggleTemplate(template.id)}
+                                            className={`p-2 rounded transition-colors ${
+                                                template.active 
+                                                    ? 'text-green-600 hover:bg-green-50' 
+                                                    : 'text-slate-400 hover:bg-slate-50'
+                                            }`}
+                                        >
+                                            {template.active ? <CheckCircle className="w-4 h-4" /> : <AlertTriangle className="w-4 h-4" />}
+                                        </button>
+                                        <button
+                                            onClick={() => handleEditTemplate(template.id)}
+                                            className="p-2 text-slate-600 hover:text-hawaii-ocean hover:bg-hawaii-ocean/10 rounded transition-colors"
+                                        >
+                                            <Edit2 className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                            onClick={() => handleDeleteTemplate(template.id)}
+                                            className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="px-2 py-1 bg-slate-100 text-slate-700 rounded">
+                                        {template.type}
+                                    </span>
+                                    <span className="text-slate-500">Used {template.usageCount} times</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+
         </div>
     );
 };

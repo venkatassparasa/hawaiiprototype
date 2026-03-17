@@ -206,7 +206,7 @@ const Login = ({ onLogin }) => {
                             {/* Footer */}
                             <div className="text-center text-xs text-slate-400 pt-4 border-t border-slate-100">
                                 <p>Authorized personnel only. Unauthorized access is prohibited.</p>
-                                <div className="mt-3">
+                                <div className="mt-3 space-y-2">
                                     <button
                                         type="button"
                                         onClick={() => {
@@ -221,6 +221,16 @@ const Login = ({ onLogin }) => {
                                         className="text-hawaii-ocean hover:underline font-medium"
                                     >
                                         Continue as Public/Guest
+                                    </button>
+                                    <br />
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            navigate('/hosting-registration');
+                                        }}
+                                        className="text-hawaii-ocean hover:underline font-medium"
+                                    >
+                                        Hosting Platform Registration
                                     </button>
                                 </div>
                             </div>

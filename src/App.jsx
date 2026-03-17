@@ -16,7 +16,8 @@ import UserProfile from './components/profile/UserProfile';
 import PublicSettings from './components/public/PublicSettings';
 import RegistrationForm from './components/registration/RegistrationForm';
 import LetterGenerator from './components/admin/LetterGenerator';
-import DataMigration from './components/admin/DataMigration';
+import HostingPlatformRegistration from './components/admin/HostingPlatformRegistration';
+// import DataMigration from './components/admin/DataMigration';
 import DataMigrationExplanation from './components/admin/DataMigrationExplanation';
 import HostingPlatformPortal from './components/admin/HostingPlatformPortal';
 import GranularPermissions from './components/admin/GranularPermissions';
@@ -85,6 +86,8 @@ function App() {
       <Router>
         {!isAuthenticated ? (
           <Routes>
+            <Route path="/" element={<Login onLogin={handleLogin} />} />
+            <Route path="/hosting-registration" element={<HostingPlatformRegistration />} />
             <Route path="*" element={<Login onLogin={handleLogin} />} />
           </Routes>
         ) : (
@@ -219,11 +222,11 @@ function App() {
                   <TVRRegistrationFlow />
                 </ProtectedRoute>
               } />
-              <Route path="/admin/data-migration" element={
+              {/* <Route path="/admin/data-migration" element={
                 <ProtectedRoute allowedRoles={['Admin']}>
                   <DataMigration />
                 </ProtectedRoute>
-              } />
+              } /> */}
               
               <Route path="/case/new" element={<NewCaseForm />} />
               <Route path="/case/:id" element={<CaseReview />} />
@@ -231,7 +234,7 @@ function App() {
               <Route path="/hosting-portal" element={<HostingPlatformPortal />} />
               <Route path="/granular-permissions" element={<GranularPermissions />} />
               <Route path="/public-portal" element={<PublicPortalDashboard />} />
-              <Route path="/public-settings" element={<PublicSettings />} />
+              <Route path="/login" element={<Login onLogin={handleLogin} />} />
               <Route path="/register" element={<PublicTVRRegistration />} />
               <Route path="/registration-status" element={<RegistrationStatus />} />
               <Route path="/notice-generator" element={<NoticeGenerator />} />

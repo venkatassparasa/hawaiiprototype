@@ -1,8 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, AreaChart, Area } from 'recharts';
-import { Download, Calendar, FileText, TrendingUp, DollarSign } from 'lucide-react';
+import { Download, Calendar, FileText, TrendingUp, DollarSign, AlertTriangle, Plus, X } from 'lucide-react';
 
 const Reports = () => {
+    const [showCaseModal, setShowCaseModal] = useState(false);
+    const [newCase, setNewCase] = useState({
+        propertyAddress: '',
+        ownerName: '',
+        violationType: 'Non-Compliance',
+        severity: 'medium',
+        description: '',
+        source: 'compliance-report'
+    });
+
     const complianceData = [
         { name: 'Aug', compliant: 2000, nonCompliant: 400 },
         { name: 'Sep', compliant: 2100, nonCompliant: 350 },
@@ -11,6 +21,37 @@ const Reports = () => {
         { name: 'Dec', compliant: 2500, nonCompliant: 200 },
         { name: 'Jan', compliant: 2800, nonCompliant: 150 },
     ];
+
+    const handleCreateCase = () => {
+        // Generate case number
+        const caseNumber = `VC-2024-${Math.floor(Math.random() * 1000)}`;
+        
+        // Create new case object
+        const caseData = {
+            ...newCase,
+            caseNumber,
+            status: 'reported',
+            createdDate: new Date().toISOString().split('T')[0],
+            estimatedFine: newCase.severity === 'high' ? 1000 : newCase.severity === 'medium' ? 500 : 250
+        };
+        
+        // In a real app, this would save to a database
+        console.log('Creating case from compliance report:', caseData);
+        
+        // Show success message
+        alert(`Case ${caseNumber} created successfully from compliance report!`);
+        
+        // Reset form and close modal
+        setNewCase({
+            propertyAddress: '',
+            ownerName: '',
+            violationType: 'Non-Compliance',
+            severity: 'medium',
+            description: '',
+            source: 'compliance-report'
+        });
+        setShowCaseModal(false);
+    };
 
     const violationsData = [
         { name: 'Noise', value: 35 },
@@ -30,6 +71,13 @@ const Reports = () => {
                     <p className="text-slate-500">Enforcement trends and compliance metrics.</p>
                 </div>
                 <div className="flex gap-2">
+                    <button 
+                        onClick={() => setShowCaseModal(true)}
+                        className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 flex items-center gap-2 text-sm shadow-sm"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Create Case from Compliance
+                    </button>
                     <button className="px-4 py-2 border border-slate-200 bg-white rounded-lg flex items-center gap-2 text-sm text-slate-600 hover:bg-slate-50">
                         <Calendar className="w-4 h-4" /> Last 6 Months
                     </button>
@@ -46,7 +94,7 @@ const Reports = () => {
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
                     <h2 className="font-bold text-slate-800 mb-6">Compliance Rate Over Time</h2>
                     <div className="h-80">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height="100%" minWidth={300} minHeight={300}>
                             <AreaChart data={complianceData}>
                                 <defs>
                                     <linearGradient id="colorComp" x1="0" y1="0" x2="0" y2="1">
@@ -68,7 +116,7 @@ const Reports = () => {
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
                     <h2 className="font-bold text-slate-800 mb-6">Violation Types Breakdown</h2>
                     <div className="h-80 flex items-center justify-center">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height="100%" minWidth={300} minHeight={300}>
                             <PieChart>
                                 <Pie
                                     data={violationsData}
@@ -102,7 +150,7 @@ const Reports = () => {
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 lg:col-span-2">
                     <h2 className="font-bold text-slate-800 mb-6">Enforcement Revenue (Fines Issued vs. Collected)</h2>
                     <div className="h-80">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height="100%" minWidth={300} minHeight={300}>
                             <BarChart data={complianceData}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} />
@@ -343,6 +391,122 @@ const Reports = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Case Creation Modal */}
+            {showCaseModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-lg">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-2xl font-bold text-slate-800">Create Case from Compliance Report</h2>
+                            <button
+                                onClick={() => setShowCaseModal(false)}
+                                className="text-slate-400 hover:text-slate-600"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+                        
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Property Address *
+                                </label>
+                                <input
+                                    type="text"
+                                    value={newCase.propertyAddress}
+                                    onChange={(e) => setNewCase({...newCase, propertyAddress: e.target.value})}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                    placeholder="Enter property address"
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Owner Name *
+                                </label>
+                                <input
+                                    type="text"
+                                    value={newCase.ownerName}
+                                    onChange={(e) => setNewCase({...newCase, ownerName: e.target.value})}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                    placeholder="Enter owner name"
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Violation Type *
+                                </label>
+                                <select
+                                    value={newCase.violationType}
+                                    onChange={(e) => setNewCase({...newCase, violationType: e.target.value})}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                >
+                                    <option value="Non-Compliance">Non-Compliance</option>
+                                    <option value="Safety Violation">Safety Violation</option>
+                                    <option value="Zoning Violation">Zoning Violation</option>
+                                    <option value="Noise Complaint">Noise Complaint</option>
+                                    <option value="Parking Violation">Parking Violation</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Severity *
+                                </label>
+                                <select
+                                    value={newCase.severity}
+                                    onChange={(e) => setNewCase({...newCase, severity: e.target.value})}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                >
+                                    <option value="low">Low</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="high">High</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Description *
+                                </label>
+                                <textarea
+                                    value={newCase.description}
+                                    onChange={(e) => setNewCase({...newCase, description: e.target.value})}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                    placeholder="Describe the compliance issue..."
+                                    rows="3"
+                                />
+                            </div>
+                        </div>
+                        
+                        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mt-4">
+                            <p className="text-sm text-amber-800">
+                                <strong>Source:</strong> Compliance Report Analytics
+                            </p>
+                            <p className="text-xs text-amber-600 mt-1">
+                                This case will be created based on compliance monitoring data
+                            </p>
+                        </div>
+                        
+                        <div className="flex justify-end gap-3 mt-6">
+                            <button
+                                onClick={() => setShowCaseModal(false)}
+                                className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleCreateCase}
+                                disabled={!newCase.propertyAddress || !newCase.ownerName || !newCase.description}
+                                className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Create Case
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

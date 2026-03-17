@@ -94,7 +94,7 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
             if (user?.role === 'Admin') {
                 items.push({ icon: Settings, label: 'Configuration', path: '/admin/config' });
                 items.push({ icon: FileText, label: 'County Dashboard', path: '/admin/dashboard' });
-                items.push({ icon: Database, label: 'Data Migration', path: '/admin/data-migration' });
+                // items.push({ icon: Database, label: 'Data Migration', path: '/admin/data-migration' });
                 items.push({ icon: Globe, label: 'Hosting Portal', path: '/hosting-portal' });
                 items.push({ icon: ShieldCheck, label: 'Granular Permissions', path: '/granular-permissions' });
             }

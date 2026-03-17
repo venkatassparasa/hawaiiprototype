@@ -103,16 +103,58 @@ const Header = ({ user, onLogout, onMenuToggle }) => {
                     </div>
                 )}
 
-                {/* Public User Login/Logout Button */}
+                {/* Public User Profile Display */}
                 {user?.role === 'Public' && (
-                    <button
-                        onClick={onLogout}
-                        className="px-4 py-2 text-sm bg-hawaii-ocean text-white rounded-lg hover:bg-blue-800 transition-colors flex items-center gap-2"
-                        style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
-                    >
-                        <LogOut className="w-4 h-4" />
-                        Login
-                    </button>
+                    <div className="relative">
+                        <button
+                            onClick={() => setShowUserMenu(!showUserMenu)}
+                            className="flex items-center gap-3 pl-3 pr-2 py-1.5 rounded-lg transition-colors"
+                        >
+                            <div className="w-9 h-9 rounded-full bg-[#345b7e] flex items-center justify-center font-bold text-sm text-white">
+                                JD
+                            </div>
+                            <div className="text-right hidden md:block">
+                                <p className="text-sm font-medium text-slate-700 text-white">John Doe</p>
+                                <p className="text-xs text-slate-400 text-white">Public Profile</p>
+                            </div>
+                            <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${showUserMenu ? 'rotate-180' : ''}`} />
+                        </button>
+
+                        {/* Dropdown Menu */}
+                        {showUserMenu && (
+                            <>
+                                <div
+                                    className="fixed inset-0 z-10"
+                                    onClick={() => setShowUserMenu(false)}
+                                ></div>
+                                <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-slate-100 py-2 z-20">
+                                    <div className="px-4 py-3 border-b border-slate-100">
+                                        <p className="text-sm font-medium text-slate-900">John Doe</p>
+                                        <p className="text-xs text-slate-500">Public User</p>
+                                    </div>
+
+                                    <Link
+                                        to="/profile"
+                                        onClick={() => setShowUserMenu(false)}
+                                        className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-3"
+                                    >
+                                        <User className="w-4 h-4" />
+                                        Public Profile
+                                    </Link>
+
+                                    <div className="border-t border-slate-100 mt-2 pt-2">
+                                        <button
+                                            onClick={onLogout}
+                                            className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-3"
+                                        >
+                                            <LogOut className="w-4 h-4" />
+                                            Sign Out
+                                        </button>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
                 )}
             </div>
         </header>

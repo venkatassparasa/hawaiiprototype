@@ -1,10 +1,20 @@
 import React, { useState } from 'react';
-import { Calendar, Search, Filter, Clock, CheckCircle, AlertTriangle, User, Binoculars, CalendarCheck, CheckLine } from 'lucide-react';
+import { Calendar, Search, Filter, Clock, CheckCircle, AlertTriangle, User, Binoculars, CalendarCheck, CheckLine, Plus, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const InspectionScheduler = () => {
     const [viewMode, setViewMode] = useState('list'); // 'list' or 'calendar'
     const [statusFilter, setStatusFilter] = useState('all');
+    const [showCaseModal, setShowCaseModal] = useState(false);
+    const [selectedInspection, setSelectedInspection] = useState(null);
+    const [newCase, setNewCase] = useState({
+        propertyAddress: '',
+        ownerName: '',
+        violationType: 'Inspection Finding',
+        severity: 'medium',
+        description: '',
+        source: 'inspection'
+    });
 
     // Mock inspection data
     const inspections = [
@@ -28,6 +38,54 @@ const InspectionScheduler = () => {
         statusFilter === 'all' || i.status === statusFilter
     );
 
+    const handleCreateCase = () => {
+        // Generate case number
+        const caseNumber = `VC-2024-${Math.floor(Math.random() * 1000)}`;
+        
+        // Create new case object
+        const caseData = {
+            ...newCase,
+            caseNumber,
+            status: 'reported',
+            createdDate: new Date().toISOString().split('T')[0],
+            estimatedFine: newCase.severity === 'high' ? 1000 : newCase.severity === 'medium' ? 500 : 250,
+            inspectionId: selectedInspection?.id,
+            inspectionType: selectedInspection?.type,
+            inspector: selectedInspection?.inspector
+        };
+        
+        // In a real app, this would save to a database
+        console.log('Creating case from inspection:', caseData);
+        
+        // Show success message
+        alert(`Case ${caseNumber} created successfully from inspection!`);
+        
+        // Reset form and close modal
+        setNewCase({
+            propertyAddress: '',
+            ownerName: '',
+            violationType: 'Inspection Finding',
+            severity: 'medium',
+            description: '',
+            source: 'inspection'
+        });
+        setSelectedInspection(null);
+        setShowCaseModal(false);
+    };
+
+    const openCaseModal = (inspection) => {
+        setSelectedInspection(inspection);
+        setNewCase({
+            propertyAddress: inspection.property,
+            ownerName: 'Property Owner', // In real app, this would come from property data
+            violationType: 'Inspection Finding',
+            severity: 'medium',
+            description: `Issues found during ${inspection.type} on ${inspection.date}`,
+            source: 'inspection'
+        });
+        setShowCaseModal(true);
+    };
+
     return (
         <div className="space-y-6 animate-in fade-in duration-500">
 
@@ -40,61 +98,21 @@ const InspectionScheduler = () => {
                 <div className="flex gap-3">
                     <button 
                         onClick={() => {
-                            const newCase = {
-                                id: Date.now(),
-                                caseNumber: `VC-2024-${Math.floor(Math.random() * 1000)}`,
-                                propertyAddress: 'Property from Inspection',
-                                ownerName: 'Property Owner',
+                            setNewCase({
+                                propertyAddress: '',
+                                ownerName: '',
                                 violationType: 'Inspection Finding',
                                 severity: 'medium',
-                                status: 'reported',
-                                priority: 'medium',
-                                dateReported: new Date().toISOString().split('T')[0],
-                                assignedTo: 'Unassigned',
-                                department: 'Compliance',
-                                estimatedFine: 0.00,
-                                description: 'Case created from inspection findings',
-                                propertyStatus: 'unregistered',
-                                exemptionStatus: 'none',
-                                exemptionReason: '',
-                                exemptionDate: null,
-                                investigation: null,
-                                linkedTVRRecords: [],
-                                assignments: [],
-                                internalNotes: [
-                                    {
-                                        id: 1,
-                                        author: 'Inspector',
-                                        date: new Date().toISOString().split('T')[0],
-                                        content: 'Case created from inspection scheduler',
-                                        type: 'inspection'
-                                    }
-                                ],
-                                statusHistory: [
-                                    { 
-                                        id: 1, 
-                                        status: 'reported', 
-                                        date: new Date().toISOString().split('T')[0], 
-                                        changedBy: 'System', 
-                                        notes: 'Case created from inspection' 
-                                    }
-                                ],
-                                outcomes: {
-                                    warning: false,
-                                    cancellation: false,
-                                    finesPaid: false,
-                                    lienFiled: false,
-                                    suspension: false,
-                                    courtAction: false
-                                }
-                            };
-                            console.log('New case created from inspection:', newCase);
-                            alert(`Case ${newCase.caseNumber} created from inspection findings!`);
+                                description: '',
+                                source: 'inspection'
+                            });
+                            setSelectedInspection(null);
+                            setShowCaseModal(true);
                         }}
                         className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-colors"
                     >
                         <Plus className="w-4 h-4" />
-                        Create Case
+                        Create Case from Inspection
                     </button>
                     <button className="px-6 py-3 bg-hawaii-ocean text-white rounded-lg font-medium hover:bg-blue-800"
                     style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
@@ -222,12 +240,22 @@ const InspectionScheduler = () => {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <Link
-                                            to={`/inspection/${inspection.id}`}
-                                            className="text-hawaii-ocean font-medium hover:underline opacity-0 group-hover:opacity-100 transition-opacity"
-                                        >
-                                            View Details
-                                        </Link>
+                                        <div className="flex items-center gap-2">
+                                            <Link
+                                                to={`/inspection/${inspection.id}`}
+                                                className="text-hawaii-ocean font-medium hover:underline opacity-0 group-hover:opacity-100 transition-opacity"
+                                            >
+                                                View Details
+                                            </Link>
+                                            {(inspection.status === 'completed' || inspection.status === 'in-progress') && (
+                                                <button
+                                                    onClick={() => openCaseModal(inspection)}
+                                                    className="text-orange-600 font-medium hover:text-orange-700 text-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                                                >
+                                                    Create Case
+                                                </button>
+                                            )}
+                                        </div>
                                     </td>
                                 </tr>
                             );
@@ -242,6 +270,133 @@ const InspectionScheduler = () => {
                 )}
             </div>
 
+            {/* Case Creation Modal */}
+            {showCaseModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-lg">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-2xl font-bold text-slate-800">Create Case from Inspection</h2>
+                            <button
+                                onClick={() => setShowCaseModal(false)}
+                                className="text-slate-400 hover:text-slate-600"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+                        
+                        {selectedInspection && (
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                                <h3 className="font-medium text-blue-900 mb-2">Inspection Details</h3>
+                                <div className="text-sm text-blue-800 space-y-1">
+                                    <p><strong>Property:</strong> {selectedInspection.property}</p>
+                                    <p><strong>Type:</strong> {selectedInspection.type}</p>
+                                    <p><strong>Inspector:</strong> {selectedInspection.inspector}</p>
+                                    <p><strong>Date:</strong> {selectedInspection.date} at {selectedInspection.time}</p>
+                                </div>
+                            </div>
+                        )}
+                        
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Property Address *
+                                </label>
+                                <input
+                                    type="text"
+                                    value={newCase.propertyAddress}
+                                    onChange={(e) => setNewCase({...newCase, propertyAddress: e.target.value})}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                    placeholder="Enter property address"
+                                />
+                            </div>
+                             
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Owner Name *
+                                </label>
+                                <input
+                                    type="text"
+                                    value={newCase.ownerName}
+                                    onChange={(e) => setNewCase({...newCase, ownerName: e.target.value})}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                    placeholder="Enter owner name"
+                                />
+                            </div>
+                             
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Violation Type *
+                                </label>
+                                <select
+                                    value={newCase.violationType}
+                                    onChange={(e) => setNewCase({...newCase, violationType: e.target.value})}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                >
+                                    <option value="Inspection Finding">Inspection Finding</option>
+                                    <option value="Safety Violation">Safety Violation</option>
+                                    <option value="Zoning Violation">Zoning Violation</option>
+                                    <option value="Noise Complaint">Noise Complaint</option>
+                                    <option value="Parking Violation">Parking Violation</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                             
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Severity *
+                                </label>
+                                <select
+                                    value={newCase.severity}
+                                    onChange={(e) => setNewCase({...newCase, severity: e.target.value})}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                >
+                                    <option value="low">Low</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="high">High</option>
+                                </select>
+                            </div>
+                             
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Description *
+                                </label>
+                                <textarea
+                                    value={newCase.description}
+                                    onChange={(e) => setNewCase({...newCase, description: e.target.value})}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                    placeholder="Describe the inspection findings..."
+                                    rows="3"
+                                />
+                            </div>
+                        </div>
+                        
+                        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mt-4">
+                            <p className="text-sm text-amber-800">
+                                <strong>Source:</strong> Inspection Report
+                            </p>
+                            <p className="text-xs text-amber-600 mt-1">
+                                This case will be created based on inspection findings
+                            </p>
+                        </div>
+                        
+                        <div className="flex justify-end gap-3 mt-6">
+                            <button
+                                onClick={() => setShowCaseModal(false)}
+                                className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleCreateCase}
+                                disabled={!newCase.propertyAddress || !newCase.ownerName || !newCase.description}
+                                className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Create Case
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
