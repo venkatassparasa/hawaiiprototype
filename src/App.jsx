@@ -18,10 +18,12 @@ import RegistrationForm from './components/registration/RegistrationForm';
 import LetterGenerator from './components/admin/LetterGenerator';
 import HostingPlatformPortal from './components/admin/HostingPlatformPortal';
 import GranularPermissions from './components/admin/GranularPermissions';
+import PublicPortalDashboard from './components/public/PublicPortalDashboard';
 import RegistrationList from './components/registration/RegistrationList';
 import RegistrationStatus from './components/registration/RegistrationStatus';
 import RegistrationDetail from './components/registration/RegistrationDetail';
 import ViolationCases from './components/enforcement/ViolationCases';
+import ViolationCaseManagement from './components/enforcement/ViolationCaseManagement';
 import NoticeGenerator from './components/enforcement/NoticeGenerator';
 import PaymentTracking from './components/enforcement/PaymentTracking';
 import PaymentDetail from './components/enforcement/PaymentDetail';
@@ -131,6 +133,11 @@ function App() {
                   <ViolationCases />
                 </ProtectedRoute>
               } />
+              <Route path="/case-management" element={
+                <ProtectedRoute allowedRoles={['Legal', 'Admin', 'Enforcement Officer']}>
+                  <ViolationCaseManagement />
+                </ProtectedRoute>
+              } />
               <Route path="/complaints" element={
                 <ProtectedRoute allowedRoles={['Legal', 'Admin', 'Enforcement Officer']}>
                   <ComplaintsList />
@@ -222,6 +229,7 @@ function App() {
               <Route path="/letter-generator" element={<LetterGenerator />} />
               <Route path="/hosting-portal" element={<HostingPlatformPortal />} />
               <Route path="/granular-permissions" element={<GranularPermissions />} />
+              <Route path="/public-portal" element={<PublicPortalDashboard />} />
               <Route path="/public-settings" element={<PublicSettings />} />
               <Route path="/register" element={<PublicTVRRegistration />} />
               <Route path="/registration-status" element={<RegistrationStatus />} />

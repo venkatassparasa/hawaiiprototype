@@ -66,8 +66,7 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
 
         if (isPublic) {
            items.push({ label: 'PUBLIC PORTAL', header: true });
-            items.push({ icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' });
-
+            items.push({ icon: LayoutDashboard, label: 'My Dashboard', path: '/public-portal' });
             items.push(
                 { icon: Building2, label: 'Property Search', path: '/public-search' },
                 { icon: FileText, label: 'TVR Registration', path: '/register' },

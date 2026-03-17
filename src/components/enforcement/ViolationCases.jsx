@@ -116,14 +116,23 @@ const ViolationCases = () => {
                     <h1 className="text-2xl font-bold text-slate-800">Violation Cases</h1>
                     <p className="text-slate-500">Manage enforcement actions and compliance violations</p>
                 </div>
-                <Link
-                    to="/case/new"
-                    className="px-6 py-3 bg-hawaii-ocean text-white rounded-lg font-medium hover:bg-blue-800 flex items-center gap-2"
-                    style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
-                >
-                    <Plus className="w-4 h-4" />
-                    New Case
-                </Link>
+                <div className="flex items-center gap-3">
+                    <Link
+                        to="/case-management"
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                    >
+                        <AlertTriangle className="w-4 h-4" />
+                        Case Management
+                    </Link>
+                    <Link
+                        to="/case/new"
+                        className="px-6 py-3 bg-hawaii-ocean text-white rounded-lg font-medium hover:bg-blue-800 flex items-center gap-2"
+                        style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
+                    >
+                        <Plus className="w-4 h-4" />
+                        New Case
+                    </Link>
+                </div>
             </div>
 
             {/* Filters */}

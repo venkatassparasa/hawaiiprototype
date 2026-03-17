@@ -72,7 +72,7 @@ const GranularPermissions = () => {
             name: 'Public User',
             description: 'General public access to property search and registration',
             templateId: null,
-            customPermissions: {},
+            customPermissions: [],
             active: true
         },
         {
@@ -80,7 +80,7 @@ const GranularPermissions = () => {
             name: 'TVR Registration Clerk',
             description: 'County staff processing TVR registrations',
             templateId: 1,
-            customPermissions: {},
+            customPermissions: [],
             active: true
         },
         {
@@ -88,7 +88,7 @@ const GranularPermissions = () => {
             name: 'Compliance Officer',
             description: 'Enforcement staff conducting inspections',
             templateId: 2,
-            customPermissions: {},
+            customPermissions: [],
             active: true
         },
         {
@@ -96,23 +96,23 @@ const GranularPermissions = () => {
             name: 'Finance Manager',
             description: 'Financial management and payment processing',
             templateId: 3,
-            customPermissions: {},
+            customPermissions: [],
             active: true
         },
         {
             id: 5,
-            name: 'Legal Staff',
-            description: 'Legal case management and appeals',
+            name: 'Legal Counsel',
+            description: 'Legal review and case management',
             templateId: 4,
-            customPermissions: {},
+            customPermissions: [],
             active: true
         },
         {
             id: 6,
             name: 'System Administrator',
-            description: 'Full system administration',
-            templateId: 5,
-            customPermissions: {},
+            description: 'Full system access and configuration',
+            templateId: null,
+            customPermissions: [],
             active: true
         }
     ]);
@@ -256,22 +256,61 @@ const GranularPermissions = () => {
     };
 
     const hasPermission = (role, module, action, record) => {
-        const permissions = getRolePermissions(role);
+        // Check if role has a template assigned
+        if (role.templateId) {
+            // For template-based roles, check both template and custom permissions
+            const template = permissionTemplates.find(t => t.id === role.templateId);
+            if (template) {
+                // Check template permissions
+                const hasTemplateAccess = !template.permissions.modules || template.permissions.modules.includes('all') || template.permissions.modules.includes(module);
+                const hasTemplateAction = !template.permissions.actions || template.permissions.actions.includes('all') || template.permissions.actions.includes(action);
+                const hasTemplateRecord = !template.permissions.records || template.permissions.records.includes('all') || 
+                                      template.permissions.records.includes(record) || 
+                                      (record === 'own' && action === 'read');
+                
+                // Check custom permissions (overrides/restrictions)
+                const customPermissions = role.customPermissions || [];
+                if (!Array.isArray(customPermissions)) return hasTemplateAccess && hasTemplateAction && hasTemplateRecord;
+                
+                // Custom permissions can override or restrict template permissions
+                const hasCustomPermission = customPermissions.some(
+                    p => p.moduleId === module && p.action === action && p.recordScope === record
+                );
+                
+                // If custom permission exists, use it; otherwise use template permission
+                return hasCustomPermission || (hasTemplateAccess && hasTemplateAction && hasTemplateRecord);
+            }
+        }
         
-        // Check module access
-        const hasModuleAccess = !permissions.modules || permissions.modules.includes('all') || permissions.modules.includes(module);
-        if (!hasModuleAccess) return false;
+        // Check custom permissions (individual permission objects) for non-template roles
+        const customPermissions = role.customPermissions || [];
+        if (!Array.isArray(customPermissions)) return false;
         
-        // Check action access
-        const hasActionAccess = !permissions.actions || permissions.actions.includes('all') || permissions.actions.includes(action);
-        if (!hasActionAccess) return false;
-        
-        // Check record scope
-        const hasRecordAccess = !permissions.records || permissions.records.includes('all') || 
-                              permissions.records.includes(record) || 
-                              (record === 'own' && action === 'read');
-        
-        return hasRecordAccess;
+        return customPermissions.some(
+            p => p.moduleId === module && p.action === action && p.recordScope === record
+        );
+    };
+
+    const handleTogglePermission = (roleId, moduleId, action, recordScope) => {
+        setUserRoles(userRoles.map(role => {
+            if (role.id !== roleId) return role;
+            
+            const currentPermissions = Array.isArray(role.customPermissions) ? role.customPermissions : [];
+            const permissionIndex = currentPermissions.findIndex(
+                p => p.moduleId === moduleId && p.action === action && p.recordScope === recordScope
+            );
+            
+            let newPermissions;
+            if (permissionIndex >= 0) {
+                // Remove permission if it exists
+                newPermissions = currentPermissions.filter((_, index) => index !== permissionIndex);
+            } else {
+                // Add permission if it doesn't exist
+                newPermissions = [...currentPermissions, { moduleId, action, recordScope }];
+            }
+            
+            return { ...role, customPermissions: newPermissions };
+        }));
     };
 
     const filteredTemplates = permissionTemplates.filter(template => 
@@ -534,13 +573,17 @@ const GranularPermissions = () => {
                                                 const hasAccess = hasPermission(role, module.id, 'read', 'all');
                                                 return (
                                                     <td key={module.id} className="px-4 py-3 text-center">
-                                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center mx-auto ${
-                                                            hasAccess 
-                                                                ? 'bg-green-100 text-green-800' 
-                                                                : 'bg-red-100 text-red-800'
-                                                        }`}>
+                                                        <button
+                                                            onClick={() => handleTogglePermission(role.id, module.id, 'read', 'all')}
+                                                            className={`w-6 h-6 rounded-full flex items-center justify-center mx-auto transition-colors hover:ring-2 hover:ring-offset-2 ${
+                                                                hasAccess 
+                                                                    ? 'bg-green-100 text-green-800 hover:bg-green-200 hover:ring-green-400' 
+                                                                    : 'bg-red-100 text-red-800 hover:bg-red-200 hover:ring-red-400'
+                                                            }`}
+                                                            title={`Toggle ${module.name} access for ${role.name}`}
+                                                        >
                                                             {hasAccess ? <CheckCircle className="w-4 h-4" /> : <X className="w-4 h-4" />}
-                                                        </div>
+                                                        </button>
                                                     </td>
                                                 );
                                             })}
@@ -558,13 +601,16 @@ const GranularPermissions = () => {
                                         <div className="w-4 h-4 bg-green-100 text-green-800 rounded-full flex items-center justify-center">
                                             <CheckCircle className="w-3 h-3" />
                                         </div>
-                                        <span>Has Access</span>
+                                        <span>Has Access (Click to remove)</span>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <div className="w-4 h-4 bg-red-100 text-red-800 rounded-full flex items-center justify-center">
                                             <X className="w-3 h-3" />
                                         </div>
-                                        <span>No Access</span>
+                                        <span>No Access (Click to add)</span>
+                                    </div>
+                                    <div className="text-xs text-slate-500 mt-2">
+                                        <strong>Interactive:</strong> Click any permission cell to toggle access
                                     </div>
                                 </div>
                             </div>
