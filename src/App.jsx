@@ -16,6 +16,8 @@ import UserProfile from './components/profile/UserProfile';
 import PublicSettings from './components/public/PublicSettings';
 import RegistrationForm from './components/registration/RegistrationForm';
 import LetterGenerator from './components/admin/LetterGenerator';
+import DataMigration from './components/admin/DataMigration';
+import DataMigrationExplanation from './components/admin/DataMigrationExplanation';
 import HostingPlatformPortal from './components/admin/HostingPlatformPortal';
 import GranularPermissions from './components/admin/GranularPermissions';
 import PublicPortalDashboard from './components/public/PublicPortalDashboard';
@@ -48,7 +50,6 @@ import WorkflowBuilder from './components/workflows/WorkflowBuilder';
 import AdminConfiguration from './components/admin/AdminConfiguration';
 import InternalCountyDashboard from './components/admin/InternalCountyDashboard';
 import TVRRegistrationFlow from './components/admin/TVRRegistrationFlow';
-import DataMigrationExplanation from './components/admin/DataMigrationExplanation';
 // Public Components
 import PublicTVRRegistration from './components/public/PublicTVRRegistration';
 import { RoleContext } from './context/RoleContext';
@@ -220,7 +221,7 @@ function App() {
               } />
               <Route path="/admin/data-migration" element={
                 <ProtectedRoute allowedRoles={['Admin']}>
-                  <DataMigrationExplanation />
+                  <DataMigration />
                 </ProtectedRoute>
               } />
               
