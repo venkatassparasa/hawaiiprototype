@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings, DollarSign, Clock, Mail, FileText, Building, Save, Plus, Edit2, Trash2, Eye, EyeOff } from 'lucide-react';
+import { Settings, DollarSign, Clock, Mail, FileText, Building, Save, Plus, Edit2, Trash2, Eye, EyeOff, AlertTriangle } from 'lucide-react';
 
 const AdminConfiguration = () => {
     const [activeTab, setActiveTab] = useState('fees');
@@ -36,6 +36,14 @@ const AdminConfiguration = () => {
         emergencyContact: '(808) 935-3333',
     });
 
+    // Violation Payment Thresholds
+    const [violationThresholds, setViolationThresholds] = useState({
+        warningThreshold: 500,
+        fineThreshold: 1000,
+        lienThreshold: 5000,
+        suspensionThreshold: 10000,
+    });
+
     const [letterTemplates, setLetterTemplates] = useState([
         { id: 1, name: 'Compliance Notice', type: 'violation', subject: 'TVR Compliance Notice', active: true },
         { id: 2, name: 'Approval Letter', type: 'approval', subject: 'TVR Registration Approved', active: true },
@@ -46,6 +54,7 @@ const AdminConfiguration = () => {
     const tabs = [
         { id: 'fees', label: 'Fee Management', icon: DollarSign },
         { id: 'useTypes', label: 'Use Types', icon: Building },
+        { id: 'thresholds', label: 'Violation Thresholds', icon: AlertTriangle },
         { id: 'standards', label: 'Operational Standards', icon: Clock },
         { id: 'contact', label: 'Contact Info', icon: Mail },
         { id: 'templates', label: 'Letter Templates', icon: FileText },
@@ -54,6 +63,111 @@ const AdminConfiguration = () => {
     const handleSave = () => {
         // Save configuration logic here
         alert('Configuration saved successfully!');
+    };
+
+    // Fee Management Handlers
+    const handleAddFee = () => {
+        const newFee = {
+            id: Math.max(...fees.map(f => f.id)) + 1,
+            name: 'New Fee',
+            amount: 0.00,
+            type: 'one-time',
+            description: 'New fee description'
+        };
+        setFees([...fees, newFee]);
+    };
+
+    const handleEditFee = (id) => {
+        const feeToEdit = fees.find(f => f.id === id);
+        const newName = prompt('Edit fee name:', feeToEdit.name);
+        const newAmount = prompt('Edit fee amount:', feeToEdit.amount);
+        
+        if (newName && newAmount) {
+            setFees(fees.map(f => 
+                f.id === id 
+                    ? { ...f, name: newName, amount: parseFloat(newAmount) }
+                    : f
+            ));
+        }
+    };
+
+    const handleDeleteFee = (id) => {
+        if (confirm('Are you sure you want to delete this fee?')) {
+            setFees(fees.filter(f => f.id !== id));
+        }
+    };
+
+    // Use Type Management Handlers
+    const handleAddUseType = () => {
+        const newUseType = {
+            id: Math.max(...useTypes.map(t => t.id)) + 1,
+            name: 'New Use Type',
+            maxOccupancy: 4,
+            minStay: 1,
+            description: 'New use type description'
+        };
+        setUseTypes([...useTypes, newUseType]);
+    };
+
+    const handleEditUseType = (id) => {
+        const typeToEdit = useTypes.find(t => t.id === id);
+        const newName = prompt('Edit use type name:', typeToEdit.name);
+        const newMaxOccupancy = prompt('Edit max occupancy:', typeToEdit.maxOccupancy);
+        const newMinStay = prompt('Edit minimum stay:', typeToEdit.minStay);
+        
+        if (newName && newMaxOccupancy && newMinStay) {
+            setUseTypes(useTypes.map(t => 
+                t.id === id 
+                    ? { ...t, name: newName, maxOccupancy: parseInt(newMaxOccupancy), minStay: parseInt(newMinStay) }
+                    : t
+            ));
+        }
+    };
+
+    const handleDeleteUseType = (id) => {
+        if (confirm('Are you sure you want to delete this use type?')) {
+            setUseTypes(useTypes.filter(t => t.id !== id));
+        }
+    };
+
+    // Template Management Handlers
+    const handleAddTemplate = () => {
+        const newTemplate = {
+            id: Math.max(...letterTemplates.map(t => t.id)) + 1,
+            name: 'New Template',
+            type: 'violation',
+            subject: 'New Template Subject',
+            active: true
+        };
+        setLetterTemplates([...letterTemplates, newTemplate]);
+    };
+
+    const handleEditTemplate = (id) => {
+        const templateToEdit = letterTemplates.find(t => t.id === id);
+        const newName = prompt('Edit template name:', templateToEdit.name);
+        const newSubject = prompt('Edit template subject:', templateToEdit.subject);
+        
+        if (newName && newSubject) {
+            setLetterTemplates(letterTemplates.map(t => 
+                t.id === id 
+                    ? { ...t, name: newName, subject: newSubject }
+                    : t
+            ));
+        }
+    };
+
+    const handleDeleteTemplate = (id) => {
+        if (confirm('Are you sure you want to delete this template?')) {
+            setLetterTemplates(letterTemplates.filter(t => t.id !== id));
+        }
+    };
+
+    const handleToggleTemplate = (id) => {
+        setLetterTemplates(letterTemplates.map(t => 
+            t.id === id 
+                ? { ...t, active: !t.active }
+                : t
+        ));
     };
 
     return (
@@ -90,7 +204,7 @@ const AdminConfiguration = () => {
                     <div>
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-xl font-semibold text-slate-800">Fee Management</h2>
-                            <button className="flex items-center gap-2 px-4 py-2 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+                            <button onClick={handleAddFee} className="flex items-center gap-2 px-4 py-2 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
                             style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
                             <Plus className="w-4 h-4" />
                             Add New Fee
@@ -110,10 +224,10 @@ const AdminConfiguration = () => {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <button className="p-2 text-slate-600 hover:text-hawaii-ocean hover:bg-hawaii-ocean/10 rounded transition-colors">
+                                            <button onClick={() => handleEditFee(fee.id)} className="p-2 text-slate-600 hover:text-hawaii-ocean hover:bg-hawaii-ocean/10 rounded transition-colors">
                                                 <Edit2 className="w-4 h-4" />
                                             </button>
-                                            <button className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
+                                            <button onClick={() => handleDeleteFee(fee.id)} className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
                                         </div>
@@ -129,7 +243,7 @@ const AdminConfiguration = () => {
                     <div>
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-xl font-semibold text-slate-800">Use Types</h2>
-                            <button className="flex items-center gap-2 px-4 py-2 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+                            <button onClick={handleAddUseType} className="flex items-center gap-2 px-4 py-2 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
                             style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
                             <Plus className="w-4 h-4" />
                             Add Use Type
@@ -149,16 +263,134 @@ const AdminConfiguration = () => {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <button className="p-2 text-slate-600 hover:text-hawaii-ocean hover:bg-hawaii-ocean/10 rounded transition-colors">
+                                            <button onClick={() => handleEditUseType(useType.id)} className="p-2 text-slate-600 hover:text-hawaii-ocean hover:bg-hawaii-ocean/10 rounded transition-colors">
                                                 <Edit2 className="w-4 h-4" />
                                             </button>
-                                            <button className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
+                                            <button onClick={() => handleDeleteUseType(useType.id)} className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
                                         </div>
                                     </div>
                                 </div>
                             ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Violation Thresholds */}
+                {activeTab === 'thresholds' && (
+                    <div>
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl font-semibold text-slate-800">Violation Payment Thresholds</h2>
+                            <button className="flex items-center gap-2 px-4 py-2 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+                            style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
+                            <Plus className="w-4 h-4" />
+                            Add New Threshold
+                        </button>
+                        </div>
+                        
+                        <div className="space-y-4">
+                            <div className="bg-white border border-slate-200 rounded-lg p-4">
+                                <h3 className="font-medium text-slate-800 mb-4">Warning Threshold</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">Amount ($)</label>
+                                        <input
+                                            type="number"
+                                            value={violationThresholds.warningThreshold}
+                                            onChange={(e) => setViolationThresholds({...violationThresholds, warningThreshold: parseInt(e.target.value)})}
+                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">Triggers</label>
+                                        <select
+                                            value={violationThresholds.warningTrigger || 'multiple_violations'}
+                                            onChange={(e) => setViolationThresholds({...violationThresholds, warningTrigger: e.target.value})}
+                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                        >
+                                            <option value="single_violation">Single Violation</option>
+                                            <option value="multiple_violations">Multiple Violations</option>
+                                            <option value="complaint_based">Complaint Based</option>
+                                            <option value="time_based">Time Based</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div className="bg-white border border-slate-200 rounded-lg p-4">
+                                <h3 className="font-medium text-slate-800 mb-4">Fine Threshold</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">Amount ($)</label>
+                                        <input
+                                            type="number"
+                                            value={violationThresholds.fineThreshold}
+                                            onChange={(e) => setViolationThresholds({...violationThresholds, fineThreshold: parseInt(e.target.value)})}
+                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">Auto-Issue At</label>
+                                        <select
+                                            value={violationThresholds.fineAutoIssue || 'manual'}
+                                            onChange={(e) => setViolationThresholds({...violationThresholds, fineAutoIssue: e.target.value})}
+                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                        >
+                                            <option value="manual">Manual Review</option>
+                                            <option value="auto">Automatic</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div className="bg-white border border-slate-200 rounded-lg p-4">
+                                <h3 className="font-medium text-slate-800 mb-4">Lien Threshold</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">Amount ($)</label>
+                                        <input
+                                            type="number"
+                                            value={violationThresholds.lienThreshold}
+                                            onChange={(e) => setViolationThresholds({...violationThresholds, lienThreshold: parseInt(e.target.value)})}
+                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">Required Days</label>
+                                        <input
+                                            type="number"
+                                            value={violationThresholds.lienDays}
+                                            onChange={(e) => setViolationThresholds({...violationThresholds, lienDays: parseInt(e.target.value)})}
+                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div className="bg-white border border-slate-200 rounded-lg p-4">
+                                <h3 className="font-medium text-slate-800 mb-4">Suspension Threshold</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">Violations Count</label>
+                                        <input
+                                            type="number"
+                                            value={violationThresholds.suspensionThreshold}
+                                            onChange={(e) => setViolationThresholds({...violationThresholds, suspensionThreshold: parseInt(e.target.value)})}
+                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">Time Period (days)</label>
+                                        <input
+                                            type="number"
+                                            value={violationThresholds.suspensionDays}
+                                            onChange={(e) => setViolationThresholds({...violationThresholds, suspensionDays: parseInt(e.target.value)})}
+                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 )}
@@ -325,7 +557,7 @@ const AdminConfiguration = () => {
                     <div>
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-xl font-semibold text-slate-800">Letter Templates</h2>
-                            <button className="flex items-center gap-2 px-4 py-2 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+                            <button onClick={handleAddTemplate} className="flex items-center gap-2 px-4 py-2 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
                             style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
                             <Plus className="w-4 h-4" />
                             Add Template
@@ -351,13 +583,13 @@ const AdminConfiguration = () => {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <button className="p-2 text-slate-600 hover:text-hawaii-ocean hover:bg-hawaii-ocean/10 rounded transition-colors">
-                                                <Eye className="w-4 h-4" />
+                                            <button onClick={() => handleToggleTemplate(template.id)} className="p-2 text-slate-600 hover:text-hawaii-ocean hover:bg-hawaii-ocean/10 rounded transition-colors">
+                                                {template.active ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                             </button>
-                                            <button className="p-2 text-slate-600 hover:text-hawaii-ocean hover:bg-hawaii-ocean/10 rounded transition-colors">
+                                            <button onClick={() => handleEditTemplate(template.id)} className="p-2 text-slate-600 hover:text-hawaii-ocean hover:bg-hawaii-ocean/10 rounded transition-colors">
                                                 <Edit2 className="w-4 h-4" />
                                             </button>
-                                            <button className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
+                                            <button onClick={() => handleDeleteTemplate(template.id)} className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
                                         </div>

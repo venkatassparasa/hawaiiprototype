@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { LayoutDashboard, Building2, Map as MapIcon, FileText, Settings, ShieldCheck, ClipboardList, AlertTriangle, DollarSign, MessageSquare, LogOut, X, Activity, Database } from 'lucide-react';
+import { LayoutDashboard, Building2, Map as MapIcon, FileText, Settings, ShieldCheck, ClipboardList, AlertTriangle, DollarSign, MessageSquare, LogOut, X, Activity, Database, Globe } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { RoleContext } from '../../context/RoleContext';
 
@@ -11,8 +11,6 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
 
     const getNavItems = () => {
         const items = [
-            { label: 'ADMINISTRATION', header: true },
-            { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
         ];
 
         // Role-based visibility
@@ -21,12 +19,21 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
         const isLegal = user?.role === 'Legal' || user?.role === 'Admin' || user?.role === 'Enforcement Officer';
         const isPublic = user?.role === 'Public';
 
+        if(user?.role === 'Admin') {
+            items.push({ label: 'ADMINISTRATION', header: true });
+        }
+
+
+        if(!isPublic) {
+            items.push({ icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' });
+        }
+
         if (isFinance || isPlanning) {
             items.push({ icon: Building2, label: 'Property Registry', path: '/registrations' },
                 // { icon: ClipboardList, label: 'Registrations', path: '/registrations' }
         );
-            
         }
+
 
         if (isPlanning) {
             items.push(
@@ -56,10 +63,11 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
             items.push({ icon: ClipboardList, label: 'Inspections', path: '/inspections' });
         }
 
-        items.push({ label: 'PUBLIC PORTAL', header: true });
-        items.push({ icon: MapIcon, label: 'Compliance Map', path: '/map' });
 
         if (isPublic) {
+           items.push({ label: 'PUBLIC PORTAL', header: true });
+            items.push({ icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' });
+
             items.push(
                 { icon: Building2, label: 'Property Search', path: '/public-search' },
                 { icon: FileText, label: 'TVR Registration', path: '/register' },
@@ -67,8 +75,11 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
                 { icon: MessageSquare, label: 'Submit Complaint', path: '/submit-complaint' }
             );
         }
+        items.push({ icon: MapIcon, label: 'Compliance Map', path: '/map' });
 
-        items.push({ label: 'SYSTEM', header: true });
+        if (!isPublic) {
+            items.push({ label: 'SYSTEM', header: true });
+        }
 
         if (!isPublic) {
             items.push({ icon: FileText, label: 'Analytics Reports', path: '/reports' });
@@ -77,6 +88,7 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
             // Workflow Management - Only for Admin, Planning, Legal, Enforcement
             if (['Admin', 'Planning', 'Legal', 'Enforcement Officer'].includes(user?.role)) {
                 items.push({ icon: Activity, label: 'Workflows', path: '/workflows' });
+                items.push({ icon: FileText, label: 'Letter Generator', path: '/letter-generator' });
             }
             
             // Configuration & Admin Controls - Only for Admin
@@ -84,10 +96,13 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
                 items.push({ icon: Settings, label: 'Configuration', path: '/admin/config' });
                 items.push({ icon: FileText, label: 'County Dashboard', path: '/admin/dashboard' });
                 items.push({ icon: Database, label: 'Data Migration', path: '/admin/data-migration' });
+                items.push({ icon: Globe, label: 'Hosting Portal', path: '/hosting-portal' });
+                items.push({ icon: ShieldCheck, label: 'Granular Permissions', path: '/granular-permissions' });
             }
+            
+            items.push({ icon: Settings, label: 'Settings', path: '/settings' });
         }
 
-        items.push({ icon: Settings, label: 'Settings', path: '/settings' });
 
         return items;
     };

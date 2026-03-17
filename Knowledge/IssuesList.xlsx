@@ -1,0 +1,30 @@
+Module Name,Functionality,Navigation Path,Role Required,Status,Description
+Dashboard,Main Dashboard,/dashboard,All Users,✅ Available,Main landing page with overview statistics
+Property Registry,Property Registration Management,/registrations,Finance/Planning/Enforcement,✅ Available,Manage TVR property registrations
+NCUC Certificates,NCUC Certificate Management,/ncuc,Planning/Enforcement,✅ Available,Manage NCUC certificates and compliance
+Violation Cases,Violation Case Management,/violations,Legal/Enforcement,✅ Available,Manage violation cases and enforcement
+Complaints,Complaint Management,/complaints,Legal/Enforcement,✅ Available,Handle and track complaints
+Appeals,Appeal Management,/appeals,Legal/Enforcement,✅ Available,Manage appeals process
+Violation Catalog,Violation Catalog Management,/violation-catalog,Legal/Enforcement,✅ Available,Catalog of violation types
+Payments,Payment Processing,/payments,Finance,✅ Available,Manage payments and billing
+Inspections,Inspection Management,/inspections,All Non-Public,✅ Available,Schedule and manage inspections
+Compliance Map,Compliance Visualization,/map,All Non-Public,✅ Available,Geographic view of compliance status
+Analytics Reports,Report Generation,/reports,All Non-Public,✅ Available,Generate analytical reports
+Custom Reports,Custom Report Builder,/custom-reports,All Non-Public,✅ Available,Create custom reports
+Workflows,Workflow Management,/workflows,Admin/Planning/Legal/Enforcement,✅ Available,Manage business workflows
+Configuration,Admin Configuration Controls,/admin/config,Admin,✅ Available,Manage system settings and configuration
+County Dashboard,Internal County Dashboard,/admin/dashboard,Admin,✅ Available,Internal admin dashboard
+Data Migration,Data Migration Tools,/admin/data-migration,Admin,✅ Available,Data migration and import tools
+Registration Flow,Admin Registration Flow,/admin/registration-flow,Admin,✅ Available,Admin-side registration management
+Property Search,Public Property Search,/public-search,Public,✅ Available,Public property search interface
+TVR Registration,Public TVR Registration,/register,Public,✅ Available,Public TVR registration form
+Public Resources,Public Information Resources,/public-resources,Public,✅ Available,Public resources and documentation
+Submit Complaint,Public Complaint Submission,/submit-complaint,Public,✅ Available,Public complaint submission form
+Case Management,New Case Form,/case/new,Legal/Enforcement,✅ Available,Create new cases
+Case Review,Case Detail Review,/case/:id,Legal/Enforcement,✅ Available,Review individual cases
+Inspection Detail,Inspection Details,/inspection/:id,All Non-Public,✅ Available,View inspection details
+Appeal Detail,Appeal Details,/appeal/:id,Legal/Enforcement,✅ Available,View appeal details
+Renewals,Renewal Management,/renewals,Finance/Planning,✅ Available,Manage registration renewals
+Complaint Detail,Complaint Details,/complaint/:id,Legal/Enforcement,✅ Available,View complaint details
+Registration Status,Registration Status Tracking,/registration-status,Public,✅ Available,Track registration status
+Notice Generator,Compliance Notice Generator,/notice-generator,Legal/Enforcement,✅ Available,Generate compliance notices

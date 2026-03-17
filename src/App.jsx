@@ -13,7 +13,11 @@ import ReportPreview from './components/reporting/ReportPreview';
 import Settings from './components/settings/Settings';
 import Login from './components/auth/Login';
 import UserProfile from './components/profile/UserProfile';
+import PublicSettings from './components/public/PublicSettings';
 import RegistrationForm from './components/registration/RegistrationForm';
+import LetterGenerator from './components/admin/LetterGenerator';
+import HostingPlatformPortal from './components/admin/HostingPlatformPortal';
+import GranularPermissions from './components/admin/GranularPermissions';
 import RegistrationList from './components/registration/RegistrationList';
 import RegistrationStatus from './components/registration/RegistrationStatus';
 import RegistrationDetail from './components/registration/RegistrationDetail';
@@ -215,6 +219,10 @@ function App() {
               
               <Route path="/case/new" element={<NewCaseForm />} />
               <Route path="/case/:id" element={<CaseReview />} />
+              <Route path="/letter-generator" element={<LetterGenerator />} />
+              <Route path="/hosting-portal" element={<HostingPlatformPortal />} />
+              <Route path="/granular-permissions" element={<GranularPermissions />} />
+              <Route path="/public-settings" element={<PublicSettings />} />
               <Route path="/register" element={<PublicTVRRegistration />} />
               <Route path="/registration-status" element={<RegistrationStatus />} />
               <Route path="/notice-generator" element={<NoticeGenerator />} />
