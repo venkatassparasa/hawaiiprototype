@@ -8,6 +8,31 @@ const ViolationCaseManagement = () => {
     const [filterStatus, setFilterStatus] = useState('all');
     const [filterPriority, setFilterPriority] = useState('all');
     const [selectedCase, setSelectedCase] = useState(null);
+    const [showNewCaseModal, setShowNewCaseModal] = useState(false);
+    const [showInvestigationModal, setShowInvestigationModal] = useState(false);
+    const [selectedCaseForInvestigation, setSelectedCaseForInvestigation] = useState(null);
+    const [showExemptionModal, setShowExemptionModal] = useState(false);
+    const [selectedCaseForExemption, setSelectedCaseForExemption] = useState(null);
+    const [exemptionDetails, setExemptionDetails] = useState({
+        exemptionReason: '',
+        exemptionType: 'religious',
+        effectiveDate: '',
+        notes: ''
+    });
+    const [investigationDetails, setInvestigationDetails] = useState({
+        investigator: 'Officer Jane Smith',
+        scheduledDate: '',
+        notes: ''
+    });
+    const [newCase, setNewCase] = useState({
+        propertyAddress: '',
+        ownerName: '',
+        violationType: '',
+        severity: 'medium',
+        priority: 'medium',
+        description: '',
+        estimatedFine: 0
+    });
 
     // Violation Cases with complete case management data
     const [violationCases, setViolationCases] = useState([
@@ -200,6 +225,56 @@ const ViolationCaseManagement = () => {
                 suspension: false,
                 courtAction: false
             }
+        },
+        {
+            id: 4,
+            caseNumber: 'VC-2024-004',
+            propertyAddress: '321 Coconut Grove, Honolulu, HI 96815',
+            ownerName: 'Maria Garcia',
+            violationType: 'Unauthorized TVR Operation',
+            severity: 'high',
+            status: 'pending',
+            priority: 'high',
+            dateReported: '2024-03-15',
+            assignedTo: '',
+            department: 'Compliance',
+            estimatedFine: 1500.00,
+            description: 'Property operating as short-term rental without proper registration and permits',
+            propertyStatus: 'unregistered',
+            exemptionStatus: 'none',
+            exemptionReason: '',
+            exemptionDate: null,
+            
+            investigation: {
+                initiated: null,
+                investigator: '',
+                status: 'not_started',
+                scheduledDate: null,
+                findings: '',
+                evidence: []
+            },
+            
+            linkedTVRRecords: [],
+            
+            assignments: [],
+            
+            internalNotes: [
+                { id: 1, author: 'System', date: '2024-03-15', content: 'Case created from anonymous complaint.', type: 'system' }
+            ],
+            
+            statusHistory: [
+                { id: 1, status: 'reported', date: '2024-03-15', changedBy: 'System', notes: 'Case created from complaint' },
+                { id: 2, status: 'pending', date: '2024-03-15', changedBy: 'System', notes: 'Case pending investigation assignment' }
+            ],
+            
+            outcomes: {
+                warning: false,
+                cancellation: false,
+                finesPaid: false,
+                lienFiled: false,
+                suspension: false,
+                courtAction: false
+            }
         }
     ]);
 
@@ -242,17 +317,84 @@ const ViolationCaseManagement = () => {
         }
     };
 
-    const handleInitiateInvestigation = (caseId) => {
+    const handleOpenExemptionModal = (case_) => {
+        setSelectedCaseForExemption(case_);
+        const today = new Date().toISOString().split('T')[0];
+        setExemptionDetails({
+            exemptionReason: '',
+            exemptionType: 'religious',
+            effectiveDate: today,
+            notes: ''
+        });
+        setShowExemptionModal(true);
+    };
+
+    const handleGrantExemption = () => {
+        if (selectedCaseForExemption) {
+            handleUpdateExemption(
+                selectedCaseForExemption.id,
+                'granted',
+                exemptionDetails.exemptionReason
+            );
+            setShowExemptionModal(false);
+            setSelectedCaseForExemption(null);
+        }
+    };
+
+    const handleOpenInvestigationModal = (case_) => {
+        setSelectedCaseForInvestigation(case_);
+        const defaultScheduledDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        setInvestigationDetails({
+            investigator: 'Officer Jane Smith',
+            scheduledDate: defaultScheduledDate,
+            notes: ''
+        });
+        setShowInvestigationModal(true);
+    };
+
+    const handleStartInvestigation = () => {
+        if (selectedCaseForInvestigation) {
+            handleInitiateInvestigation(
+                selectedCaseForInvestigation.id,
+                investigationDetails.investigator,
+                investigationDetails.scheduledDate,
+                investigationDetails.notes
+            );
+            setShowInvestigationModal(false);
+            setSelectedCaseForInvestigation(null);
+        }
+    };
+
+    const handleInitiateInvestigation = (caseId, investigator = 'Officer Jane Smith', scheduledDate = null, notes = '') => {
+        const today = new Date().toISOString().split('T')[0];
+        const defaultScheduledDate = scheduledDate || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]; // 7 days from now
+        const findings = notes || 'Investigation initiated. Initial assessment pending.';
+        
         setViolationCases(violationCases.map(case_ => 
             case_.id === caseId 
                 ? { 
                     ...case_, 
                     status: 'under_investigation',
+                    assignedTo: investigator,
                     investigation: {
                         ...case_.investigation,
-                        initiated: new Date().toISOString().split('T')[0],
-                        status: 'active'
-                    }
+                        initiated: today,
+                        investigator: investigator,
+                        status: 'active',
+                        scheduledDate: defaultScheduledDate,
+                        findings: findings
+                    },
+                    assignments: [
+                        ...case_.assignments,
+                        {
+                            id: case_.assignments.length + 1,
+                            staffId: 1,
+                            staffName: investigator,
+                            role: 'Lead Investigator',
+                            assignedDate: today,
+                            status: 'active'
+                        }
+                    ]
                 }
                 : case_
         ));
@@ -315,6 +457,64 @@ const ViolationCaseManagement = () => {
                 }
                 : case_
         ));
+    };
+
+    const handleCreateNewCase = () => {
+        const caseNumber = `VC-${new Date().getFullYear()}-${String(violationCases.length + 1).padStart(3, '0')}`;
+        const newCaseData = {
+            id: violationCases.length + 1,
+            caseNumber: caseNumber,
+            propertyAddress: newCase.propertyAddress,
+            ownerName: newCase.ownerName,
+            violationType: newCase.violationType,
+            severity: newCase.severity,
+            status: 'pending',
+            priority: newCase.priority,
+            dateReported: new Date().toISOString().split('T')[0],
+            assignedTo: '',
+            department: 'Compliance',
+            estimatedFine: newCase.estimatedFine,
+            description: newCase.description,
+            propertyStatus: 'unregistered',
+            exemptionStatus: 'none',
+            exemptionReason: '',
+            exemptionDate: null,
+            
+            investigation: {
+                initiated: null,
+                investigator: '',
+                status: 'not_started',
+                scheduledDate: null,
+                findings: '',
+                evidence: []
+            },
+            
+            linkedTVRRecords: [],
+            
+            assignments: [],
+            
+            internalNotes: [],
+            
+            outcomes: {
+                warning: false,
+                cancellation: false,
+                finesPaid: false,
+                suspension: false,
+                courtAction: false
+            }
+        };
+        
+        setViolationCases([...violationCases, newCaseData]);
+        setShowNewCaseModal(false);
+        setNewCase({
+            propertyAddress: '',
+            ownerName: '',
+            violationType: '',
+            severity: 'medium',
+            priority: 'medium',
+            description: '',
+            estimatedFine: 0
+        });
     };
 
     const filteredCases = violationCases.filter(case_ => {
@@ -402,6 +602,14 @@ const ViolationCaseManagement = () => {
                                 <option value="medium">Medium</option>
                                 <option value="low">Low</option>
                             </select>
+                            <button
+                                onClick={() => setShowNewCaseModal(true)}
+                                className="flex items-center gap-2 px-4 py-2 text-white rounded-lg font-medium hover:bg-blue-800 transition-colors"
+                                style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
+                            >
+                                <Plus className="w-4 h-4" />
+                                Create New Case
+                            </button>
                         </div>
                     </div>
                     
@@ -443,11 +651,21 @@ const ViolationCaseManagement = () => {
                                         </button>
                                         {case_.status === 'pending' && (
                                             <button 
-                                                onClick={() => handleInitiateInvestigation(case_.id)}
-                                                className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                                                onClick={() => handleOpenInvestigationModal(case_)}
+                                                className="flex items-center gap-2 px-3 py-2 text-white rounded hover:bg-blue-800 transition-colors"
+                                                style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
                                             >
                                                 <Search className="w-4 h-4" />
                                                 Start Investigation
+                                            </button>
+                                        )}
+                                        {case_.exemptionStatus === 'none' && (
+                                            <button 
+                                                onClick={() => handleOpenExemptionModal(case_)}
+                                                className="flex items-center gap-2 px-3 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 transition-colors"
+                                            >
+                                                <ShieldCheck className="w-4 h-4" />
+                                                Grant Exemption
                                             </button>
                                         )}
                                     </div>
@@ -756,6 +974,343 @@ const ViolationCaseManagement = () => {
                                 </div>
                             </div>
                         ))}
+                    </div>
+                </div>
+            )}
+            
+            {/* New Case Modal */}
+            {showNewCaseModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-2xl font-bold text-slate-800">Create New Violation Case</h2>
+                            <button
+                                onClick={() => setShowNewCaseModal(false)}
+                                className="text-slate-400 hover:text-slate-600"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+                        
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Property Address *
+                                </label>
+                                <input
+                                    type="text"
+                                    value={newCase.propertyAddress}
+                                    onChange={(e) => setNewCase({...newCase, propertyAddress: e.target.value})}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                    placeholder="Enter property address"
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Owner Name *
+                                </label>
+                                <input
+                                    type="text"
+                                    value={newCase.ownerName}
+                                    onChange={(e) => setNewCase({...newCase, ownerName: e.target.value})}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                    placeholder="Enter owner name"
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Violation Type *
+                                </label>
+                                <select
+                                    value={newCase.violationType}
+                                    onChange={(e) => setNewCase({...newCase, violationType: e.target.value})}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                >
+                                    <option value="">Select violation type</option>
+                                    <option value="Unauthorized TVR Operation">Unauthorized TVR Operation</option>
+                                    <option value="Zoning Violation">Zoning Violation</option>
+                                    <option value="Noise Complaint">Noise Complaint</option>
+                                    <option value="Parking Violation">Parking Violation</option>
+                                    <option value="Safety Violation">Safety Violation</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                                        Severity *
+                                    </label>
+                                    <select
+                                        value={newCase.severity}
+                                        onChange={(e) => setNewCase({...newCase, severity: e.target.value})}
+                                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                    >
+                                        <option value="low">Low</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="high">High</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                                        Priority *
+                                    </label>
+                                    <select
+                                        value={newCase.priority}
+                                        onChange={(e) => setNewCase({...newCase, priority: e.target.value})}
+                                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                    >
+                                        <option value="low">Low</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="high">High</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Estimated Fine ($)
+                                </label>
+                                <input
+                                    type="number"
+                                    value={newCase.estimatedFine}
+                                    onChange={(e) => setNewCase({...newCase, estimatedFine: parseFloat(e.target.value) || 0})}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                    placeholder="0.00"
+                                    min="0"
+                                    step="0.01"
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Description *
+                                </label>
+                                <textarea
+                                    value={newCase.description}
+                                    onChange={(e) => setNewCase({...newCase, description: e.target.value})}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                    placeholder="Describe the violation details"
+                                    rows="4"
+                                />
+                            </div>
+                        </div>
+                        
+                        <div className="flex justify-end gap-3 mt-6">
+                            <button
+                                onClick={() => setShowNewCaseModal(false)}
+                                className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleCreateNewCase}
+                                disabled={!newCase.propertyAddress || !newCase.ownerName || !newCase.violationType || !newCase.description}
+                                className="px-4 py-2 text-white rounded-lg hover:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
+                            >
+                                Create Case
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            
+            {/* Investigation Modal */}
+            {showInvestigationModal && selectedCaseForInvestigation && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-lg">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-2xl font-bold text-slate-800">Start Investigation</h2>
+                            <button
+                                onClick={() => setShowInvestigationModal(false)}
+                                className="text-slate-400 hover:text-slate-600"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+                        
+                        <div className="mb-4">
+                            <div className="bg-slate-50 p-4 rounded-lg">
+                                <h3 className="font-medium text-slate-800 mb-2">Case Details</h3>
+                                <p className="text-sm text-slate-600"><strong>Case Number:</strong> {selectedCaseForInvestigation.caseNumber}</p>
+                                <p className="text-sm text-slate-600"><strong>Property:</strong> {selectedCaseForInvestigation.propertyAddress}</p>
+                                <p className="text-sm text-slate-600"><strong>Owner:</strong> {selectedCaseForInvestigation.ownerName}</p>
+                                <p className="text-sm text-slate-600"><strong>Violation:</strong> {selectedCaseForInvestigation.violationType}</p>
+                            </div>
+                        </div>
+                        
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Assign Investigator *
+                                </label>
+                                <select
+                                    value={investigationDetails.investigator}
+                                    onChange={(e) => setInvestigationDetails({...investigationDetails, investigator: e.target.value})}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                >
+                                    <option value="Officer Jane Smith">Officer Jane Smith</option>
+                                    <option value="Officer Mike Johnson">Officer Mike Johnson</option>
+                                    <option value="Officer Sarah Wilson">Officer Sarah Wilson</option>
+                                    <option value="Officer David Lee">Officer David Lee</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Scheduled Investigation Date *
+                                </label>
+                                <input
+                                    type="date"
+                                    value={investigationDetails.scheduledDate}
+                                    onChange={(e) => setInvestigationDetails({...investigationDetails, scheduledDate: e.target.value})}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                    min={new Date().toISOString().split('T')[0]}
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Initial Notes
+                                </label>
+                                <textarea
+                                    value={investigationDetails.notes}
+                                    onChange={(e) => setInvestigationDetails({...investigationDetails, notes: e.target.value})}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                    placeholder="Add any initial investigation notes..."
+                                    rows="3"
+                                />
+                            </div>
+                        </div>
+                        
+                        <div className="flex justify-end gap-3 mt-6">
+                            <button
+                                onClick={() => setShowInvestigationModal(false)}
+                                className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleStartInvestigation}
+                                disabled={!investigationDetails.investigator || !investigationDetails.scheduledDate}
+                                className="px-4 py-2 text-white rounded-lg hover:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
+                            >
+                                Start Investigation
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            
+            {/* Exemption Modal */}
+            {showExemptionModal && selectedCaseForExemption && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-lg">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-2xl font-bold text-slate-800">Grant Property Exemption</h2>
+                            <button
+                                onClick={() => setShowExemptionModal(false)}
+                                className="text-slate-400 hover:text-slate-600"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+                        
+                        <div className="mb-4">
+                            <div className="bg-slate-50 p-4 rounded-lg">
+                                <h3 className="font-medium text-slate-800 mb-2">Case Details</h3>
+                                <p className="text-sm text-slate-600"><strong>Case Number:</strong> {selectedCaseForExemption.caseNumber}</p>
+                                <p className="text-sm text-slate-600"><strong>Property:</strong> {selectedCaseForExemption.propertyAddress}</p>
+                                <p className="text-sm text-slate-600"><strong>Owner:</strong> {selectedCaseForExemption.ownerName}</p>
+                                <p className="text-sm text-slate-600"><strong>Violation:</strong> {selectedCaseForExemption.violationType}</p>
+                            </div>
+                        </div>
+                        
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Exemption Type *
+                                </label>
+                                <select
+                                    value={exemptionDetails.exemptionType}
+                                    onChange={(e) => setExemptionDetails({...exemptionDetails, exemptionType: e.target.value})}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                >
+                                    <option value="religious">Religious Institution</option>
+                                    <option value="government">Government Property</option>
+                                    <option value="nonprofit">Non-profit Organization</option>
+                                    <option value="historical">Historical Property</option>
+                                    <option value="agricultural">Agricultural Use</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Exemption Reason *
+                                </label>
+                                <textarea
+                                    value={exemptionDetails.exemptionReason}
+                                    onChange={(e) => setExemptionDetails({...exemptionDetails, exemptionReason: e.target.value})}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                    placeholder="Provide detailed reason for exemption..."
+                                    rows="3"
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Effective Date *
+                                </label>
+                                <input
+                                    type="date"
+                                    value={exemptionDetails.effectiveDate}
+                                    onChange={(e) => setExemptionDetails({...exemptionDetails, effectiveDate: e.target.value})}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                    min={new Date().toISOString().split('T')[0]}
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Additional Notes
+                                </label>
+                                <textarea
+                                    value={exemptionDetails.notes}
+                                    onChange={(e) => setExemptionDetails({...exemptionDetails, notes: e.target.value})}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                    placeholder="Any additional notes or conditions..."
+                                    rows="2"
+                                />
+                            </div>
+                        </div>
+                        
+                        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mt-4">
+                            <p className="text-sm text-amber-800">
+                                <strong>Warning:</strong> Granting an exemption will change the property status to "exempt" and may affect enforcement actions.
+                            </p>
+                        </div>
+                        
+                        <div className="flex justify-end gap-3 mt-6">
+                            <button
+                                onClick={() => setShowExemptionModal(false)}
+                                className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleGrantExemption}
+                                disabled={!exemptionDetails.exemptionReason || !exemptionDetails.effectiveDate}
+                                className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Grant Exemption
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

@@ -37,10 +37,70 @@ const InspectionScheduler = () => {
                     <h1 className="text-2xl font-bold text-slate-800">Inspection Scheduler</h1>
                     <p className="text-slate-500">Schedule and manage property inspections</p>
                 </div>
-                <button className="px-6 py-3 bg-hawaii-ocean text-white rounded-lg font-medium hover:bg-blue-800"
-                style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
-                    Schedule Inspection
-                </button>
+                <div className="flex gap-3">
+                    <button 
+                        onClick={() => {
+                            const newCase = {
+                                id: Date.now(),
+                                caseNumber: `VC-2024-${Math.floor(Math.random() * 1000)}`,
+                                propertyAddress: 'Property from Inspection',
+                                ownerName: 'Property Owner',
+                                violationType: 'Inspection Finding',
+                                severity: 'medium',
+                                status: 'reported',
+                                priority: 'medium',
+                                dateReported: new Date().toISOString().split('T')[0],
+                                assignedTo: 'Unassigned',
+                                department: 'Compliance',
+                                estimatedFine: 0.00,
+                                description: 'Case created from inspection findings',
+                                propertyStatus: 'unregistered',
+                                exemptionStatus: 'none',
+                                exemptionReason: '',
+                                exemptionDate: null,
+                                investigation: null,
+                                linkedTVRRecords: [],
+                                assignments: [],
+                                internalNotes: [
+                                    {
+                                        id: 1,
+                                        author: 'Inspector',
+                                        date: new Date().toISOString().split('T')[0],
+                                        content: 'Case created from inspection scheduler',
+                                        type: 'inspection'
+                                    }
+                                ],
+                                statusHistory: [
+                                    { 
+                                        id: 1, 
+                                        status: 'reported', 
+                                        date: new Date().toISOString().split('T')[0], 
+                                        changedBy: 'System', 
+                                        notes: 'Case created from inspection' 
+                                    }
+                                ],
+                                outcomes: {
+                                    warning: false,
+                                    cancellation: false,
+                                    finesPaid: false,
+                                    lienFiled: false,
+                                    suspension: false,
+                                    courtAction: false
+                                }
+                            };
+                            console.log('New case created from inspection:', newCase);
+                            alert(`Case ${newCase.caseNumber} created from inspection findings!`);
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-colors"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Create Case
+                    </button>
+                    <button className="px-6 py-3 bg-hawaii-ocean text-white rounded-lg font-medium hover:bg-blue-800"
+                    style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
+                        Schedule Inspection
+                    </button>
+                </div>
             </div>
 
             {/* Stats Cards */}

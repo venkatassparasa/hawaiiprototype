@@ -46,8 +46,62 @@ const ComplaintSubmission = () => {
         e.preventDefault();
         if (validateForm()) {
             console.log('Submitting complaint:', formData);
-            alert('Thank you! Your complaint has been submitted. Reference number: COMP-2026-' + Math.floor(Math.random() * 1000));
-            navigate('/registration-status');
+            
+            // Create a new case from the complaint
+            const newCase = {
+                id: Date.now(), // Use timestamp for unique ID
+                caseNumber: `VC-2024-${Math.floor(Math.random() * 1000)}`,
+                propertyAddress: formData.propertyAddress,
+                ownerName: formData.anonymous ? 'Anonymous' : formData.name,
+                violationType: formData.complaintType,
+                severity: 'medium',
+                status: 'reported',
+                priority: 'medium',
+                dateReported: new Date().toISOString().split('T')[0],
+                assignedTo: 'Unassigned',
+                department: 'Compliance',
+                estimatedFine: 0.00,
+                description: formData.description,
+                propertyStatus: 'unregistered',
+                exemptionStatus: 'none',
+                exemptionReason: '',
+                exemptionDate: null,
+                investigation: null,
+                linkedTVRRecords: [],
+                assignments: [],
+                internalNotes: [
+                    {
+                        id: 1,
+                        author: formData.anonymous ? 'Anonymous' : formData.name,
+                        date: new Date().toISOString().split('T')[0],
+                        content: `Complaint submitted: ${formData.description}`,
+                        type: 'complaint'
+                    }
+                ],
+                statusHistory: [
+                    { 
+                        id: 1, 
+                        status: 'reported', 
+                        date: new Date().toISOString().split('T')[0], 
+                        changedBy: 'System', 
+                        notes: 'Case created from complaint submission' 
+                    }
+                ],
+                outcomes: {
+                    warning: false,
+                    cancellation: false,
+                    finesPaid: false,
+                    lienFiled: false,
+                    suspension: false,
+                    courtAction: false
+                }
+            };
+            
+            // Store the case (in real app, this would be an API call)
+            console.log('New case created from complaint:', newCase);
+            
+            alert(`Thank you! Your complaint has been submitted and case ${newCase.caseNumber} has been created. Reference number: COMP-2026-${Math.floor(Math.random() * 1000)}`);
+            navigate('/violations');
         }
     };
 
