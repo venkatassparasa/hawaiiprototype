@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { LayoutDashboard, Building2, Map as MapIcon, FileText, Settings, ShieldCheck, ClipboardList, AlertTriangle, DollarSign, MessageSquare, LogOut, X, Activity } from 'lucide-react';
+import { LayoutDashboard, Building2, Map as MapIcon, FileText, Settings, ShieldCheck, ClipboardList, AlertTriangle, DollarSign, MessageSquare, LogOut, X, Activity, Database } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { RoleContext } from '../../context/RoleContext';
 
@@ -59,6 +59,7 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
         if (isPublic) {
             items.push(
                 { icon: Building2, label: 'Property Search', path: '/public-search' },
+                { icon: FileText, label: 'TVR Registration', path: '/register' },
                 { icon: FileText, label: 'Public Resources', path: '/public-resources' },
                 { icon: MessageSquare, label: 'Submit Complaint', path: '/submit-complaint' }
             );
@@ -73,6 +74,13 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
             // Workflow Management - Only for Admin, Planning, Legal, Enforcement
             if (['Admin', 'Planning', 'Legal', 'Enforcement Officer'].includes(user?.role)) {
                 items.push({ icon: Activity, label: 'Workflows', path: '/workflows' });
+            }
+            
+            // Configuration & Admin Controls - Only for Admin
+            if (user?.role === 'Admin') {
+                items.push({ icon: Settings, label: 'Configuration', path: '/admin/config' });
+                items.push({ icon: FileText, label: 'County Dashboard', path: '/admin/dashboard' });
+                items.push({ icon: Database, label: 'Data Migration', path: '/admin/data-migration' });
             }
         }
 

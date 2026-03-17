@@ -38,6 +38,13 @@ import WorkflowDashboard from './components/workflows/WorkflowDashboard';
 import WorkflowDetail from './components/workflows/WorkflowDetail';
 import NewWorkflow from './components/workflows/NewWorkflow';
 import WorkflowBuilder from './components/workflows/WorkflowBuilder';
+// Admin Components
+import AdminConfiguration from './components/admin/AdminConfiguration';
+import InternalCountyDashboard from './components/admin/InternalCountyDashboard';
+import TVRRegistrationFlow from './components/admin/TVRRegistrationFlow';
+import DataMigrationExplanation from './components/admin/DataMigrationExplanation';
+// Public Components
+import PublicTVRRegistration from './components/public/PublicTVRRegistration';
 import { RoleContext } from './context/RoleContext';
 
 // Protected Route Component
@@ -184,6 +191,28 @@ function App() {
                 </ProtectedRoute>
               } />
               
+              {/* Admin Routes - Only Admin Role */}
+              <Route path="/admin/config" element={
+                <ProtectedRoute allowedRoles={['Admin']}>
+                  <AdminConfiguration />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/dashboard" element={
+                <ProtectedRoute allowedRoles={['Admin']}>
+                  <InternalCountyDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/registration-flow" element={
+                <ProtectedRoute allowedRoles={['Admin']}>
+                  <TVRRegistrationFlow />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/data-migration" element={
+                <ProtectedRoute allowedRoles={['Admin']}>
+                  <DataMigrationExplanation />
+                </ProtectedRoute>
+              } />
+              
               <Route path="/case/new" element={<NewCaseForm />} />
               <Route path="/case/:id" element={<CaseReview />} />
               <Route path="/register" element={<RegistrationForm />} />
@@ -197,6 +226,7 @@ function App() {
               <Route path="/complaint/:id" element={<ComplaintDetail />} />
               <Route path="/public-search" element={<PublicPropertySearch />} />
               <Route path="/public-resources" element={<PublicResources />} />
+              <Route path="/register" element={<PublicTVRRegistration />} />
             </Routes>
           </Layout>
         )}

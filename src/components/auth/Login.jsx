@@ -64,22 +64,25 @@ const Login = ({ onLogin }) => {
             const userEmail = email || '';
             let userRole = role;
             let userName = name;
-            
+
             // Determine role based on exact email domain match
-            if (userEmail === 'finance@uhcc.com') {
+            if (userEmail.toLowerCase() === 'admin@hawaiicounty.gov') {
+                userRole = 'Admin';
+                userName = 'System Administrator';
+            } else if (userEmail.toLowerCase() === 'finance@hawaiicounty.gov') {
                 userRole = 'Finance';
                 userName = 'Finance Director';
-            } else if (userEmail === 'legal@uhcc.com') {
+            } else if (userEmail.toLowerCase() === 'legal@hawaiicounty.gov') {
                 userRole = 'Legal';
                 userName = 'County Attorney';
-            } else if (userEmail === 'planning@uhcc.com') {
+            } else if (userEmail.toLowerCase() === 'planning@hawaiicounty.gov') {
                 userRole = 'Planning';
                 userName = 'Planning Director';
-            } else if (userEmail === 'enforcement@uhcc.com') {
+            } else if (userEmail.toLowerCase() === 'enforcement@hawaiicounty.gov') {
                 userRole = 'Enforcement';
                 userName = 'Enforcement Officer';
             }
-            
+
             // Create full user session
             onLogin({
                 name: userName,
