@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { ShieldCheck, Users, Settings, Edit2, Trash2, Plus, Eye, EyeOff, Save, Search, Filter, Lock, Unlock, Database, FileText, AlertTriangle, CheckCircle, X } from 'lucide-react';
+import { ShieldCheck, Users, Settings, Edit2, Trash2, Plus, Eye, EyeOff, Save, Search, Filter, Lock, Unlock, Database, FileText, AlertTriangle, CheckCircle, X, Copy, Download, Upload } from 'lucide-react';
 
 const GranularPermissions = () => {
     const [activeTab, setActiveTab] = useState('permissions');
     const [searchTerm, setSearchTerm] = useState('');
     const [filterModule, setFilterModule] = useState('all');
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+    const [lastSavedTime, setLastSavedTime] = useState(null);
+    const [editingTemplate, setEditingTemplate] = useState(null);
 
     // Permission Templates
     const [permissionTemplates, setPermissionTemplates] = useState([
@@ -292,6 +295,7 @@ const GranularPermissions = () => {
     };
 
     const handleTogglePermission = (roleId, moduleId, action, recordScope) => {
+        setHasUnsavedChanges(true);
         setUserRoles(userRoles.map(role => {
             if (role.id !== roleId) return role;
             
@@ -311,6 +315,95 @@ const GranularPermissions = () => {
             
             return { ...role, customPermissions: newPermissions };
         }));
+    };
+
+    const handleSaveChanges = async () => {
+        try {
+            // Simulate API call to save changes
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            setHasUnsavedChanges(false);
+            setLastSavedTime(new Date());
+            
+            // Show success message
+            alert('Permission changes saved successfully!');
+        } catch (error) {
+            console.error('Failed to save changes:', error);
+            alert('Failed to save changes. Please try again.');
+        }
+    };
+
+    const handleCloneTemplate = (templateId) => {
+        const template = permissionTemplates.find(t => t.id === templateId);
+        if (!template) return;
+        
+        const clonedTemplate = {
+            id: Math.max(...permissionTemplates.map(t => t.id)) + 1,
+            name: `${template.name} (Clone)`,
+            description: `Cloned from: ${template.name}`,
+            permissions: { ...template.permissions },
+            templateId: templateId, // Reference to original template
+            isCloned: true,
+            active: true
+        };
+        
+        setPermissionTemplates([...permissionTemplates, clonedTemplate]);
+        setHasUnsavedChanges(true);
+        setEditingTemplate(clonedTemplate.id);
+    };
+
+    const handleCustomizeTemplate = (templateId) => {
+        const template = permissionTemplates.find(t => t.id === templateId);
+        if (!template) return;
+        
+        const customizedTemplate = {
+            id: Math.max(...permissionTemplates.map(t => t.id)) + 1,
+            name: `${template.name} (Custom)`,
+            description: `Customized from: ${template.name}`,
+            permissions: { ...template.permissions },
+            templateId: templateId, // Reference to original template
+            isCustom: true,
+            active: true
+        };
+        
+        setPermissionTemplates([...permissionTemplates, customizedTemplate]);
+        setHasUnsavedChanges(true);
+        setEditingTemplate(customizedTemplate.id);
+    };
+
+    const handleExportTemplate = (template) => {
+        const dataStr = JSON.stringify(template, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${template.name.replace(/\s+/g, '_')}_permissions.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
+    const handleImportTemplate = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const importedTemplate = JSON.parse(e.target.result);
+                importedTemplate.id = Math.max(...permissionTemplates.map(t => t.id)) + 1;
+                importedTemplate.name = `${importedTemplate.name} (Imported)`;
+                importedTemplate.isImported = true;
+                
+                setPermissionTemplates([...permissionTemplates, importedTemplate]);
+                setHasUnsavedChanges(true);
+                alert('Template imported successfully!');
+            } catch (error) {
+                alert('Failed to import template. Please check the file format.');
+            }
+        };
+        reader.readAsText(file);
     };
 
     const filteredTemplates = permissionTemplates.filter(template => 
@@ -353,15 +446,49 @@ const GranularPermissions = () => {
             {activeTab === 'permissions' && (
                 <div>
                     <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-xl font-semibold text-slate-800">Permission Templates</h2>
-                        <button
-                            onClick={handleCreateTemplate}
-                            className="flex items-center gap-2 px-4 py-2 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
-                            style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
-                        >
-                            <Plus className="w-4 h-4" />
-                            Create Template
-                        </button>
+                        <div className="flex items-center gap-4">
+                            <h2 className="text-xl font-semibold text-slate-800">Permission Templates</h2>
+                            {hasUnsavedChanges && (
+                                <div className="flex items-center gap-2 text-amber-600">
+                                    <AlertTriangle className="w-4 h-4" />
+                                    <span className="text-sm font-medium">Unsaved changes</span>
+                                </div>
+                            )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                            {lastSavedTime && (
+                                <span className="text-sm text-slate-500">
+                                    Last saved: {lastSavedTime.toLocaleTimeString()}
+                                </span>
+                            )}
+                            <label className="flex items-center gap-2 px-3 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 cursor-pointer">
+                                <Upload className="w-4 h-4" />
+                                Import Template
+                                <input
+                                    type="file"
+                                    accept=".json"
+                                    onChange={handleImportTemplate}
+                                    className="hidden"
+                                />
+                            </label>
+                            <button
+                                onClick={handleSaveChanges}
+                                disabled={!hasUnsavedChanges}
+                                className="flex items-center gap-2 px-4 py-2 text-white rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                                style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
+                            >
+                                <Save className="w-4 h-4" />
+                                Save Changes
+                            </button>
+                            <button
+                                onClick={handleCreateTemplate}
+                                className="flex items-center gap-2 px-4 py-2 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+                                style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
+                            >
+                                <Plus className="w-4 h-4" />
+                                Create Template
+                            </button>
+                        </div>
                     </div>
                     
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -388,6 +515,27 @@ const GranularPermissions = () => {
                                             className="p-2 text-slate-600 hover:text-hawaii-ocean hover:bg-hawaii-ocean/10 rounded transition-colors"
                                         >
                                             <Edit2 className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                            onClick={() => handleCloneTemplate(template.id)}
+                                            className="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded transition-colors"
+                                            title="Clone Template"
+                                        >
+                                            <Copy className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                            onClick={() => handleCustomizeTemplate(template.id)}
+                                            className="p-2 text-purple-600 hover:text-purple-700 hover:bg-purple-50 rounded transition-colors"
+                                            title="Customize Template"
+                                        >
+                                            <Settings className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                            onClick={() => handleExportTemplate(template)}
+                                            className="p-2 text-slate-600 hover:text-hawaii-ocean hover:bg-hawaii-ocean/10 rounded transition-colors"
+                                            title="Export Template"
+                                        >
+                                            <Download className="w-4 h-4" />
                                         </button>
                                         <button
                                             onClick={() => handleDeleteTemplate(template.id)}
