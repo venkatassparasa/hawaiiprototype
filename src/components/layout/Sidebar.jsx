@@ -22,13 +22,16 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
         const isPublic = user?.role === 'Public';
 
         if (isFinance || isPlanning) {
-            items.push({ icon: Building2, label: 'Property Registry', path: '/properties' });
+            items.push({ icon: Building2, label: 'Property Registry', path: '/registrations' },
+                // { icon: ClipboardList, label: 'Registrations', path: '/registrations' }
+        );
+            
         }
 
         if (isPlanning) {
             items.push(
                 { icon: ShieldCheck, label: 'NCUC Certificates', path: '/ncuc' },
-                { icon: ClipboardList, label: 'Registrations', path: '/registrations' }
+                // { icon: ClipboardList, label: 'Registrations', path: '/registrations' }
             );
         }
 

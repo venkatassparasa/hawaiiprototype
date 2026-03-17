@@ -6,54 +6,83 @@ const TVRRegistrationFlow = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [showWalkthrough, setShowWalkthrough] = useState(true);
     const [uploadedFiles, setUploadedFiles] = useState({});
-    const [uploadProgress, setUploadProgress] = useState({});
+    const [uploadProgress, setUploadProgress] = useState({
+        sitePlan: 100,
+        ownershipProof: 100,
+        taxClearanceCertificate: 100,
+        propertyPhotos: 100,
+        businessLicense: 100,
+        insuranceCertificate: 100,
+    });
+    
+    // Create mock files for demonstration
+    const createMockFile = (name, size, type) => {
+        const mockFile = new File(['mock content'], name, { type });
+        Object.defineProperty(mockFile, 'size', { value: size });
+        return mockFile;
+    };
+    
     const [formData, setFormData] = useState({
         // Step 1: Property Information
-        propertyName: '',
-        propertyAddress: '',
-        propertyType: '',
-        bedrooms: '',
-        bathrooms: '',
-        maxOccupancy: '',
-        squareFootage: '',
-        parkingSpaces: '',
-        amenities: [],
+        propertyName: 'Oceanview Paradise Villa',
+        propertyAddress: '123 Beach Road, Hilo, HI 96720',
+        propertyType: 'single-family',
+        bedrooms: '3',
+        bathrooms: '2',
+        maxOccupancy: '6',
+        squareFootage: '1500',
+        parkingSpaces: '2',
+        amenities: ['WiFi', 'Kitchen', 'Parking', 'Pool', 'Air Conditioning', 'Beach Access'],
         
         // Step 2: Owner Information
-        ownerName: '',
-        ownerEmail: '',
-        ownerPhone: '',
-        ownerAddress: '',
-        ownerCity: '',
-        ownerState: '',
-        ownerZip: '',
-        ownerCountry: '',
+        ownerName: 'John Smith',
+        ownerEmail: 'john.smith@example.com',
+        ownerPhone: '(808) 123-4567',
+        ownerAddress: '456 Main Street',
+        ownerCity: 'Hilo',
+        ownerState: 'HI',
+        ownerZip: '96720',
+        ownerCountry: 'US',
         
         // Step 3: Business Information
-        businessName: '',
-        businessLicense: '',
-        taxId: '',
-        insuranceProvider: '',
-        insurancePolicyNumber: '',
-        insuranceExpiry: '',
+        businessName: 'Hawaii Vacation Rentals LLC',
+        businessLicense: 'GE-123456-7890',
+        taxId: '12-3456789',
+        taxFilingStatus: 'current',
+        taxCompliance: true,
+        taxExempt: false,
+        insuranceProvider: 'State Farm Insurance',
+        insurancePolicyNumber: 'POL-123456789',
+        insuranceExpiry: '2024-12-31',
         
-        // Step 4: Operational Details
-        checkInTime: '',
-        checkOutTime: '',
-        quietHoursStart: '',
-        quietHoursEnd: '',
-        cleaningFrequency: '',
-        trashCollection: '',
-        emergencyContact: '',
-        emergencyPhone: '',
+        // Step 4: Tax & Compliance
+        taxDocuments: [],
+        complianceCertificate: null,
+        sitePlan: createMockFile('site-plan.pdf', 1024 * 512, 'application/pdf'), // 512KB
+        ownershipProof: createMockFile('ownership-deed.pdf', 1024 * 256, 'application/pdf'), // 256KB
+        taxClearanceCertificate: createMockFile('tax-clearance-2024.pdf', 1024 * 128, 'application/pdf'), // 128KB
         
-        // Step 5: Documents
-        propertyPhotos: [],
-        businessLicense: null,
-        insuranceCertificate: null,
-        taxDocuments: null,
+        // Step 5: Operational Details
+        checkInTime: '15:00',
+        checkOutTime: '11:00',
+        quietHoursStart: '22:00',
+        quietHoursEnd: '07:00',
+        cleaningFrequency: 'every-stay',
+        trashCollection: 'twice-weekly',
+        emergencyContact: 'Jane Smith',
+        emergencyPhone: '(808) 987-6543',
         
-        // Step 6: Review & Submit
+        // Step 6: Documents
+        propertyPhotos: [
+            createMockFile('exterior-view.jpg', 1024 * 2048, 'image/jpeg'), // 2MB
+            createMockFile('living-room.jpg', 1024 * 1536, 'image/jpeg'), // 1.5MB
+            createMockFile('bedroom.jpg', 1024 * 1024, 'image/jpeg'), // 1MB
+        ],
+        businessLicense: createMockFile('business-license.pdf', 1024 * 256, 'application/pdf'), // 256KB
+        insuranceCertificate: createMockFile('insurance-policy.pdf', 1024 * 512, 'application/pdf'), // 512KB
+        complianceCertificate: null,
+        
+        // Step 7: Review & Submit
         agreedToTerms: false,
         agreedToCompliance: false,
     });
@@ -77,9 +106,10 @@ const TVRRegistrationFlow = () => {
         { id: 1, title: 'Property Information', icon: Home },
         { id: 2, title: 'Owner Information', icon: Users },
         { id: 3, title: 'Business Information', icon: FileText },
-        { id: 4, title: 'Operational Details', icon: Clock },
-        { id: 5, title: 'Documents', icon: Upload },
-        { id: 6, title: 'Review & Submit', icon: CheckCircle },
+        { id: 4, title: 'Tax & Compliance', icon: ShieldCheck },
+        { id: 5, title: 'Operational Details', icon: Clock },
+        { id: 6, title: 'Documents', icon: Upload },
+        { id: 7, title: 'Review & Submit', icon: CheckCircle },
     ];
 
     // Walkthrough steps for demo

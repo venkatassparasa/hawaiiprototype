@@ -5,61 +5,81 @@ const PublicTVRRegistration = () => {
     const [currentStep, setCurrentStep] = useState(1);
     const [showPassword, setShowPassword] = useState(false);
     const [uploadedFiles, setUploadedFiles] = useState({});
-    const [uploadProgress, setUploadProgress] = useState({});
+    const [uploadProgress, setUploadProgress] = useState({
+        sitePlan: 100,
+        ownershipProof: 100,
+        taxClearanceCertificate: 100,
+        propertyPhotos: 100,
+        businessLicense: 100,
+        insuranceCertificate: 100,
+    });
+    
+    // Create mock files for demonstration
+    const createMockFile = (name, size, type) => {
+        const mockFile = new File(['mock content'], name, { type });
+        Object.defineProperty(mockFile, 'size', { value: size });
+        return mockFile;
+    };
+    
     const [formData, setFormData] = useState({
         // Step 1: Property Information
-        propertyName: '',
-        propertyAddress: '',
-        propertyType: '',
-        bedrooms: '',
-        bathrooms: '',
-        maxOccupancy: '',
-        squareFootage: '',
-        parkingSpaces: '',
-        amenities: [],
+        propertyName: 'Oceanview Paradise Villa',
+        propertyAddress: '123 Beach Road, Hilo, HI 96720',
+        propertyType: 'single-family',
+        bedrooms: '3',
+        bathrooms: '2',
+        maxOccupancy: '6',
+        squareFootage: '1500',
+        parkingSpaces: '2',
+        amenities: ['WiFi', 'Kitchen', 'Parking', 'Pool', 'Air Conditioning', 'Beach Access'],
         
         // Step 2: Owner Information
-        ownerName: '',
-        ownerEmail: '',
-        ownerPhone: '',
-        ownerAddress: '',
-        ownerCity: '',
-        ownerState: '',
-        ownerZip: '',
-        ownerCountry: '',
+        ownerName: 'John Smith',
+        ownerEmail: 'john.smith@example.com',
+        ownerPhone: '(808) 123-4567',
+        ownerAddress: '456 Main Street',
+        ownerCity: 'Hilo',
+        ownerState: 'HI',
+        ownerZip: '96720',
+        ownerCountry: 'US',
         
         // Step 3: Business Information
-        businessName: '',
-        businessLicense: '',
-        taxId: '',
-        taxFilingStatus: '',
-        taxCompliance: false,
+        businessName: 'Hawaii Vacation Rentals LLC',
+        businessLicense: 'GE-123456-7890',
+        taxId: '12-3456789',
+        taxFilingStatus: 'current',
+        taxCompliance: true,
         taxExempt: false,
-        insuranceProvider: '',
-        insurancePolicyNumber: '',
-        insuranceExpiry: '',
+        insuranceProvider: 'State Farm Insurance',
+        insurancePolicyNumber: 'POL-123456789',
+        insuranceExpiry: '2024-12-31',
         
         // Step 4: Tax & Compliance
         taxDocuments: [],
         complianceCertificate: null,
+        sitePlan: createMockFile('site-plan.pdf', 1024 * 512, 'application/pdf'), // 512KB
+        ownershipProof: createMockFile('ownership-deed.pdf', 1024 * 256, 'application/pdf'), // 256KB
+        taxClearanceCertificate: createMockFile('tax-clearance-2024.pdf', 1024 * 128, 'application/pdf'), // 128KB
         
         // Step 5: Operational Details
-        checkInTime: '',
-        checkOutTime: '',
-        quietHoursStart: '',
-        quietHoursEnd: '',
-        cleaningFrequency: '',
-        trashCollection: '',
-        emergencyContact: '',
-        emergencyPhone: '',
+        checkInTime: '15:00',
+        checkOutTime: '11:00',
+        quietHoursStart: '22:00',
+        quietHoursEnd: '07:00',
+        cleaningFrequency: 'every-stay',
+        trashCollection: 'twice-weekly',
+        emergencyContact: 'Jane Smith',
+        emergencyPhone: '(808) 987-6543',
         
         // Step 6: Documents
-        propertyPhotos: [],
-        businessLicense: null,
-        insuranceCertificate: null,
-        taxDocuments: null,
-        
-        // Step 6: Review & Submit
+        propertyPhotos: [
+            createMockFile('exterior-view.jpg', 1024 * 2048, 'image/jpeg'), // 2MB
+            createMockFile('living-room.jpg', 1024 * 1536, 'image/jpeg'), // 1.5MB
+            createMockFile('bedroom.jpg', 1024 * 1024, 'image/jpeg'), // 1MB
+        ],
+        businessLicense: createMockFile('business-license.pdf', 1024 * 256, 'application/pdf'), // 256KB
+        insuranceCertificate: createMockFile('insurance-policy.pdf', 1024 * 512, 'application/pdf'), // 512KB
+        complianceCertificate: null,
         agreedToTerms: false,
         agreedToCompliance: false,
     });
@@ -85,8 +105,7 @@ const PublicTVRRegistration = () => {
         { id: 3, title: 'Business Information', icon: FileText },
         { id: 4, title: 'Tax & Compliance', icon: ShieldCheck },
         { id: 5, title: 'Operational Details', icon: Clock },
-        { id: 6, title: 'Documents', icon: Upload },
-        { id: 7, title: 'Review & Submit', icon: CheckCircle },
+        { id: 6, title: 'Review & Submit', icon: CheckCircle },
     ];
 
     // File upload handler
@@ -155,6 +174,10 @@ const PublicTVRRegistration = () => {
         if (step === 4) {
             if (!formData.taxId) newErrors.taxId = 'Tax ID is required';
             if (!formData.taxCompliance) newErrors.taxCompliance = 'You must confirm tax compliance';
+        }
+        
+        if (step === 5) {
+            // No required validation for Operational Details step
         }
         
         setErrors(newErrors);
@@ -527,6 +550,17 @@ const PublicTVRRegistration = () => {
                         <h2 className="text-2xl font-bold text-slate-800">Tax & Compliance</h2>
                         <p className="text-slate-600">Provide tax information and upload required compliance documents</p>
                         
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                            <h3 className="font-semibold text-blue-900 mb-2">Required Documents</h3>
+                            <ul className="text-sm text-blue-800 space-y-1">
+                                <li>• Site drawing/floor plan</li>
+                                <li>• Property photos (exterior and interior)</li>
+                                <li>• Proof of ownership or lease agreement</li>
+                                <li>• County tax clearance certificate</li>
+                            </ul>
+                            <p className="text-sm text-blue-700 mt-2">All documents will be uploaded in this step</p>
+                        </div>
+                        
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-2">Tax ID Number *</label>
@@ -586,20 +620,20 @@ const PublicTVRRegistration = () => {
                         </div>
                         
                         <div className="mt-6 space-y-4">
-                            <h3 className="text-lg font-semibold text-slate-800">Required Tax Documents</h3>
-                            <p className="text-sm text-slate-600">Upload your tax registration and compliance documents</p>
+                            <h3 className="text-lg font-semibold text-slate-800">Required Documents</h3>
+                            <p className="text-sm text-slate-600">Upload the following required documents for your TVR registration</p>
                             
-                            {/* Tax Documents Upload */}
+                            {/* Site Drawing/Floor Plan */}
                             <div className="border-2 border-dashed border-slate-300 rounded-lg p-6">
                                 <div className="flex items-center justify-between mb-4">
                                     <div>
                                         <h4 className="font-medium text-slate-800 flex items-center gap-2">
-                                            <FileText className="w-5 h-5 text-orange-600" />
-                                            Tax Registration Documents
+                                            <FileImage className="w-5 h-5 text-blue-600" />
+                                            Site Drawing/Floor Plan
                                         </h4>
-                                        <p className="text-sm text-slate-600 mt-1">Upload your tax registration documents</p>
+                                        <p className="text-sm text-slate-600 mt-1">Upload your site drawing or floor plan</p>
                                     </div>
-                                    {formData.taxDocuments && (
+                                    {formData.sitePlan && (
                                         <span className="text-sm text-green-600">✓ Uploaded</span>
                                     )}
                                 </div>
@@ -607,24 +641,77 @@ const PublicTVRRegistration = () => {
                                 <div className="mb-4">
                                     <input
                                         type="file"
-                                        multiple
                                         accept=".pdf,.jpg,.jpeg,.png"
-                                        onChange={(e) => handleFileUpload('taxDocuments', e.target.files)}
+                                        onChange={(e) => handleFileUpload('sitePlan', e.target.files)}
                                         className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
                                     />
                                 </div>
                                 
-                                {formData.taxDocuments && formData.taxDocuments.length > 0 && (
+                                {formData.sitePlan && (
+                                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                                        <div className="flex items-center gap-3">
+                                            <FileImage className="w-4 h-4 text-blue-600" />
+                                            <span className="text-sm text-slate-700">{formData.sitePlan.name}</span>
+                                            <span className="text-xs text-slate-500">({(formData.sitePlan.size / 1024 / 1024).toFixed(2)} MB)</span>
+                                        </div>
+                                        <button
+                                            onClick={() => handleFileRemove('sitePlan')}
+                                            className="text-red-500 hover:text-red-700 transition-colors"
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                )}
+                                
+                                {(uploadProgress.sitePlan > 0 && uploadProgress.sitePlan < 100) && (
+                                    <div className="mt-2">
+                                        <div className="w-full bg-slate-200 rounded-full h-2">
+                                            <div 
+                                                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                                                style={{ width: `${uploadProgress.sitePlan}%` }}
+                                            />
+                                        </div>
+                                        <p className="text-xs text-slate-500 mt-1">Uploading... {uploadProgress.sitePlan}%</p>
+                                    </div>
+                                )}
+                            </div>
+                            
+                            {/* Property Photos */}
+                            <div className="border-2 border-dashed border-slate-300 rounded-lg p-6">
+                                <div className="flex items-center justify-between mb-4">
+                                    <div>
+                                        <h4 className="font-medium text-slate-800 flex items-center gap-2">
+                                            <FileImage className="w-5 h-5 text-green-600" />
+                                            Property Photos (exterior and interior)
+                                        </h4>
+                                        <p className="text-sm text-slate-600 mt-1">Upload exterior and interior photos of your property</p>
+                                    </div>
+                                    <span className="text-sm text-slate-500">
+                                        {formData.propertyPhotos.length}/3 minimum
+                                    </span>
+                                </div>
+                                
+                                <div className="mb-4">
+                                    <input
+                                        type="file"
+                                        multiple
+                                        accept="image/*"
+                                        onChange={(e) => handleFileUpload('propertyPhotos', e.target.files)}
+                                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                    />
+                                </div>
+                                
+                                {formData.propertyPhotos.length > 0 && (
                                     <div className="space-y-2">
-                                        {formData.taxDocuments.map((file, index) => (
+                                        {formData.propertyPhotos.map((file, index) => (
                                             <div key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                                                 <div className="flex items-center gap-3">
-                                                    <FileText className="w-4 h-4 text-orange-600" />
+                                                    <FileImage className="w-4 h-4 text-green-600" />
                                                     <span className="text-sm text-slate-700">{file.name}</span>
                                                     <span className="text-xs text-slate-500">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
                                                 </div>
                                                 <button
-                                                    onClick={() => handleFileRemove('taxDocuments', index)}
+                                                    onClick={() => handleFileRemove('propertyPhotos', index)}
                                                     className="text-red-500 hover:text-red-700 transition-colors"
                                                 >
                                                     <X className="w-4 h-4" />
@@ -634,30 +721,30 @@ const PublicTVRRegistration = () => {
                                     </div>
                                 )}
                                 
-                                {(uploadProgress.taxDocuments > 0 && uploadProgress.taxDocuments < 100) && (
+                                {(uploadProgress.propertyPhotos > 0 && uploadProgress.propertyPhotos < 100) && (
                                     <div className="mt-2">
                                         <div className="w-full bg-slate-200 rounded-full h-2">
                                             <div 
-                                                className="bg-orange-600 h-2 rounded-full transition-all duration-300"
-                                                style={{ width: `${uploadProgress.taxDocuments}%` }}
+                                                className="bg-green-600 h-2 rounded-full transition-all duration-300"
+                                                style={{ width: `${uploadProgress.propertyPhotos}%` }}
                                             />
                                         </div>
-                                        <p className="text-xs text-slate-500 mt-1">Uploading... {uploadProgress.taxDocuments}%</p>
+                                        <p className="text-xs text-slate-500 mt-1">Uploading... {uploadProgress.propertyPhotos}%</p>
                                     </div>
                                 )}
                             </div>
                             
-                            {/* Compliance Certificate Upload */}
+                            {/* Proof of Ownership/Lease Agreement */}
                             <div className="border-2 border-dashed border-slate-300 rounded-lg p-6">
                                 <div className="flex items-center justify-between mb-4">
                                     <div>
                                         <h4 className="font-medium text-slate-800 flex items-center gap-2">
-                                            <Shield className="w-5 h-5 text-purple-600" />
-                                            Compliance Certificate
+                                            <FileText className="w-5 h-5 text-purple-600" />
+                                            Proof of Ownership or Lease Agreement
                                         </h4>
-                                        <p className="text-sm text-slate-600 mt-1">Upload your compliance certificate</p>
+                                        <p className="text-sm text-slate-600 mt-1">Upload proof of ownership or lease agreement</p>
                                     </div>
-                                    {formData.complianceCertificate && (
+                                    {formData.ownershipProof && (
                                         <span className="text-sm text-green-600">✓ Uploaded</span>
                                     )}
                                 </div>
@@ -666,20 +753,20 @@ const PublicTVRRegistration = () => {
                                     <input
                                         type="file"
                                         accept=".pdf,.jpg,.jpeg,.png"
-                                        onChange={(e) => handleFileUpload('complianceCertificate', e.target.files)}
+                                        onChange={(e) => handleFileUpload('ownershipProof', e.target.files)}
                                         className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
                                     />
                                 </div>
                                 
-                                {formData.complianceCertificate && (
+                                {formData.ownershipProof && (
                                     <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                                         <div className="flex items-center gap-3">
-                                            <Shield className="w-4 h-4 text-purple-600" />
-                                            <span className="text-sm text-slate-700">{formData.complianceCertificate.name}</span>
-                                            <span className="text-xs text-slate-500">({(formData.complianceCertificate.size / 1024 / 1024).toFixed(2)} MB)</span>
+                                            <FileText className="w-4 h-4 text-purple-600" />
+                                            <span className="text-sm text-slate-700">{formData.ownershipProof.name}</span>
+                                            <span className="text-xs text-slate-500">({(formData.ownershipProof.size / 1024 / 1024).toFixed(2)} MB)</span>
                                         </div>
                                         <button
-                                            onClick={() => handleFileRemove('complianceCertificate')}
+                                            onClick={() => handleFileRemove('ownershipProof')}
                                             className="text-red-500 hover:text-red-700 transition-colors"
                                         >
                                             <X className="w-4 h-4" />
@@ -687,15 +774,68 @@ const PublicTVRRegistration = () => {
                                     </div>
                                 )}
                                 
-                                {(uploadProgress.complianceCertificate > 0 && uploadProgress.complianceCertificate < 100) && (
+                                {(uploadProgress.ownershipProof > 0 && uploadProgress.ownershipProof < 100) && (
                                     <div className="mt-2">
                                         <div className="w-full bg-slate-200 rounded-full h-2">
                                             <div 
                                                 className="bg-purple-600 h-2 rounded-full transition-all duration-300"
-                                                style={{ width: `${uploadProgress.complianceCertificate}%` }}
+                                                style={{ width: `${uploadProgress.ownershipProof}%` }}
                                             />
                                         </div>
-                                        <p className="text-xs text-slate-500 mt-1">Uploading... {uploadProgress.complianceCertificate}%</p>
+                                        <p className="text-xs text-slate-500 mt-1">Uploading... {uploadProgress.ownershipProof}%</p>
+                                    </div>
+                                )}
+                            </div>
+                            
+                            {/* County Tax Clearance Certificate */}
+                            <div className="border-2 border-dashed border-slate-300 rounded-lg p-6">
+                                <div className="flex items-center justify-between mb-4">
+                                    <div>
+                                        <h4 className="font-medium text-slate-800 flex items-center gap-2">
+                                            <ShieldCheck className="w-5 h-5 text-orange-600" />
+                                            County Tax Clearance Certificate
+                                        </h4>
+                                        <p className="text-sm text-slate-600 mt-1">Upload your county tax clearance certificate</p>
+                                    </div>
+                                    {formData.taxClearanceCertificate && (
+                                        <span className="text-sm text-green-600">✓ Uploaded</span>
+                                    )}
+                                </div>
+                                
+                                <div className="mb-4">
+                                    <input
+                                        type="file"
+                                        accept=".pdf,.jpg,.jpeg,.png"
+                                        onChange={(e) => handleFileUpload('taxClearanceCertificate', e.target.files)}
+                                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                    />
+                                </div>
+                                
+                                {formData.taxClearanceCertificate && (
+                                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                                        <div className="flex items-center gap-3">
+                                            <ShieldCheck className="w-4 h-4 text-orange-600" />
+                                            <span className="text-sm text-slate-700">{formData.taxClearanceCertificate.name}</span>
+                                            <span className="text-xs text-slate-500">({(formData.taxClearanceCertificate.size / 1024 / 1024).toFixed(2)} MB)</span>
+                                        </div>
+                                        <button
+                                            onClick={() => handleFileRemove('taxClearanceCertificate')}
+                                            className="text-red-500 hover:text-red-700 transition-colors"
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                )}
+                                
+                                {(uploadProgress.taxClearanceCertificate > 0 && uploadProgress.taxClearanceCertificate < 100) && (
+                                    <div className="mt-2">
+                                        <div className="w-full bg-slate-200 rounded-full h-2">
+                                            <div 
+                                                className="bg-orange-600 h-2 rounded-full transition-all duration-300"
+                                                style={{ width: `${uploadProgress.taxClearanceCertificate}%` }}
+                                            />
+                                        </div>
+                                        <p className="text-xs text-slate-500 mt-1">Uploading... {uploadProgress.taxClearanceCertificate}%</p>
                                     </div>
                                 )}
                             </div>
@@ -805,234 +945,7 @@ const PublicTVRRegistration = () => {
                     </div>
                 );
                 
-            case 5:
-                return (
-                    <div className="space-y-6">
-                        <h2 className="text-2xl font-bold text-slate-800">Documents</h2>
-                        <p className="text-slate-600">Upload required documents for your TVR registration</p>
-                        
-                        <div className="space-y-6">
-                            {/* Property Photos */}
-                            <div className="border-2 border-dashed border-slate-300 rounded-lg p-6">
-                                <div className="flex items-center justify-between mb-4">
-                                    <div>
-                                        <h3 className="font-medium text-slate-800 flex items-center gap-2">
-                                            <FileImage className="w-5 h-5 text-blue-600" />
-                                            Property Photos
-                                        </h3>
-                                        <p className="text-sm text-slate-600 mt-1">Upload at least 3 photos of your property</p>
-                                    </div>
-                                    <span className="text-sm text-slate-500">
-                                        {formData.propertyPhotos.length}/3 minimum
-                                    </span>
-                                </div>
-                                
-                                <div className="mb-4">
-                                    <input
-                                        type="file"
-                                        multiple
-                                        accept="image/*"
-                                        onChange={(e) => handleFileUpload('propertyPhotos', e.target.files)}
-                                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-                                    />
-                                </div>
-                                
-                                {formData.propertyPhotos.length > 0 && (
-                                    <div className="space-y-2">
-                                        {formData.propertyPhotos.map((file, index) => (
-                                            <div key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                                                <div className="flex items-center gap-3">
-                                                    <FileImage className="w-4 h-4 text-blue-600" />
-                                                    <span className="text-sm text-slate-700">{file.name}</span>
-                                                    <span className="text-xs text-slate-500">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
-                                                </div>
-                                                <button
-                                                    onClick={() => handleFileRemove('propertyPhotos', index)}
-                                                    className="text-red-500 hover:text-red-700 transition-colors"
-                                                >
-                                                    <X className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                                
-                                {(uploadProgress.propertyPhotos > 0 && uploadProgress.propertyPhotos < 100) && (
-                                    <div className="mt-2">
-                                        <div className="w-full bg-slate-200 rounded-full h-2">
-                                            <div 
-                                                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                                                style={{ width: `${uploadProgress.propertyPhotos}%` }}
-                                            />
-                                        </div>
-                                        <p className="text-xs text-slate-500 mt-1">Uploading... {uploadProgress.propertyPhotos}%</p>
-                                    </div>
-                                )}
-                            </div>
-                            
-                            {/* Business License */}
-                            <div className="border-2 border-dashed border-slate-300 rounded-lg p-6">
-                                <div className="flex items-center justify-between mb-4">
-                                    <div>
-                                        <h3 className="font-medium text-slate-800 flex items-center gap-2">
-                                            <FileIcon className="w-5 h-5 text-green-600" />
-                                            Business License
-                                        </h3>
-                                        <p className="text-sm text-slate-600 mt-1">Upload your valid business license</p>
-                                    </div>
-                                    {formData.businessLicense && (
-                                        <span className="text-sm text-green-600">✓ Uploaded</span>
-                                    )}
-                                </div>
-                                
-                                <div className="mb-4">
-                                    <input
-                                        type="file"
-                                        accept=".pdf,.jpg,.jpeg,.png"
-                                        onChange={(e) => handleFileUpload('businessLicense', e.target.files)}
-                                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-                                    />
-                                </div>
-                                
-                                {formData.businessLicense && (
-                                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                                        <div className="flex items-center gap-3">
-                                            <FileIcon className="w-4 h-4 text-green-600" />
-                                            <span className="text-sm text-slate-700">{formData.businessLicense.name}</span>
-                                            <span className="text-xs text-slate-500">({(formData.businessLicense.size / 1024 / 1024).toFixed(2)} MB)</span>
-                                        </div>
-                                        <button
-                                            onClick={() => handleFileRemove('businessLicense')}
-                                            className="text-red-500 hover:text-red-700 transition-colors"
-                                        >
-                                            <X className="w-4 h-4" />
-                                        </button>
-                                    </div>
-                                )}
-                                
-                                {(uploadProgress.businessLicense > 0 && uploadProgress.businessLicense < 100) && (
-                                    <div className="mt-2">
-                                        <div className="w-full bg-slate-200 rounded-full h-2">
-                                            <div 
-                                                className="bg-green-600 h-2 rounded-full transition-all duration-300"
-                                                style={{ width: `${uploadProgress.businessLicense}%` }}
-                                            />
-                                        </div>
-                                        <p className="text-xs text-slate-500 mt-1">Uploading... {uploadProgress.businessLicense}%</p>
-                                    </div>
-                                )}
-                            </div>
-                            
-                            {/* Insurance Certificate */}
-                            <div className="border-2 border-dashed border-slate-300 rounded-lg p-6">
-                                <div className="flex items-center justify-between mb-4">
-                                    <div>
-                                        <h3 className="font-medium text-slate-800 flex items-center gap-2">
-                                            <Shield className="w-5 h-5 text-purple-600" />
-                                            Insurance Certificate
-                                        </h3>
-                                        <p className="text-sm text-slate-600 mt-1">Upload your insurance certificate</p>
-                                    </div>
-                                    {formData.insuranceCertificate && (
-                                        <span className="text-sm text-green-600">✓ Uploaded</span>
-                                    )}
-                                </div>
-                                
-                                <div className="mb-4">
-                                    <input
-                                        type="file"
-                                        accept=".pdf,.jpg,.jpeg,.png"
-                                        onChange={(e) => handleFileUpload('insuranceCertificate', e.target.files)}
-                                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-                                    />
-                                </div>
-                                
-                                {formData.insuranceCertificate && (
-                                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                                        <div className="flex items-center gap-3">
-                                            <Shield className="w-4 h-4 text-purple-600" />
-                                            <span className="text-sm text-slate-700">{formData.insuranceCertificate.name}</span>
-                                            <span className="text-xs text-slate-500">({(formData.insuranceCertificate.size / 1024 / 1024).toFixed(2)} MB)</span>
-                                        </div>
-                                        <button
-                                            onClick={() => handleFileRemove('insuranceCertificate')}
-                                            className="text-red-500 hover:text-red-700 transition-colors"
-                                        >
-                                            <X className="w-4 h-4" />
-                                        </button>
-                                    </div>
-                                )}
-                                
-                                {(uploadProgress.insuranceCertificate > 0 && uploadProgress.insuranceCertificate < 100) && (
-                                    <div className="mt-2">
-                                        <div className="w-full bg-slate-200 rounded-full h-2">
-                                            <div 
-                                                className="bg-purple-600 h-2 rounded-full transition-all duration-300"
-                                                style={{ width: `${uploadProgress.insuranceCertificate}%` }}
-                                            />
-                                        </div>
-                                        <p className="text-xs text-slate-500 mt-1">Uploading... {uploadProgress.insuranceCertificate}%</p>
-                                    </div>
-                                )}
-                            </div>
-                            
-                            {/* Tax Documents */}
-                            <div className="border-2 border-dashed border-slate-300 rounded-lg p-6">
-                                <div className="flex items-center justify-between mb-4">
-                                    <div>
-                                        <h3 className="font-medium text-slate-800 flex items-center gap-2">
-                                            <FileText className="w-5 h-5 text-orange-600" />
-                                            Tax Documents
-                                        </h3>
-                                        <p className="text-sm text-slate-600 mt-1">Upload your tax registration documents</p>
-                                    </div>
-                                    {formData.taxDocuments && (
-                                        <span className="text-sm text-green-600">✓ Uploaded</span>
-                                    )}
-                                </div>
-                                
-                                <div className="mb-4">
-                                    <input
-                                        type="file"
-                                        accept=".pdf,.jpg,.jpeg,.png"
-                                        onChange={(e) => handleFileUpload('taxDocuments', e.target.files)}
-                                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-                                    />
-                                </div>
-                                
-                                {formData.taxDocuments && (
-                                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                                        <div className="flex items-center gap-3">
-                                            <FileText className="w-4 h-4 text-orange-600" />
-                                            <span className="text-sm text-slate-700">{formData.taxDocuments.name}</span>
-                                            <span className="text-xs text-slate-500">({(formData.taxDocuments.size / 1024 / 1024).toFixed(2)} MB)</span>
-                                        </div>
-                                        <button
-                                            onClick={() => handleFileRemove('taxDocuments')}
-                                            className="text-red-500 hover:text-red-700 transition-colors"
-                                        >
-                                            <X className="w-4 h-4" />
-                                        </button>
-                                    </div>
-                                )}
-                                
-                                {(uploadProgress.taxDocuments > 0 && uploadProgress.taxDocuments < 100) && (
-                                    <div className="mt-2">
-                                        <div className="w-full bg-slate-200 rounded-full h-2">
-                                            <div 
-                                                className="bg-orange-600 h-2 rounded-full transition-all duration-300"
-                                                style={{ width: `${uploadProgress.taxDocuments}%` }}
-                                            />
-                                        </div>
-                                        <p className="text-xs text-slate-500 mt-1">Uploading... {uploadProgress.taxDocuments}%</p>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                );
-                
-            case 7:
+            case 6:
                 return (
                     <div className="space-y-6">
                         <h2 className="text-2xl font-bold text-slate-800">Review & Submit</h2>
@@ -1077,7 +990,7 @@ const PublicTVRRegistration = () => {
                                 </div>
                                 <div>
                                     <p className="text-sm text-slate-600">Business License</p>
-                                    <p className="font-medium text-slate-800">{formData.businessLicense || 'Not provided'}</p>
+                                    <p className="font-medium text-slate-800">{formData.businessLicense ? formData.businessLicense.name : 'Not provided'}</p>
                                 </div>
                                 <div>
                                     <p className="text-sm text-slate-600">Tax ID</p>
@@ -1099,15 +1012,23 @@ const PublicTVRRegistration = () => {
                                 </div>
                                 <div>
                                     <p className="text-sm text-slate-600">Business License</p>
-                                    <p className="font-medium text-slate-800">{formData.businessLicense ? '✓ Uploaded' : 'Not uploaded'}</p>
+                                    <p className="font-medium text-slate-800">{formData.businessLicense ? formData.businessLicense.name : 'Not uploaded'}</p>
                                 </div>
                                 <div>
                                     <p className="text-sm text-slate-600">Insurance Certificate</p>
-                                    <p className="font-medium text-slate-800">{formData.insuranceCertificate ? '✓ Uploaded' : 'Not uploaded'}</p>
+                                    <p className="font-medium text-slate-800">{formData.insuranceCertificate ? formData.insuranceCertificate.name : 'Not uploaded'}</p>
                                 </div>
                                 <div>
-                                    <p className="text-sm text-slate-600">Tax Documents</p>
-                                    <p className="font-medium text-slate-800">{formData.taxDocuments ? '✓ Uploaded' : 'Not uploaded'}</p>
+                                    <p className="text-sm text-slate-600">Site Plan</p>
+                                    <p className="font-medium text-slate-800">{formData.sitePlan ? formData.sitePlan.name : 'Not uploaded'}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-slate-600">Ownership Proof</p>
+                                    <p className="font-medium text-slate-800">{formData.ownershipProof ? formData.ownershipProof.name : 'Not uploaded'}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-slate-600">Tax Clearance Certificate</p>
+                                    <p className="font-medium text-slate-800">{formData.taxClearanceCertificate ? formData.taxClearanceCertificate.name : 'Not uploaded'}</p>
                                 </div>
                             </div>
                         </div>
@@ -1157,46 +1078,46 @@ const PublicTVRRegistration = () => {
             <div className="max-w-4xl mx-auto px-4">
                 {/* Progress Steps */}
                 <div className="mb-8">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0">
                         {steps.map((step, index) => (
-                            <div key={step.id} className="flex items-center">
-                                <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-colors ${
-                                    currentStep === step.id
-                                        ? 'border-hawaii-ocean bg-hawaii-ocean text-white'
-                                        : currentStep > step.id
-                                        ? 'border-green-500 bg-green-500 text-white'
-                                        : 'border-slate-300 bg-white text-slate-600'
-                                }`}>
-                                    {currentStep > step.id ? (
-                                        <CheckCircle className="w-5 h-5" />
-                                    ) : (
-                                        <step.icon className="w-5 h-5" />
-                                    )}
-                                </div>
-                                <div className="ml-3 hidden sm:block">
-                                    <p className="text-sm font-medium text-slate-800">{step.title}</p>
+                            <React.Fragment key={step.id}>
+                                <div className="flex flex-col items-center">
+                                    <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-colors ${
+                                        currentStep === step.id
+                                            ? 'border-hawaii-ocean bg-hawaii-ocean text-white'
+                                            : currentStep > step.id
+                                            ? 'border-green-500 bg-green-500 text-white'
+                                            : 'border-slate-300 bg-white text-slate-600'
+                                    }`}>
+                                        {currentStep > step.id ? (
+                                            <CheckCircle className="w-5 h-5" />
+                                        ) : (
+                                            <step.icon className="w-5 h-5" />
+                                        )}
+                                    </div>
+                                    <p className="text-xs sm:text-sm font-medium text-slate-800 mt-1 text-center">{step.title}</p>
                                 </div>
                                 {index < steps.length - 1 && (
-                                    <div className={`hidden sm:block w-16 h-0.5 ml-4 ${
+                                    <div className={`hidden sm:block w-16 h-0.5 ${
                                         currentStep > step.id ? 'bg-green-500' : 'bg-slate-300'
                                     }`} />
                                 )}
-                            </div>
+                            </React.Fragment>
                         ))}
                     </div>
                 </div>
                 
                 {/* Main Content */}
-                <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 mb-6">
+                <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-4 sm:p-6 mb-6 min-h-[500px]">
                     {renderStepContent()}
                 </div>
                 
                 {/* Navigation Buttons */}
-                <div className="flex justify-between">
+                <div className="flex flex-col sm:flex-row justify-between gap-4 sm:gap-0">
                     <button
                         onClick={handlePrevious}
                         disabled={currentStep === 1}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-lg transition-colors ${
+                        className={`flex items-center justify-center sm:justify-start gap-2 px-6 py-3 rounded-lg transition-colors ${
                             currentStep === 1
                                 ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
                                 : 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-50'
@@ -1209,7 +1130,7 @@ const PublicTVRRegistration = () => {
                     {currentStep === 6 ? (
                         <button
                             onClick={handleSubmit}
-                            className="flex items-center gap-2 px-6 py-3 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+                            className="flex items-center justify-center sm:justify-end gap-2 px-6 py-3 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
                             style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
                         >
                             Submit Registration
@@ -1218,7 +1139,7 @@ const PublicTVRRegistration = () => {
                     ) : (
                         <button
                             onClick={handleNext}
-                            className="flex items-center gap-2 px-6 py-3 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+                            className="flex items-center justify-center sm:justify-end gap-2 px-6 py-3 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
                             style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
                         >
                             Next

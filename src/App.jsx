@@ -215,7 +215,7 @@ function App() {
               
               <Route path="/case/new" element={<NewCaseForm />} />
               <Route path="/case/:id" element={<CaseReview />} />
-              <Route path="/register" element={<RegistrationForm />} />
+              <Route path="/register" element={<PublicTVRRegistration />} />
               <Route path="/registration-status" element={<RegistrationStatus />} />
               <Route path="/notice-generator" element={<NoticeGenerator />} />
               <Route path="/submit-complaint" element={<ComplaintSubmission />} />
