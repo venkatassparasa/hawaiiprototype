@@ -22,6 +22,14 @@ const Reports = () => {
         { name: 'Jan', compliant: 2800, nonCompliant: 150 },
     ];
 
+    const [activeReport, setActiveReport] = useState(null);
+    const [showReportDetail, setShowReportDetail] = useState(false);
+
+    const handleGenerateReport = (reportType) => {
+        setActiveReport(reportType);
+        setShowReportDetail(true);
+    };
+
     const handleCreateCase = () => {
         // Generate case number
         const caseNumber = `VC-2024-${Math.floor(Math.random() * 1000)}`;
@@ -183,23 +191,26 @@ const Reports = () => {
                         </div>
                         <div className="space-y-2">
                             <div className="flex justify-between text-sm">
-                                <span className="text-slate-600">Honolulu</span>
+                                <span className="text-slate-600">Hilo</span>
                                 <span className="font-medium">245 cases</span>
                             </div>
                             <div className="flex justify-between text-sm">
-                                <span className="text-slate-600">Maui</span>
+                                <span className="text-slate-600">Kona</span>
                                 <span className="font-medium">189 cases</span>
                             </div>
                             <div className="flex justify-between text-sm">
-                                <span className="text-slate-600">Kauai</span>
+                                <span className="text-slate-600">Puna</span>
                                 <span className="font-medium">127 cases</span>
                             </div>
                             <div className="flex justify-between text-sm">
-                                <span className="text-slate-600">Big Island</span>
+                                <span className="text-slate-600">Kohala</span>
                                 <span className="font-medium">203 cases</span>
                             </div>
                         </div>
-                        <button className="w-full mt-4 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                        <button 
+                            onClick={() => handleGenerateReport('region')}
+                            className="w-full mt-4 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors"
+                        >
                             Generate Report
                         </button>
                     </div>
@@ -233,7 +244,10 @@ const Reports = () => {
                                 <span className="font-medium">89 cases</span>
                             </div>
                         </div>
-                        <button className="w-full mt-4 px-3 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition-colors">
+                        <button 
+                            onClick={() => handleGenerateReport('type')}
+                            className="w-full mt-4 px-3 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition-colors"
+                        >
                             Generate Report
                         </button>
                     </div>
@@ -267,7 +281,10 @@ const Reports = () => {
                                 <span className="font-medium text-slate-600">156</span>
                             </div>
                         </div>
-                        <button className="w-full mt-4 px-3 py-2 bg-amber-600 text-white rounded-lg text-sm hover:bg-amber-700 transition-colors">
+                        <button 
+                            onClick={() => handleGenerateReport('tat')}
+                            className="w-full mt-4 px-3 py-2 bg-amber-600 text-white rounded-lg text-sm hover:bg-amber-700 transition-colors"
+                        >
                             Generate Report
                         </button>
                     </div>
@@ -301,7 +318,10 @@ const Reports = () => {
                                 <span className="font-medium">$45.2K</span>
                             </div>
                         </div>
-                        <button className="w-full mt-4 px-3 py-2 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 transition-colors">
+                        <button 
+                            onClick={() => handleGenerateReport('enforcement')}
+                            className="w-full mt-4 px-3 py-2 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 transition-colors"
+                        >
                             Generate Report
                         </button>
                     </div>
@@ -335,7 +355,10 @@ const Reports = () => {
                                 <span className="font-medium text-blue-600">+15.0%</span>
                             </div>
                         </div>
-                        <button className="w-full mt-4 px-3 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 transition-colors">
+                        <button 
+                            onClick={() => handleGenerateReport('trends')}
+                            className="w-full mt-4 px-3 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 transition-colors"
+                        >
                             Generate Report
                         </button>
                     </div>
@@ -369,7 +392,10 @@ const Reports = () => {
                                 <span className="font-medium text-green-600">$847.5K</span>
                             </div>
                         </div>
-                        <button className="w-full mt-4 px-3 py-2 bg-emerald-600 text-white rounded-lg text-sm hover:bg-emerald-700 transition-colors">
+                        <button 
+                            onClick={() => handleGenerateReport('revenue')}
+                            className="w-full mt-4 px-3 py-2 bg-emerald-600 text-white rounded-lg text-sm hover:bg-emerald-700 transition-colors"
+                        >
                             Generate Report
                         </button>
                     </div>
@@ -379,6 +405,7 @@ const Reports = () => {
                     <div className="text-sm text-slate-500">
                         <p>Last updated: March 15, 2024 at 2:30 PM HST</p>
                         <p>Data source: County Compliance Management System</p>
+                        <p className="mt-1 text-xs italic">Note: Underlying data captured from high-fidelity TVR Registration Portal at the time of registration.</p>
                     </div>
                     <div className="flex gap-3">
                         <button className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-sm">
@@ -503,6 +530,130 @@ const Reports = () => {
                             >
                                 Create Case
                             </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Report Detail Modal */}
+            {showReportDetail && (
+                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+                        <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                            <div>
+                                <h2 className="text-xl font-bold text-slate-800 capitalize">
+                                    {activeReport === 'region' && 'Regional Compliance Deep-Dive'}
+                                    {activeReport === 'type' && 'Property Type Analysis Detail'}
+                                    {activeReport === 'tat' && 'TAT Revenue & Payment Audit'}
+                                    {activeReport === 'enforcement' && 'Enforcement Efficiency Metrics'}
+                                    {activeReport === 'trends' && 'Compliance Velocity Tracking'}
+                                    {activeReport === 'revenue' && 'Economic Impact Assessment'}
+                                </h2>
+                                <p className="text-sm text-slate-500 mt-1">Detailed breakdown from TVR Registration historical data.</p>
+                            </div>
+                            <button
+                                onClick={() => setShowReportDetail(false)}
+                                className="p-2 hover:bg-slate-200 rounded-full text-slate-400 hover:text-slate-600 transition-colors"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+                        
+                        <div className="p-8 overflow-y-auto flex-1 bg-white">
+                            {/* Mock Content based on report type */}
+                            <div className="space-y-8">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                                        <p className="text-blue-600 text-xs font-bold uppercase tracking-wider mb-1">
+                                            {activeReport === 'revenue' ? 'Total Collected' : 'Total Records'}
+                                        </p>
+                                        <p className="text-2xl font-black text-blue-900">
+                                            {activeReport === 'revenue' ? '$847.5K' : '1,248'}
+                                        </p>
+                                    </div>
+                                    <div className="bg-green-50 p-4 rounded-xl border border-green-100">
+                                        <p className="text-green-600 text-xs font-bold uppercase tracking-wider mb-1">
+                                            {activeReport === 'trends' ? 'Growth Rate' : 'Compliance Accuracy'}
+                                        </p>
+                                        <p className="text-2xl font-black text-green-900">
+                                            {activeReport === 'trends' ? '+12.3%' : '94.2%'}
+                                        </p>
+                                    </div>
+                                    <div className="bg-orange-50 p-4 rounded-xl border border-orange-100">
+                                        <p className="text-orange-600 text-xs font-bold uppercase tracking-wider mb-1">Audit Confidence</p>
+                                        <p className="text-2xl font-black text-orange-900">98.5%</p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                        <TrendingUp className="w-4 h-4 text-hawaii-ocean" />
+                                        {activeReport === 'trends' ? 'Monthly Compliance Velocity' : 'Data Distribution Analysis'}
+                                    </h3>
+                                    <div className="h-64 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-center italic text-slate-400">
+                                        [Interactive Visualizer for {activeReport} - Loading high-fidelity telemetry...]
+                                    </div>
+                                </div>
+
+                                <div className="border border-slate-100 rounded-xl overflow-hidden">
+                                    <table className="w-full text-left text-sm">
+                                        <thead className="bg-slate-50">
+                                            <tr>
+                                                <th className="px-4 py-3 font-bold text-slate-700">
+                                                    {activeReport === 'region' && 'District'}
+                                                    {activeReport === 'type' && 'Property Category'}
+                                                    {activeReport === 'tat' && 'Payment Status'}
+                                                    {activeReport === 'enforcement' && 'Violation Category'}
+                                                    {activeReport === 'trends' && 'Reporting period'}
+                                                    {activeReport === 'revenue' && 'Revenue Stream'}
+                                                </th>
+                                                <th className="px-4 py-3 font-bold text-slate-700">
+                                                    {activeReport === 'revenue' || activeReport === 'tat' ? 'Financial Volume' : 'Units Identified'}
+                                                </th>
+                                                <th className="px-4 py-3 font-bold text-slate-700">Compliance Factor</th>
+                                                <th className="px-4 py-3 font-bold text-slate-700">Impact Score</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-100">
+                                            {(activeReport === 'region' ? ['Hilo', 'Kona', 'Puna', 'Kohala', 'Hamakua'] :
+                                              activeReport === 'type' ? ['Single Family', 'Condo/Apt', 'Vacation Home', 'Estate', 'Other'] :
+                                              activeReport === 'tat' ? ['Paid & Current', 'Late Payment', 'Delinquent', 'Not Filed'] :
+                                              activeReport === 'enforcement' ? ['Noise', 'Parking', 'Unpermitted', 'Safety', 'Zoning'] :
+                                              activeReport === 'trends' ? ['Q1 2024', 'Q4 2023', 'Q3 2023', 'Q2 2023'] :
+                                              ['Fines', 'TAT Revenue', 'Fees', 'Permits']).map((item, i) => (
+                                                <tr key={i} className="hover:bg-slate-50/50">
+                                                    <td className="px-4 py-3 text-slate-600 font-medium">{item}</td>
+                                                    <td className="px-4 py-3 text-slate-800">
+                                                        {activeReport === 'revenue' || activeReport === 'tat' ? `$${(Math.random() * 50 + 10).toFixed(1)}K` : Math.floor(Math.random() * 300 + 50)}
+                                                    </td>
+                                                    <td className="px-4 py-3">
+                                                        <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-bold">
+                                                            {(Math.random() * 10 + 90).toFixed(1)}%
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-slate-900 font-bold">
+                                                        {(Math.random() * 4 + 6).toFixed(1)} / 10
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-6 border-t border-slate-100 bg-slate-50 flex justify-between items-center">
+                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                                Verification Hash: 0X8F23...DE91 | Source: TVR REG PORTAL 2024
+                            </p>
+                            <div className="flex gap-3">
+                                <button className="px-4 py-2 border border-slate-200 bg-white text-slate-700 rounded-lg text-sm font-bold hover:bg-slate-100 transition-colors">
+                                    Export CSV Data
+                                </button>
+                                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20">
+                                    Print Full Audit Report
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
