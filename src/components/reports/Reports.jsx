@@ -29,6 +29,7 @@ const Reports = () => {
 
     const [activeReport, setActiveReport] = useState(null);
     const [showReportDetail, setShowReportDetail] = useState(false);
+    const [isExporting, setIsExporting] = useState(false);
     const reportsRef = useRef(null);
 
     const handleGenerateReport = (reportType) => {
@@ -37,52 +38,86 @@ const Reports = () => {
     };
 
     const handleExportPDF = async () => {
-        if (!reportsRef.current) return;
+        setIsExporting(true);
         
-        // Show loading state or alert if needed
-        const btn = document.activeElement;
-        const originalText = btn.innerHTML;
-        btn.innerHTML = 'Generating PDF...';
-        btn.disabled = true;
+        // Wait for state update and rendering
+        setTimeout(async () => {
+            try {
+                const zip = new JSZip();
+                const timestamp = new Date().toISOString().split('T')[0];
+                const folderName = `Hawaii_County_Compliance_Reports_${timestamp}`;
+                
+                // Helper to capture a section by ID and return PDF blob
+                const captureToPDF = async (elementId, filename, isLandscape = true) => {
+                    const element = document.getElementById(elementId);
+                    if (!element) return null;
+                    
+                    const canvas = await html2canvas(element, {
+                        scale: 2,
+                        useCORS: true,
+                        logging: false,
+                        backgroundColor: '#f8fafc',
+                        windowWidth: 1600
+                    });
+                    
+                    const imgData = canvas.toDataURL('image/png');
+                    const orientation = isLandscape ? 'l' : 'p';
+                    const pdf = new jsPDF(orientation, 'mm', 'a4');
+                    const imgProps = pdf.getImageProperties(imgData);
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                    
+                    // Center and add first page
+                    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                    
+                    // Handle overflow if any (though each report is designed to fit)
+                    let remainingHeight = pdfHeight - pdf.internal.pageSize.getHeight();
+                    let currentPosition = -pdf.internal.pageSize.getHeight();
+                    
+                    while (remainingHeight > 0) {
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', 0, currentPosition, pdfWidth, pdfHeight);
+                        remainingHeight -= pdf.internal.pageSize.getHeight();
+                        currentPosition -= pdf.internal.pageSize.getHeight();
+                    }
+                    
+                    return pdf.output('blob');
+                };
 
-        try {
-            const canvas = await html2canvas(reportsRef.current, {
-                scale: 2,
-                useCORS: true,
-                logging: false,
-                backgroundColor: '#f8fafc',
-                windowWidth: 1200,
-                ignoreElements: (element) => element.tagName === 'BUTTON'
-            });
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const imgProps = pdf.getImageProperties(imgData);
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-            
-            // Handle multi-page if height is too large
-            let heightLeft = pdfHeight;
-            let position = 0;
-            const pageHeight = pdf.internal.pageSize.getHeight();
+                // 1. Capture Dashboard Overview
+                const overviewBlob = await captureToPDF('pdf-dashboard-reports', 'Hawaii_Compliance_Overview.pdf');
+                if (overviewBlob) zip.file('01_Hawaii_Compliance_Overview.pdf', overviewBlob);
 
-            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
-            heightLeft -= pageHeight;
+                // 2. Capture Each Standard Report
+                const reportTypes = ['region', 'type', 'tat', 'enforcement', 'trends', 'revenue'];
+                const reportNames = {
+                    region: 'Regional_Compliance_Detail',
+                    type: 'Property_Type_Analysis',
+                    tat: 'TAT_Revenue_Audit',
+                    enforcement: 'Enforcement_Efficiency',
+                    trends: 'Compliance_Velocity',
+                    revenue: 'Economic_Impact'
+                };
 
-            while (heightLeft >= 0) {
-                position = heightLeft - pdfHeight;
-                pdf.addPage();
-                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
-                heightLeft -= pageHeight;
+                for (let i = 0; i < reportTypes.length; i++) {
+                    const type = reportTypes[i];
+                    const blob = await captureToPDF(`pdf-report-${type}`, `${reportNames[type]}.pdf`);
+                    if (blob) zip.file(`${String(i + 2).padStart(2, '0')}_${reportNames[type]}.pdf`, blob);
+                }
+
+                const content = await zip.generateAsync({ type: 'blob' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(content);
+                link.download = `${folderName}.zip`;
+                link.click();
+
+            } catch (error) {
+                console.error('Error generating ZIP of PDFs:', error);
+                alert('Failed to generate report package. Please try again.');
+            } finally {
+                setIsExporting(false);
             }
-
-            pdf.save(`Hawaii_County_Full_Compliance_Report_${new Date().toISOString().split('T')[0]}.pdf`);
-        } catch (error) {
-            console.error('Error generating PDF:', error);
-            alert('Failed to generate PDF. Please try again.');
-        } finally {
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-        }
+        }, 800);
     };
 
     const handleExportAll = async () => {
@@ -401,7 +436,15 @@ const Reports = () => {
             </div>
 
             <div ref={reportsRef} className="space-y-8 p-4 bg-slate-50/30 rounded-2xl">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div id="pdf-dashboard-reports" className="relative grid grid-cols-1 lg:grid-cols-2 gap-8 bg-[#f8fafc] p-6 pt-24 rounded-2xl">
+                    {/* Logo for PDF Export */}
+                    <div className="absolute top-6 left-6 flex items-center gap-4">
+                        <img src="/h_logo.png" alt="County logo" className="h-16 w-16 object-contain" />
+                        <div>
+                            <h3 className="text-xl font-bold text-slate-800">County of Hawaii</h3>
+                            <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Compliance Analytics Overview</p>
+                        </div>
+                    </div>
 
                 {/* Compliance Trend Chart */}
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -725,20 +768,21 @@ const Reports = () => {
                     </div>
                 </div>
 
-                {/* Hidden Detailed Reports for PDF Export Only */}
-                <div style={{ position: 'absolute', left: '-9999px', top: '0', width: '1100px', background: '#f8fafc' }}>
-                    <div className="p-12 space-y-16">
-                        <div className="border-b-4 border-hawaii-ocean pb-6 mb-10">
-                            <h1 className="text-4xl font-black text-slate-800">
-                                County of Hawaii Compliance Analytics
-                            </h1>
-                            <p className="text-slate-500 mt-2 font-bold uppercase tracking-widest">
-                                Full System Audit | Generated: {new Date().toLocaleDateString()}
-                            </p>
-                        </div>
+                {/* Detailed Reports for PDF Export Only */}
+                {isExporting && (
+                    <div className="p-12 space-y-16 bg-[#f8fafc] w-[1400px] mx-auto">
 
                         {['region', 'type', 'tat', 'enforcement', 'trends', 'revenue'].map(type => (
-                            <div key={type} className="bg-white rounded-3xl p-10 shadow-sm border border-slate-100">
+                            <div key={type} id={`pdf-report-${type}`} className="relative bg-white rounded-3xl p-10 pt-28 shadow-sm border border-slate-100">
+                                {/* Logo for PDF Export */}
+                                <div className="absolute top-8 left-10 flex items-center gap-4">
+                                    <img src="/h_logo.png" alt="County logo" className="h-20 w-20 object-contain" />
+                                    <div>
+                                        <h3 className="text-2xl font-black text-slate-800 leading-tight">County of Hawaii</h3>
+                                        <p className="text-sm text-hawaii-ocean font-bold uppercase tracking-widest">Department of Finance | Compliance Division</p>
+                                    </div>
+                                </div>
+
                                 <h2 className="text-3xl font-bold text-slate-800 mb-8 border-l-8 border-hawaii-ocean pl-6 leading-tight">
                                     {type === 'region' && 'Regional Compliance Deep-Dive'}
                                     {type === 'type' && 'Property Type Analysis Detail'}
@@ -754,7 +798,7 @@ const Reports = () => {
                             </div>
                         ))}
                     </div>
-                </div>
+                )}
             </div>
             </div>
 
@@ -917,6 +961,18 @@ const Reports = () => {
                             </div>
                         </div>
                     </div>
+                </div>
+            )}
+
+            {/* Exporting Overlay */}
+            {isExporting && (
+                <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md flex flex-col items-center justify-center z-[100] text-white">
+                    <div className="w-16 h-16 border-4 border-hawaii-ocean border-t-transparent rounded-full animate-spin mb-6"></div>
+                    <h2 className="text-2xl font-bold mb-2">Generating Comprehensive Report</h2>
+                    <p className="text-slate-300">Capturing dashboard visualizations and detailed audit data...</p>
+                    <p className="text-sm text-slate-400 mt-8 animate-pulse text-center max-w-xs">
+                        This may take a few seconds due to the volume of data being processed.
+                    </p>
                 </div>
             )}
         </div>
