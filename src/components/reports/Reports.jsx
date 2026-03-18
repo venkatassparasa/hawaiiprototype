@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, AreaChart, Area } from 'recharts';
 import { Download, Calendar, FileText, TrendingUp, DollarSign, AlertTriangle, Plus, X } from 'lucide-react';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
+import JSZip from 'jszip';
+import Papa from 'papaparse';
+import { useRef } from 'react';
 
 const Reports = () => {
     const [showCaseModal, setShowCaseModal] = useState(false);
@@ -24,10 +29,85 @@ const Reports = () => {
 
     const [activeReport, setActiveReport] = useState(null);
     const [showReportDetail, setShowReportDetail] = useState(false);
+    const reportsRef = useRef(null);
 
     const handleGenerateReport = (reportType) => {
         setActiveReport(reportType);
         setShowReportDetail(true);
+    };
+
+    const handleExportPDF = async () => {
+        if (!reportsRef.current) return;
+        try {
+            const canvas = await html2canvas(reportsRef.current, {
+                scale: 2,
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#f8fafc'
+            });
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const imgProps = pdf.getImageProperties(imgData);
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+            
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            pdf.save(`Hawaii_County_Compliance_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+            alert('Failed to generate PDF. Please try again.');
+        }
+    };
+
+    const handleExportAll = async () => {
+        const zip = new JSZip();
+        
+        const reportsData = {
+            'Regional_Compliance.csv': [
+                { District: 'Hilo', Cases: 245, Compliance: '92.4%' },
+                { District: 'Kona', Cases: 189, Compliance: '88.1%' },
+                { District: 'Puna', Cases: 127, Compliance: '94.2%' },
+                { District: 'Kohala', Cases: 203, Compliance: '90.5%' },
+                { District: 'Hamakua', Cases: 92, Compliance: '95.8%' }
+            ],
+            'Property_Type_Analysis.csv': [
+                { Type: 'Single Family', Units: 342, Impact: '6.8/10' },
+                { Type: 'Condo/Apt', Units: 278, Impact: '7.2/10' },
+                { Type: 'Vacation Home', Units: 156, Impact: '8.4/10' },
+                { Type: 'Other', Units: 89, Impact: '5.5/10' }
+            ],
+            'TAT_Payment_Status.csv': [
+                { Status: 'Paid & Current', Volume: 423, Revenue: '$567.8K' },
+                { Status: 'Late Payment', Volume: 87, Revenue: '$34.2K' },
+                { Status: 'Delinquent', Volume: 34, Revenue: '$12.5K' },
+                { Status: 'Not Filed', Volume: 156, Revenue: '$0' }
+            ],
+            'Enforcement_Efficiency.csv': [
+                { Metric: 'Response Time', Value: '2.3 days avg' },
+                { Metric: 'Resolution Rate', Value: '78%' },
+                { Metric: 'Active Cases', Value: '145' }
+            ],
+            'Compliance_Trends.csv': [
+                { Month: 'Jan', Compliance_Rate: '94.2%', Growth: '+12.3%' },
+                { Month: 'Dec', Compliance_Rate: '88.7%', Growth: '+8.7%' }
+            ],
+            'Revenue_Impact.csv': [
+                { Stream: 'Fines Collected', Amount: '$234.5K' },
+                { Stream: 'TAT Revenue', Amount: '$567.8K' },
+                { Stream: 'Processing Fees', Amount: '$45.2K' },
+                { Stream: 'Total Impact', Amount: '$847.5K' }
+            ]
+        };
+
+        Object.entries(reportsData).forEach(([filename, data]) => {
+            zip.file(filename, Papa.unparse(data));
+        });
+
+        const content = await zip.generateAsync({ type: 'blob' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(content);
+        link.download = `Hawaii_County_Standard_Reports_${new Date().toISOString().split('T')[0]}.zip`;
+        link.click();
     };
 
     const handleCreateCase = () => {
@@ -71,7 +151,7 @@ const Reports = () => {
     const COLORS = ['#0f4c81', '#ff7f50', '#f59e0b', '#ef4444'];
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
+        <div ref={reportsRef} className="space-y-8 animate-in fade-in duration-500 p-2">
 
             <div className="flex justify-between items-center">
                 <div>
@@ -79,18 +159,13 @@ const Reports = () => {
                     <p className="text-slate-500">Enforcement trends and compliance metrics.</p>
                 </div>
                 <div className="flex gap-2">
-                    <button 
-                        onClick={() => setShowCaseModal(true)}
-                        className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 flex items-center gap-2 text-sm shadow-sm"
-                    >
-                        <Plus className="w-4 h-4" />
-                        Create Case from Compliance
-                    </button>
-                    <button className="px-4 py-2 border border-slate-200 bg-white rounded-lg flex items-center gap-2 text-sm text-slate-600 hover:bg-slate-50">
+                    {/* <button className="px-4 py-2 border border-slate-200 bg-white rounded-lg flex items-center gap-2 text-sm text-slate-600 hover:bg-slate-50">
                         <Calendar className="w-4 h-4" /> Last 6 Months
-                    </button>
-                    <button className="px-4 py-2 bg-hawaii-ocean text-white rounded-lg hover:bg-blue-800 flex items-center gap-2 text-sm shadow-sm"
-                     style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
+                    </button> */}
+                    <button 
+                        onClick={handleExportPDF}
+                        className="px-4 py-2 bg-hawaii-ocean text-white rounded-lg hover:bg-blue-800 flex items-center gap-2 text-sm shadow-sm"
+                        style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
                         <Download className="w-4 h-4" /> Export PDF
                     </button>
                 </div>
@@ -408,11 +483,13 @@ const Reports = () => {
                         <p className="mt-1 text-xs italic">Note: Underlying data captured from high-fidelity TVR Registration Portal at the time of registration.</p>
                     </div>
                     <div className="flex gap-3">
-                        <button className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-sm">
+                        {/* <button className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-sm">
                             Schedule Reports
-                        </button>
-                        <button className="px-4 py-2 bg-hawaii-ocean text-white rounded-lg hover:bg-blue-800 transition-colors text-sm"
-                         style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
+                        </button> */}
+                        <button 
+                            onClick={handleExportAll}
+                            className="px-4 py-2 bg-hawaii-ocean text-white rounded-lg hover:bg-blue-800 transition-colors text-sm"
+                            style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
                             Export All Reports
                         </button>
                     </div>
