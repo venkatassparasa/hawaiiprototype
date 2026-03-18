@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, DollarSign, Clock, Mail, FileText, Building, Save, Plus, Edit2, Trash2, Eye, EyeOff, AlertTriangle, Database } from 'lucide-react';
+import { Settings, DollarSign, Clock, Mail, FileText, Building, Save, Plus, Edit2, Trash2, Eye, EyeOff, AlertTriangle, Database, X } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 
 const AdminConfiguration = () => {
@@ -61,6 +61,11 @@ const AdminConfiguration = () => {
         { id: 4, name: 'Renewal Reminder', type: 'reminder', subject: 'TVR Registration Renewal Due', active: false },
     ]);
 
+    // Modal state management
+    const [feeModal, setFeeModal] = useState({ isOpen: false, editingFee: null });
+    const [useTypeModal, setUseTypeModal] = useState({ isOpen: false, editingUseType: null });
+    const [templateModal, setTemplateModal] = useState({ isOpen: false, editingTemplate: null });
+
     // Hosting Platform Registration Data
     const [hostingPlatform, setHostingPlatform] = useState({
         platformName: '',
@@ -87,11 +92,10 @@ const AdminConfiguration = () => {
     const tabs = [
         { id: 'fees', label: 'Fee Management', icon: DollarSign },
         { id: 'useTypes', label: 'Use Types', icon: Building },
-        { id: 'thresholds', label: 'Violation Thresholds', icon: AlertTriangle },
-        { id: 'standards', label: 'Operational Standards', icon: Clock },
+        { id: 'operational', label: 'Operational Standards', icon: Settings },
         { id: 'contact', label: 'Contact Info', icon: Mail },
-        { id: 'templates', label: 'Letter Templates', icon: FileText },
-        { id: 'hosting', label: 'Hosting Platform', icon: Database },
+        { id: 'thresholds', label: 'Violation Thresholds', icon: AlertTriangle },
+        { id: 'templates', label: 'Letter Templates', icon: FileText }
     ];
 
     const handleSave = () => {
@@ -101,28 +105,32 @@ const AdminConfiguration = () => {
 
     // Fee Management Handlers
     const handleAddFee = () => {
-        const newFee = {
-            id: Math.max(...fees.map(f => f.id)) + 1,
-            name: 'New Fee',
-            amount: 0.00,
-            type: 'one-time',
-            description: 'New fee description'
-        };
-        setFees([...fees, newFee]);
+        setFeeModal({ isOpen: true, editingFee: null });
     };
 
     const handleEditFee = (id) => {
         const feeToEdit = fees.find(f => f.id === id);
-        const newName = prompt('Edit fee name:', feeToEdit.name);
-        const newAmount = prompt('Edit fee amount:', feeToEdit.amount);
-        
-        if (newName && newAmount) {
+        setFeeModal({ isOpen: true, editingFee: { ...feeToEdit } });
+    };
+
+    const handleSaveFee = (feeData) => {
+        if (feeModal.editingFee) {
+            // Update existing fee
             setFees(fees.map(f => 
-                f.id === id 
-                    ? { ...f, name: newName, amount: parseFloat(newAmount) }
+                f.id === feeModal.editingFee.id 
+                    ? { ...f, ...feeData }
                     : f
             ));
+        } else {
+            // Add new fee
+            const newFee = {
+                id: Math.max(...fees.map(f => f.id)) + 1,
+                ...feeData,
+                active: true
+            };
+            setFees([...fees, newFee]);
         }
+        setFeeModal({ isOpen: false, editingFee: null });
     };
 
     const handleDeleteFee = (id) => {
@@ -133,29 +141,32 @@ const AdminConfiguration = () => {
 
     // Use Type Management Handlers
     const handleAddUseType = () => {
-        const newUseType = {
-            id: Math.max(...useTypes.map(t => t.id)) + 1,
-            name: 'New Use Type',
-            maxOccupancy: 4,
-            minStay: 1,
-            description: 'New use type description'
-        };
-        setUseTypes([...useTypes, newUseType]);
+        setUseTypeModal({ isOpen: true, editingUseType: null });
     };
 
     const handleEditUseType = (id) => {
-        const typeToEdit = useTypes.find(t => t.id === id);
-        const newName = prompt('Edit use type name:', typeToEdit.name);
-        const newMaxOccupancy = prompt('Edit max occupancy:', typeToEdit.maxOccupancy);
-        const newMinStay = prompt('Edit minimum stay:', typeToEdit.minStay);
-        
-        if (newName && newMaxOccupancy && newMinStay) {
-            setUseTypes(useTypes.map(t => 
-                t.id === id 
-                    ? { ...t, name: newName, maxOccupancy: parseInt(newMaxOccupancy), minStay: parseInt(newMinStay) }
-                    : t
+        const useTypeToEdit = useTypes.find(u => u.id === id);
+        setUseTypeModal({ isOpen: true, editingUseType: { ...useTypeToEdit } });
+    };
+
+    const handleSaveUseType = (useTypeData) => {
+        if (useTypeModal.editingUseType) {
+            // Update existing use type
+            setUseTypes(useTypes.map(u => 
+                u.id === useTypeModal.editingUseType.id 
+                    ? { ...u, ...useTypeData }
+                    : u
             ));
+        } else {
+            // Add new use type
+            const newUseType = {
+                id: Math.max(...useTypes.map(u => u.id)) + 1,
+                ...useTypeData,
+                active: true
+            };
+            setUseTypes([...useTypes, newUseType]);
         }
+        setUseTypeModal({ isOpen: false, editingUseType: null });
     };
 
     const handleDeleteUseType = (id) => {
@@ -166,28 +177,32 @@ const AdminConfiguration = () => {
 
     // Template Management Handlers
     const handleAddTemplate = () => {
-        const newTemplate = {
-            id: Math.max(...letterTemplates.map(t => t.id)) + 1,
-            name: 'New Template',
-            type: 'violation',
-            subject: 'New Template Subject',
-            active: true
-        };
-        setLetterTemplates([...letterTemplates, newTemplate]);
+        setTemplateModal({ isOpen: true, editingTemplate: null });
     };
 
     const handleEditTemplate = (id) => {
         const templateToEdit = letterTemplates.find(t => t.id === id);
-        const newName = prompt('Edit template name:', templateToEdit.name);
-        const newSubject = prompt('Edit template subject:', templateToEdit.subject);
-        
-        if (newName && newSubject) {
+        setTemplateModal({ isOpen: true, editingTemplate: { ...templateToEdit } });
+    };
+
+    const handleSaveTemplate = (templateData) => {
+        if (templateModal.editingTemplate) {
+            // Update existing template
             setLetterTemplates(letterTemplates.map(t => 
-                t.id === id 
-                    ? { ...t, name: newName, subject: newSubject }
+                t.id === templateModal.editingTemplate.id 
+                    ? { ...t, ...templateData }
                     : t
             ));
+        } else {
+            // Add new template
+            const newTemplate = {
+                id: Math.max(...letterTemplates.map(t => t.id)) + 1,
+                ...templateData,
+                active: true
+            };
+            setLetterTemplates([...letterTemplates, newTemplate]);
         }
+        setTemplateModal({ isOpen: false, editingTemplate: null });
     };
 
     const handleDeleteTemplate = (id) => {
@@ -233,6 +248,310 @@ const AdminConfiguration = () => {
         // Save hosting platform configuration
         console.log('Saving hosting platform:', hostingPlatform);
         alert('Hosting Platform registration saved successfully!');
+    };
+
+    // Modal Components
+    const FeeModal = () => {
+        if (!feeModal.isOpen) return null;
+        
+        const initialData = feeModal.editingFee || {
+            name: '',
+            amount: 0,
+            type: 'one-time',
+            description: ''
+        };
+
+        return (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+                    <div className="flex justify-between items-center p-6 border-b">
+                        <h3 className="text-lg font-semibold text-slate-800">
+                            {feeModal.editingFee ? 'Edit Fee' : 'Add New Fee'}
+                        </h3>
+                        <button 
+                            onClick={() => setFeeModal({ isOpen: false, editingFee: null })}
+                            className="text-slate-400 hover:text-slate-600"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+                    </div>
+                    
+                    <div className="p-6 space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Fee Name</label>
+                            <input
+                                type="text"
+                                defaultValue={initialData.name}
+                                id="feeName"
+                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                            />
+                        </div>
+                        
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Amount ($)</label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                defaultValue={initialData.amount}
+                                id="feeAmount"
+                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                            />
+                        </div>
+                        
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Type</label>
+                            <select
+                                defaultValue={initialData.type}
+                                id="feeType"
+                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                            >
+                                <option value="one-time">One-time</option>
+                                <option value="recurring">Recurring</option>
+                                <option value="per-night">Per Night</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Description</label>
+                            <textarea
+                                defaultValue={initialData.description}
+                                id="feeDescription"
+                                rows={3}
+                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                            />
+                        </div>
+                    </div>
+                    
+                    <div className="flex justify-end gap-3 p-6 border-t">
+                        <button
+                            onClick={() => setFeeModal({ isOpen: false, editingFee: null })}
+                            className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={() => {
+                                const feeData = {
+                                    name: document.getElementById('feeName').value,
+                                    amount: parseFloat(document.getElementById('feeAmount').value),
+                                    type: document.getElementById('feeType').value,
+                                    description: document.getElementById('feeDescription').value
+                                };
+                                handleSaveFee(feeData);
+                            }}
+                            className="flex items-center gap-2 px-6 py-2 text-white rounded-lg font-medium hover:opacity-90 min-w-[120px]"
+                            style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
+                        >
+                            <Save className="w-4 h-4 mr-2" />
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    const UseTypeModal = () => {
+        if (!useTypeModal.isOpen) return null;
+        
+        const initialData = useTypeModal.editingUseType || {
+            name: '',
+            description: '',
+            maxOccupancy: 2,
+            minStay: 1
+        };
+
+        return (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+                    <div className="flex justify-between items-center p-6 border-b">
+                        <h3 className="text-lg font-semibold text-slate-800">
+                            {useTypeModal.editingUseType ? 'Edit Use Type' : 'Add New Use Type'}
+                        </h3>
+                        <button 
+                            onClick={() => setUseTypeModal({ isOpen: false, editingUseType: null })}
+                            className="text-slate-400 hover:text-slate-600"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+                    </div>
+                    
+                    <div className="p-6 space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Use Type Name</label>
+                            <input
+                                type="text"
+                                defaultValue={initialData.name}
+                                id="useTypeName"
+                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                            />
+                        </div>
+                        
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Description</label>
+                            <textarea
+                                defaultValue={initialData.description}
+                                id="useTypeDescription"
+                                rows={3}
+                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                            />
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">Max Occupancy</label>
+                                <input
+                                    type="number"
+                                    defaultValue={initialData.maxOccupancy}
+                                    id="maxOccupancy"
+                                    min="1"
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">Min Stay (nights)</label>
+                                <input
+                                    type="number"
+                                    defaultValue={initialData.minStay}
+                                    id="minStay"
+                                    min="1"
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="flex justify-end gap-3 p-6 border-t">
+                        <button
+                            onClick={() => setUseTypeModal({ isOpen: false, editingUseType: null })}
+                            className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={() => {
+                                const useTypeData = {
+                                    name: document.getElementById('useTypeName').value,
+                                    description: document.getElementById('useTypeDescription').value,
+                                    maxOccupancy: parseInt(document.getElementById('maxOccupancy').value),
+                                    minStay: parseInt(document.getElementById('minStay').value)
+                                };
+                                handleSaveUseType(useTypeData);
+                            }}
+                            className="flex items-center gap-2 px-6 py-2 text-white rounded-lg font-medium hover:opacity-90 min-w-[120px]"
+                            style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
+                        >
+                            <Save className="w-4 h-4 mr-2" />
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    const TemplateModal = () => {
+        if (!templateModal.isOpen) return null;
+        
+        const initialData = templateModal.editingTemplate || {
+            name: '',
+            type: 'custom',
+            subject: '',
+            active: true
+        };
+
+        return (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+                    <div className="flex justify-between items-center p-6 border-b">
+                        <h3 className="text-lg font-semibold text-slate-800">
+                            {templateModal.editingTemplate ? 'Edit Template' : 'Add New Template'}
+                        </h3>
+                        <button 
+                            onClick={() => setTemplateModal({ isOpen: false, editingTemplate: null })}
+                            className="text-slate-400 hover:text-slate-600"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+                    </div>
+                    
+                    <div className="p-6 space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Template Name</label>
+                            <input
+                                type="text"
+                                defaultValue={initialData.name}
+                                id="templateName"
+                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                            />
+                        </div>
+                        
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Subject</label>
+                            <input
+                                type="text"
+                                defaultValue={initialData.subject}
+                                id="templateSubject"
+                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                            />
+                        </div>
+                        
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Type</label>
+                            <select
+                                defaultValue={initialData.type}
+                                id="templateType"
+                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                            >
+                                <option value="violation">Violation</option>
+                                <option value="approval">Approval</option>
+                                <option value="rejection">Rejection</option>
+                                <option value="reminder">Reminder</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    defaultChecked={initialData.active}
+                                    id="templateActive"
+                                    className="rounded border-slate-300 text-hawaii-ocean focus:ring-hawaii-ocean"
+                                />
+                                <span className="text-sm font-medium text-slate-700">Active</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div className="flex justify-end gap-3 p-6 border-t">
+                        <button
+                            onClick={() => setTemplateModal({ isOpen: false, editingTemplate: null })}
+                            className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={() => {
+                                const templateData = {
+                                    name: document.getElementById('templateName').value,
+                                    subject: document.getElementById('templateSubject').value,
+                                    type: document.getElementById('templateType').value,
+                                    active: document.getElementById('templateActive').checked
+                                };
+                                handleSaveTemplate(templateData);
+                            }}
+                            className="flex items-center gap-2 px-6 py-2 text-white rounded-lg font-medium hover:opacity-90 min-w-[120px]"
+                            style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
+                        >
+                            <Save className="w-4 h-4 mr-2" />
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
     };
 
     return (
@@ -347,7 +666,7 @@ const AdminConfiguration = () => {
                     <div>
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-xl font-semibold text-slate-800">Violation Payment Thresholds</h2>
-                            <button className="flex items-center gap-2 px-4 py-2 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+                            <button onClick={() => alert('Add new threshold functionality coming soon!')} className="flex items-center gap-2 px-4 py-2 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
                             style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
                             <Plus className="w-4 h-4" />
                             Add New Threshold
@@ -665,251 +984,6 @@ const AdminConfiguration = () => {
                     </div>
                 )}
 
-                {/* Hosting Platform */}
-                {activeTab === 'hosting' && (
-                    <div>
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-xl font-semibold text-slate-800">Hosting Platform Registration</h2>
-                            <button onClick={handleSaveHostingPlatform} className="flex items-center gap-2 px-4 py-2 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
-                            style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
-                            <Save className="w-4 h-4" />
-                            Save Registration
-                        </button>
-                        </div>
-                        
-                        <div className="bg-white border border-slate-200 rounded-lg p-6">
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                {/* Platform Information */}
-                                <div className="space-y-4">
-                                    <h3 className="text-lg font-medium text-slate-800 border-b border-slate-200 pb-2">Platform Information</h3>
-                                    
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">Platform Name *</label>
-                                        <input
-                                            type="text"
-                                            value={hostingPlatform.platformName}
-                                            onChange={(e) => handleHostingPlatformChange('platformName', e.target.value)}
-                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-                                            placeholder="e.g., Airbnb, VRBO, Booking.com"
-                                        />
-                                    </div>
-                                    
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">Company Name *</label>
-                                        <input
-                                            type="text"
-                                            value={hostingPlatform.companyName}
-                                            onChange={(e) => handleHostingPlatformChange('companyName', e.target.value)}
-                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-                                            placeholder="Legal company name"
-                                        />
-                                    </div>
-                                    
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">Website</label>
-                                        <input
-                                            type="url"
-                                            value={hostingPlatform.website}
-                                            onChange={(e) => handleHostingPlatformChange('website', e.target.value)}
-                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-                                            placeholder="https://example.com"
-                                        />
-                                    </div>
-                                </div>
-                                
-                                {/* Contact Information */}
-                                <div className="space-y-4">
-                                    <h3 className="text-lg font-medium text-slate-800 border-b border-slate-200 pb-2">Contact Information</h3>
-                                    
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">Contact Person</label>
-                                        <input
-                                            type="text"
-                                            value={hostingPlatform.contactPerson}
-                                            onChange={(e) => handleHostingPlatformChange('contactPerson', e.target.value)}
-                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-                                            placeholder="Primary contact name"
-                                        />
-                                    </div>
-                                    
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">Email *</label>
-                                        <input
-                                            type="email"
-                                            value={hostingPlatform.email}
-                                            onChange={(e) => handleHostingPlatformChange('email', e.target.value)}
-                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-                                            placeholder="contact@example.com"
-                                        />
-                                    </div>
-                                    
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">Phone</label>
-                                        <input
-                                            type="tel"
-                                            value={hostingPlatform.phone}
-                                            onChange={(e) => handleHostingPlatformChange('phone', e.target.value)}
-                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-                                            placeholder="+1 (555) 123-4567"
-                                        />
-                                    </div>
-                                </div>
-                                
-                                {/* Address Information */}
-                                <div className="space-y-4">
-                                    <h3 className="text-lg font-medium text-slate-800 border-b border-slate-200 pb-2">Address Information</h3>
-                                    
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">Business Address</label>
-                                        <textarea
-                                            value={hostingPlatform.address}
-                                            onChange={(e) => handleHostingPlatformChange('address', e.target.value)}
-                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-                                            placeholder="Full business address"
-                                            rows="3"
-                                        />
-                                    </div>
-                                </div>
-                                
-                                {/* Technical Information */}
-                                <div className="space-y-4">
-                                    <h3 className="text-lg font-medium text-slate-800 border-b border-slate-200 pb-2">Technical Information</h3>
-                                    
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">API Endpoint</label>
-                                        <input
-                                            type="url"
-                                            value={hostingPlatform.apiEndpoint}
-                                            onChange={(e) => handleHostingPlatformChange('apiEndpoint', e.target.value)}
-                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-                                            placeholder="https://api.example.com/v1"
-                                        />
-                                    </div>
-                                    
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">API Key</label>
-                                        <div className="relative">
-                                            <input
-                                                type={showPassword ? "text" : "password"}
-                                                value={hostingPlatform.apiKey}
-                                                onChange={(e) => handleHostingPlatformChange('apiKey', e.target.value)}
-                                                className="w-full px-3 py-2 pr-10 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-                                                placeholder="API authentication key"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => setShowPassword(!showPassword)}
-                                                className="absolute inset-y-0 right-0 flex items-center pr-3"
-                                            >
-                                                {showPassword ? <EyeOff className="w-4 h-4 text-slate-400" /> : <Eye className="w-4 h-4 text-slate-400" />}
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                {/* Financial Information */}
-                                <div className="space-y-4">
-                                    <h3 className="text-lg font-medium text-slate-800 border-b border-slate-200 pb-2">Financial Information</h3>
-                                    
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">Commission Rate (%)</label>
-                                        <input
-                                            type="number"
-                                            value={hostingPlatform.commissionRate}
-                                            onChange={(e) => handleHostingPlatformChange('commissionRate', parseFloat(e.target.value))}
-                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-                                            placeholder="0.00"
-                                            step="0.01"
-                                            min="0"
-                                            max="100"
-                                        />
-                                    </div>
-                                    
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">Listing Fee ($)</label>
-                                        <input
-                                            type="number"
-                                            value={hostingPlatform.listingFee}
-                                            onChange={(e) => handleHostingPlatformChange('listingFee', parseFloat(e.target.value))}
-                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-                                            placeholder="0.00"
-                                            step="0.01"
-                                            min="0"
-                                        />
-                                    </div>
-                                </div>
-                                
-                                {/* Compliance Features */}
-                                <div className="space-y-4">
-                                    <h3 className="text-lg font-medium text-slate-800 border-b border-slate-200 pb-2">Compliance Features</h3>
-                                    
-                                    <div className="space-y-3">
-                                        <label className="flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                checked={hostingPlatform.complianceFeatures.autoReporting}
-                                                onChange={(e) => handleHostingPlatformChange('complianceFeatures.autoReporting', e.target.checked)}
-                                                className="mr-2 rounded border-slate-300 text-hawaii-ocean focus:ring-hawaii-ocean"
-                                            />
-                                            <span className="text-sm text-slate-700">Automatic Reporting to County</span>
-                                        </label>
-                                        
-                                        <label className="flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                checked={hostingPlatform.complianceFeatures.taxCollection}
-                                                onChange={(e) => handleHostingPlatformChange('complianceFeatures.taxCollection', e.target.checked)}
-                                                className="mr-2 rounded border-slate-300 text-hawaii-ocean focus:ring-hawaii-ocean"
-                                            />
-                                            <span className="text-sm text-slate-700">Tax Collection Services</span>
-                                        </label>
-                                        
-                                        <label className="flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                checked={hostingPlatform.complianceFeatures.verification}
-                                                onChange={(e) => handleHostingPlatformChange('complianceFeatures.verification', e.target.checked)}
-                                                className="mr-2 rounded border-slate-300 text-hawaii-ocean focus:ring-hawaii-ocean"
-                                            />
-                                            <span className="text-sm text-slate-700">Property Verification System</span>
-                                        </label>
-                                        
-                                        <label className="flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                checked={hostingPlatform.complianceFeatures.monitoring}
-                                                onChange={(e) => handleHostingPlatformChange('complianceFeatures.monitoring', e.target.checked)}
-                                                className="mr-2 rounded border-slate-300 text-hawaii-ocean focus:ring-hawaii-ocean"
-                                            />
-                                            <span className="text-sm text-slate-700">Compliance Monitoring</span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            {/* Platform Status */}
-                            <div className="mt-6 pt-6 border-t border-slate-200">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <h3 className="text-lg font-medium text-slate-800">Platform Status</h3>
-                                        <p className="text-sm text-slate-600 mt-1">Enable or disable this hosting platform</p>
-                                    </div>
-                                    <label className="flex items-center">
-                                        <input
-                                            type="checkbox"
-                                            checked={hostingPlatform.isActive}
-                                            onChange={(e) => handleHostingPlatformChange('isActive', e.target.checked)}
-                                            className="mr-2 rounded border-slate-300 text-hawaii-ocean focus:ring-hawaii-ocean"
-                                        />
-                                        <span className="text-sm font-medium text-slate-700">Active Platform</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </div>
-
             {/* Save Button */}
             <div className="mt-6 flex justify-end">
                 <button
@@ -921,6 +995,13 @@ const AdminConfiguration = () => {
                     Save Configuration
                 </button>
             </div>
+
+            </div>
+
+            {/* Modal Components */}
+            <FeeModal />
+            <UseTypeModal />
+            <TemplateModal />
         </div>
     );
 };
