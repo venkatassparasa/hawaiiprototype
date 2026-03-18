@@ -170,7 +170,11 @@ function App() {
               } />
 
               {/* Other Routes */}
-              <Route path="/settings" element={<Settings />} />
+              <Route path="/settings" element={
+                <ProtectedRoute allowedRoles={['Admin']}>
+                  <Settings />
+                </ProtectedRoute>
+              } />
               <Route path="/reports" element={<Reports />} />
               
               {/* Custom Reporting Routes */}
