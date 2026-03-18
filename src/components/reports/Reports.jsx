@@ -49,43 +49,59 @@ const Reports = () => {
                 
                 // Helper to capture a section by ID and return PDF blob
                 const captureToPDF = async (elementId, filename, isLandscape = true) => {
-                    const element = document.getElementById(elementId);
-                    if (!element) return null;
+                    const container = document.getElementById(elementId);
+                    if (!container) return null;
                     
-                    const canvas = await html2canvas(element, {
-                        scale: 2,
-                        useCORS: true,
-                        logging: false,
-                        backgroundColor: '#f8fafc',
-                        windowWidth: 1600
-                    });
-                    
-                    const imgData = canvas.toDataURL('image/png');
                     const orientation = isLandscape ? 'l' : 'p';
                     const pdf = new jsPDF(orientation, 'mm', 'a4');
-                    const imgProps = pdf.getImageProperties(imgData);
                     const pdfWidth = pdf.internal.pageSize.getWidth();
-                    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-                    
-                    // Center and add first page
-                    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-                    
-                    // Handle overflow if any (though each report is designed to fit)
-                    let remainingHeight = pdfHeight - pdf.internal.pageSize.getHeight();
-                    let currentPosition = -pdf.internal.pageSize.getHeight();
-                    
-                    while (remainingHeight > 0) {
-                        pdf.addPage();
-                        pdf.addImage(imgData, 'PNG', 0, currentPosition, pdfWidth, pdfHeight);
-                        remainingHeight -= pdf.internal.pageSize.getHeight();
-                        currentPosition -= pdf.internal.pageSize.getHeight();
+                    const pdfHeight = pdf.internal.pageSize.getHeight();
+                    const margin = 10;
+                    let currentY = margin;
+
+                    // 1. Capture the Branded Ribbon specifically
+                    const ribbon = container.querySelector('[style*="linear-gradient"]');
+                    let ribbonHeight = 0;
+                    if (ribbon) {
+                        const canvas = await html2canvas(ribbon, { scale: 2, useCORS: true, windowWidth: 1600 });
+                        const imgData = canvas.toDataURL('image/png');
+                        const imgProps = pdf.getImageProperties(imgData);
+                        ribbonHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, ribbonHeight);
+                        currentY = ribbonHeight + (margin * 1.5); // Add extra buffer after ribbon
+                    }
+
+                    // 2. Capture all sub-sections with .pdf-section class
+                    const sections = container.querySelectorAll('.pdf-section');
+                    for (let i = 0; i < sections.length; i++) {
+                        const section = sections[i];
+                        const canvas = await html2canvas(section, { 
+                            scale: 2, 
+                            useCORS: true, 
+                            logging: false, 
+                            backgroundColor: '#ffffff',
+                            windowWidth: 1600 
+                        });
+                        const imgData = canvas.toDataURL('image/png');
+                        const imgProps = pdf.getImageProperties(imgData);
+                        const sectionWidth = pdfWidth - (margin * 2);
+                        const sectionHeight = (imgProps.height * sectionWidth) / imgProps.width;
+
+                        // Check if it fits on current page - skip check for first section to lead on page 1
+                        if (i > 0 && currentY + sectionHeight > pdfHeight - margin) {
+                            pdf.addPage();
+                            currentY = margin;
+                        }
+
+                        pdf.addImage(imgData, 'PNG', margin, currentY, sectionWidth, sectionHeight);
+                        currentY += sectionHeight + margin;
                     }
                     
                     return pdf.output('blob');
                 };
 
-                // 1. Capture Dashboard Overview
-                const overviewBlob = await captureToPDF('pdf-dashboard-reports', 'Hawaii_Compliance_Overview.pdf');
+                // 1. Capture Dashboard Overview from the dedicated export container
+                const overviewBlob = await captureToPDF('pdf-dashboard-reports-export', 'Hawaii_Compliance_Overview.pdf');
                 if (overviewBlob) zip.file('01_Hawaii_Compliance_Overview.pdf', overviewBlob);
 
                 // 2. Capture Each Standard Report
@@ -211,6 +227,85 @@ const Reports = () => {
 
     const COLORS = ['#0f4c81', '#ff7f50', '#f59e0b', '#ef4444'];
 
+    const renderDashboardContent = () => {
+        return (
+            <>
+                {/* Compliance Trend Chart */}
+                <div className="pdf-section bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                    <h2 className="font-bold text-slate-800 mb-6">Compliance Rate Over Time</h2>
+                    <div className="h-80">
+                        <ResponsiveContainer width="100%" height="100%" minWidth={300} minHeight={300}>
+                            <AreaChart data={complianceData}>
+                                <defs>
+                                    <linearGradient id="colorComp" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.8} />
+                                        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} />
+                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} />
+                                <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                                <Area type="monotone" dataKey="compliant" stroke="#10b981" fillOpacity={1} fill="url(#colorComp)" name="Compliant Units" />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+
+                {/* Violations Pie Chart */}
+                <div className="pdf-section bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                    <h2 className="font-bold text-slate-800 mb-6">Violation Types Breakdown</h2>
+                    <div className="h-80 flex items-center justify-center">
+                        <ResponsiveContainer width="100%" height="100%" minWidth={300} minHeight={300}>
+                            <PieChart>
+                                <Pie
+                                    data={violationsData}
+                                    cx="50%"
+                                    cy="50%"
+                                    innerRadius={60}
+                                    outerRadius={100}
+                                    fill="#8884d8"
+                                    paddingAngle={5}
+                                    dataKey="value"
+                                >
+                                    {violationsData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    ))}
+                                </Pie>
+                                <Tooltip />
+                            </PieChart>
+                        </ResponsiveContainer>
+                    </div>
+                    <div className="flex justify-center gap-4 mt-4 flex-wrap">
+                        {violationsData.map((entry, index) => (
+                            <div key={index} className="flex items-center gap-2 text-xs">
+                                <span className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index] }}></span>
+                                <span className="text-slate-600 font-medium">{entry.name}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Bar Chart - Fines */}
+                <div className="pdf-section bg-white p-6 rounded-xl shadow-sm border border-slate-100 lg:col-span-2">
+                    <h2 className="font-bold text-slate-800 mb-6">Enforcement Revenue (Fines Issued vs. Collected)</h2>
+                    <div className="h-80">
+                        <ResponsiveContainer width="100%" height="100%" minWidth={300} minHeight={300}>
+                            <BarChart data={complianceData}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} />
+                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} />
+                                <Tooltip cursor={{ fill: '#f1f5f9' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                                <Bar dataKey="compliant" name="Fines Issued" fill="#0f4c81" radius={[4, 4, 0, 0]} />
+                                <Bar dataKey="nonCompliant" name="Fines Collected" fill="#38bdf8" radius={[4, 4, 0, 0]} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+            </>
+        );
+    };
+
     const renderReportContent = (reportType) => {
         const sharedProps = {
             margin: { top: 10, right: 10, left: -20, bottom: 0 }
@@ -218,7 +313,7 @@ const Reports = () => {
 
         return (
             <div className="space-y-8">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="pdf-section grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
                         <p className="text-blue-600 text-xs font-bold uppercase tracking-wider mb-1">
                             {reportType === 'revenue' ? 'Total Collected' : 'Total Records'}
@@ -241,7 +336,7 @@ const Reports = () => {
                     </div>
                 </div>
 
-                <div>
+                <div className="pdf-section">
                     <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
                         <TrendingUp className="w-4 h-4 text-hawaii-ocean" />
                         {reportType === 'trends' ? 'Monthly Compliance Velocity' : 'Data Distribution Analysis'}
@@ -366,7 +461,7 @@ const Reports = () => {
                     </div>
                 </div>
 
-                <div className="border border-slate-100 rounded-xl overflow-hidden">
+                <div className="pdf-section border border-slate-100 rounded-xl overflow-hidden">
                     <table className="w-full text-left text-sm">
                         <thead className="bg-slate-50">
                             <tr>
@@ -436,92 +531,8 @@ const Reports = () => {
             </div>
 
             <div ref={reportsRef} className="space-y-8 p-4 bg-slate-50/30 rounded-2xl">
-                <div id="pdf-dashboard-reports" className="relative grid grid-cols-1 lg:grid-cols-2 gap-8 bg-[#f8fafc] p-6 pt-40 rounded-2xl border border-slate-200 overflow-hidden">
-                    {/* Branded Header Ribbon for PDF Export */}
-                    <div className="absolute top-0 left-0 right-0 h-32 flex items-center px-8 gap-6 shadow-md" 
-                         style={{background: 'transparent linear-gradient(180deg, #2D6065 0%, #19484D 100%) 0% 0% no-repeat padding-box'}}>
-                        <img 
-                            src="/h_logo.png" 
-                            alt="County logo" 
-                            className="h-24 w-auto object-contain filter sepia-[30%] saturate-150 brightness-110 contrast-105" 
-                        />
-                        <div>
-                            <h3 className="text-3xl font-black text-white leading-tight">County of Hawaii</h3>
-                            <p className="text-sm text-white/70 font-bold uppercase tracking-widest">Compliance Analytics Overview | System Audit</p>
-                        </div>
-                    </div>
-
-                {/* Compliance Trend Chart */}
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                    <h2 className="font-bold text-slate-800 mb-6">Compliance Rate Over Time</h2>
-                    <div className="h-80">
-                        <ResponsiveContainer width="100%" height="100%" minWidth={300} minHeight={300}>
-                            <AreaChart data={complianceData}>
-                                <defs>
-                                    <linearGradient id="colorComp" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.8} />
-                                        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                                    </linearGradient>
-                                </defs>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} />
-                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} />
-                                <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                                <Area type="monotone" dataKey="compliant" stroke="#10b981" fillOpacity={1} fill="url(#colorComp)" name="Compliant Units" />
-                            </AreaChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
-
-                {/* Violations Pie Chart */}
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                    <h2 className="font-bold text-slate-800 mb-6">Violation Types Breakdown</h2>
-                    <div className="h-80 flex items-center justify-center">
-                        <ResponsiveContainer width="100%" height="100%" minWidth={300} minHeight={300}>
-                            <PieChart>
-                                <Pie
-                                    data={violationsData}
-                                    cx="50%"
-                                    cy="50%"
-                                    innerRadius={60}
-                                    outerRadius={100}
-                                    fill="#8884d8"
-                                    paddingAngle={5}
-                                    dataKey="value"
-                                >
-                                    {violationsData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                    ))}
-                                </Pie>
-                                <Tooltip />
-                            </PieChart>
-                        </ResponsiveContainer>
-                    </div>
-                    <div className="flex justify-center gap-4 mt-4 flex-wrap">
-                        {violationsData.map((entry, index) => (
-                            <div key={index} className="flex items-center gap-2 text-xs">
-                                <span className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index] }}></span>
-                                <span className="text-slate-600 font-medium">{entry.name}</span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Bar Chart - Fines */}
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 lg:col-span-2">
-                    <h2 className="font-bold text-slate-800 mb-6">Enforcement Revenue (Fines Issued vs. Collected)</h2>
-                    <div className="h-80">
-                        <ResponsiveContainer width="100%" height="100%" minWidth={300} minHeight={300}>
-                            <BarChart data={complianceData}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} />
-                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} />
-                                <Tooltip cursor={{ fill: '#f1f5f9' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                                <Bar dataKey="compliant" name="Fines Issued" fill="#0f4c81" radius={[4, 4, 0, 0]} />
-                                <Bar dataKey="nonCompliant" name="Fines Collected" fill="#38bdf8" radius={[4, 4, 0, 0]} />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
+                <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-8 bg-[#f8fafc] p-6 pt-10 rounded-2xl border border-slate-200 overflow-hidden">
+                    {renderDashboardContent()}
                 </div>
 
             </div>
@@ -776,6 +787,24 @@ const Reports = () => {
                 {/* Detailed Reports for PDF Export Only */}
                 {isExporting && (
                     <div className="p-12 space-y-16 bg-[#f8fafc] w-[1400px] mx-auto">
+                        
+                        {/* Dedicated Dashboard Overview for PDF Export */}
+                        <div id="pdf-dashboard-reports-export" className="relative grid grid-cols-1 lg:grid-cols-2 gap-8 bg-[#f8fafc] p-6 pt-40 rounded-2xl border border-slate-200 overflow-hidden">
+                            {/* Branded Header Ribbon for PDF Export */}
+                            <div className="absolute top-0 left-0 right-0 h-32 flex items-center px-8 gap-6 shadow-md" 
+                                style={{background: 'transparent linear-gradient(180deg, #2D6065 0%, #19484D 100%) 0% 0% no-repeat padding-box'}}>
+                                <img 
+                                    src="/h_logo.png" 
+                                    alt="County logo" 
+                                    className="h-24 w-auto object-contain filter sepia-[30%] saturate-150 brightness-110 contrast-105" 
+                                />
+                                <div>
+                                    <h3 className="text-3xl font-black text-white leading-tight">County of Hawaii</h3>
+                                    <p className="text-sm text-white/70 font-bold uppercase tracking-widest">Compliance Analytics Overview | System Audit</p>
+                                </div>
+                            </div>
+                            {renderDashboardContent()}
+                        </div>
 
                         {['region', 'type', 'tat', 'enforcement', 'trends', 'revenue'].map(type => (
                             <div key={type} id={`pdf-report-${type}`} className="relative bg-white rounded-3xl p-10 pt-48 shadow-sm border border-slate-200 overflow-hidden">
@@ -793,7 +822,7 @@ const Reports = () => {
                                     </div>
                                 </div>
 
-                                <h2 className="text-3xl font-bold text-slate-800 mb-8 border-l-8 border-hawaii-ocean pl-6 leading-tight">
+                                <h2 className="pdf-section text-3xl font-bold text-slate-800 mb-8 border-l-8 border-hawaii-ocean pl-6 py-6 leading-tight">
                                     {type === 'region' && 'Regional Compliance Deep-Dive'}
                                     {type === 'type' && 'Property Type Analysis Detail'}
                                     {type === 'tat' && 'TAT Revenue & Payment Audit'}
@@ -809,7 +838,6 @@ const Reports = () => {
                         ))}
                     </div>
                 )}
-            </div>
             </div>
 
             {/* Case Creation Modal */}
