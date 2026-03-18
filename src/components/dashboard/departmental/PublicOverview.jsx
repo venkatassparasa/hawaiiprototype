@@ -35,19 +35,7 @@ const PublicOverview = () => {
             </div>
 
             {/* Quick Access Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
-                    <div className="w-full h-32 bg-white-50 rounded-xl flex items-center justify-center text-blue-600 mb-4">
-                        {/* <MapPin className="w-6 h-6" /> */}
-                        <img src="/map.png" alt="Map Icon" className="w-64 h-32" />
-                    </div>
-                    <h3 className="text-lg font-bold text-slate-800 mb-2">Compliance Map</h3>
-                    <p className="text-slate-500 text-sm mb-4">View a geospatial representation of permitted short-term rentals and overall compliance status across the island.</p>
-                    <Link to="/map" className="text-hawaii-ocean font-bold text-sm flex items-center gap-1 hover:underline">
-                        Explore Map <ExternalLink className="w-3 h-3" />
-                    </Link>
-                </div>
-
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
                     <div className="w-full h-32 bg-white-50 rounded-xl flex items-center justify-center text-purple-600 mb-4">
                         {/* <FileText className="w-6 h-6" /> */}

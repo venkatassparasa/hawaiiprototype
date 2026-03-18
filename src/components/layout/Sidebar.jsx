@@ -74,9 +74,9 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
                 { icon: MessageSquare, label: 'Submit Complaint', path: '/submit-complaint' }
             );
         }
-        items.push({ icon: MapIcon, label: 'Compliance Map', path: '/map' });
 
         if (!isPublic) {
+            items.push({ icon: MapIcon, label: 'Compliance Map', path: '/map' });
             items.push({ label: 'SYSTEM', header: true });
         }
 
@@ -86,7 +86,7 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
             
             // Workflow Management - Only for Admin, Planning, Legal, Enforcement
             if (['Admin', 'Planning', 'Legal', 'Enforcement Officer'].includes(user?.role)) {
-                items.push({ icon: Activity, label: 'Workflows', path: '/workflows' });
+                // items.push({ icon: Activity, label: 'Workflows', path: '/workflows' });
                 items.push({ icon: FileText, label: 'Letter Generator', path: '/letter-generator?tab=generator' });
             }
             

@@ -67,6 +67,7 @@ const AdminConfiguration = () => {
     const [templateModal, setTemplateModal] = useState({ isOpen: false, editingTemplate: null });
     const [thresholdModal, setThresholdModal] = useState({ isOpen: false, editingThreshold: null });
     const [contactModal, setContactModal] = useState({ isOpen: false, editingContact: null });
+    const [operationalModal, setOperationalModal] = useState({ isOpen: false, editingOperational: null });
 
     // Hosting Platform Registration Data
     const [hostingPlatform, setHostingPlatform] = useState({
@@ -259,6 +260,23 @@ const AdminConfiguration = () => {
             });
         }
         setContactModal({ isOpen: false, editingContact: null });
+    };
+
+    // Operational Standards Handlers
+    const handleAddOperational = () => {
+        setOperationalModal({ isOpen: true, editingOperational: null });
+    };
+
+    const handleEditOperational = () => {
+        setOperationalModal({ isOpen: true, editingOperational: { ...operationalStandards } });
+    };
+
+    const handleSaveOperational = (operationalData) => {
+        setOperationalStandards({
+            ...operationalStandards,
+            ...operationalData
+        });
+        setOperationalModal({ isOpen: false, editingOperational: null });
     };
 
     const handleDeleteTemplate = (id) => {
@@ -871,6 +889,134 @@ const AdminConfiguration = () => {
         );
     };
 
+    const OperationalModal = () => {
+        if (!operationalModal.isOpen) return null;
+        
+        const initialData = operationalModal.editingOperational || operationalStandards;
+
+        return (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+                    <div className="flex justify-between items-center p-6 border-b">
+                        <h3 className="text-lg font-semibold text-slate-800">
+                            Edit Operational Standards
+                        </h3>
+                        <button 
+                            onClick={() => setOperationalModal({ isOpen: false, editingOperational: null })}
+                            className="text-slate-400 hover:text-slate-600"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+                    </div>
+                    
+                    <div className="p-6 space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">Quiet Hours Start</label>
+                                <input
+                                    type="time"
+                                    defaultValue={initialData.quietHoursStart}
+                                    id="operationalQuietHoursStart"
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">Quiet Hours End</label>
+                                <input
+                                    type="time"
+                                    defaultValue={initialData.quietHoursEnd}
+                                    id="operationalQuietHoursEnd"
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                />
+                            </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">Max Occupancy Per Bedroom</label>
+                                <input
+                                    type="number"
+                                    defaultValue={initialData.maxOccupancyPerBedroom}
+                                    id="operationalMaxOccupancy"
+                                    min="1"
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">Parking Spaces Required</label>
+                                <input
+                                    type="number"
+                                    defaultValue={initialData.parkingSpacesRequired}
+                                    id="operationalParking"
+                                    min="0"
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                />
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Noise Limit (dB)</label>
+                            <input
+                                type="number"
+                                defaultValue={initialData.noiseLimit}
+                                id="operationalNoise"
+                                min="0"
+                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                            />
+                        </div>
+                        
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Trash Collection Days</label>
+                            <div className="space-y-2">
+                                {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day) => (
+                                    <label key={day} className="flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            defaultChecked={initialData.trashCollectionDays?.includes(day) || false}
+                                            id={`operationalTrash${day}`}
+                                            className="mr-2"
+                                        />
+                                        {day}
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="flex justify-end gap-3 p-6 border-t">
+                        <button
+                            onClick={() => setOperationalModal({ isOpen: false, editingOperational: null })}
+                            className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={() => {
+                                const operationalData = {
+                                    quietHoursStart: document.getElementById('operationalQuietHoursStart').value,
+                                    quietHoursEnd: document.getElementById('operationalQuietHoursEnd').value,
+                                    maxOccupancyPerBedroom: parseInt(document.getElementById('operationalMaxOccupancy').value),
+                                    parkingSpacesRequired: parseInt(document.getElementById('operationalParking').value),
+                                    noiseLimit: parseInt(document.getElementById('operationalNoise').value),
+                                    trashCollectionDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+                                        .filter(day => document.getElementById(`operationalTrash${day}`)?.checked)
+                                };
+                                handleSaveOperational(operationalData);
+                            }}
+                            className="flex items-center gap-2 px-6 py-2 text-white rounded-lg font-medium hover:opacity-90 min-w-[120px]"
+                            style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
+                        >
+                            <Save className="w-4 h-4 mr-2" />
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     return (
         <div className="p-6 max-w-7xl mx-auto">
             <div className="mb-6">
@@ -1097,9 +1243,18 @@ const AdminConfiguration = () => {
                 )}
 
                 {/* Operational Standards */}
-                {activeTab === 'standards' && (
+                {activeTab === 'operational' && (
                     <div>
-                        <h2 className="text-xl font-semibold text-slate-800 mb-6">Operational Standards</h2>
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl font-semibold text-slate-800">Operational Standards</h2>
+                            <div className="flex items-center gap-2">
+                                <button onClick={handleEditOperational} className="flex items-center gap-2 px-4 py-2 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+                                style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
+                                <Edit2 className="w-4 h-4" />
+                                Edit Standards
+                            </button>
+                            </div>
+                        </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
@@ -1107,8 +1262,8 @@ const AdminConfiguration = () => {
                                 <input
                                     type="time"
                                     value={operationalStandards.quietHoursStart}
-                                    onChange={(e) => setOperationalStandards({...operationalStandards, quietHoursStart: e.target.value})}
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                    readOnly
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-slate-50 text-slate-600"
                                 />
                             </div>
                             
@@ -1117,8 +1272,8 @@ const AdminConfiguration = () => {
                                 <input
                                     type="time"
                                     value={operationalStandards.quietHoursEnd}
-                                    onChange={(e) => setOperationalStandards({...operationalStandards, quietHoursEnd: e.target.value})}
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                    readOnly
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-slate-50 text-slate-600"
                                 />
                             </div>
                             
@@ -1127,8 +1282,8 @@ const AdminConfiguration = () => {
                                 <input
                                     type="number"
                                     value={operationalStandards.maxOccupancyPerBedroom}
-                                    onChange={(e) => setOperationalStandards({...operationalStandards, maxOccupancyPerBedroom: parseInt(e.target.value)})}
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                    readOnly
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-slate-50 text-slate-600"
                                 />
                             </div>
                             
@@ -1137,8 +1292,8 @@ const AdminConfiguration = () => {
                                 <input
                                     type="number"
                                     value={operationalStandards.parkingSpacesRequired}
-                                    onChange={(e) => setOperationalStandards({...operationalStandards, parkingSpacesRequired: parseInt(e.target.value)})}
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                    readOnly
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-slate-50 text-slate-600"
                                 />
                             </div>
                             
@@ -1147,8 +1302,8 @@ const AdminConfiguration = () => {
                                 <input
                                     type="number"
                                     value={operationalStandards.noiseLimit}
-                                    onChange={(e) => setOperationalStandards({...operationalStandards, noiseLimit: parseInt(e.target.value)})}
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                    readOnly
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-slate-50 text-slate-600"
                                 />
                             </div>
                             
@@ -1160,20 +1315,8 @@ const AdminConfiguration = () => {
                                             <input
                                                 type="checkbox"
                                                 checked={operationalStandards.trashCollectionDays.includes(day)}
-                                                onChange={(e) => {
-                                                    if (e.target.checked) {
-                                                        setOperationalStandards({
-                                                            ...operationalStandards,
-                                                            trashCollectionDays: [...operationalStandards.trashCollectionDays, day]
-                                                        });
-                                                    } else {
-                                                        setOperationalStandards({
-                                                            ...operationalStandards,
-                                                            trashCollectionDays: operationalStandards.trashCollectionDays.filter(d => d !== day)
-                                                        });
-                                                    }
-                                                }}
-                                                className="mr-2"
+                                                readOnly
+                                                className="mr-2 bg-slate-50 text-slate-600"
                                             />
                                             {day}
                                         </label>
@@ -1280,6 +1423,7 @@ const AdminConfiguration = () => {
             <TemplateModal />
             <ThresholdModal />
             <ContactModal />
+            <OperationalModal />
         </div>
     );
 };
