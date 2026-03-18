@@ -321,8 +321,7 @@ const LetterGenerator = () => {
 
     const tabs = [
         { id: 'generator', label: 'Generate Letters', icon: Send },
-        { id: 'history', label: 'Letter History', icon: Clock },
-        { id: 'templates', label: 'Letter Templates', icon: FileText }
+        { id: 'history', label: 'Letter History', icon: Clock }
     ];
 
     const handleCreateTemplate = () => {

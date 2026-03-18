@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import { Settings, DollarSign, Clock, Mail, FileText, Building, Save, Plus, Edit2, Trash2, Eye, EyeOff, AlertTriangle, Database, X } from 'lucide-react';
+import { Settings, DollarSign, Clock, Mail, FileText, Building, Save, Plus, Edit2, Trash2, Eye, EyeOff, AlertTriangle, Database, X, Check } from 'lucide-react';
 
 import { useSearchParams } from 'react-router-dom';
 
@@ -111,15 +111,42 @@ const AdminConfiguration = () => {
 
 
     const [letterTemplates, setLetterTemplates] = useState([
-
-        { id: 1, name: 'Compliance Notice', type: 'violation', subject: 'TVR Compliance Notice', active: true },
-
-        { id: 2, name: 'Approval Letter', type: 'approval', subject: 'TVR Registration Approved', active: true },
-
-        { id: 3, name: 'Rejection Letter', type: 'rejection', subject: 'TVR Registration Denied', active: true },
-
-        { id: 4, name: 'Renewal Reminder', type: 'reminder', subject: 'TVR Registration Renewal Due', active: false },
-
+        { 
+            id: 1, 
+            name: 'Compliance Notice', 
+            type: 'violation', 
+            subject: 'TVR Compliance Notice - [Property Address]',
+            content: 'Dear [Owner Name],\n\nThis is to notify you of a compliance issue regarding your TVR registration at [Property Address] (Registration #[Registration Number]).\n\n[Violation Details]\n\nPlease address these issues by [Due Date] to avoid further enforcement action.\n\nIf you have any questions, please contact our office at (808) 961-8285.\n\nSincerely,\nCounty of Hawaii Planning Department',
+            active: true,
+            usageCount: 45
+        },
+        { 
+            id: 2, 
+            name: 'Approval Letter', 
+            type: 'approval', 
+            subject: 'TVR Registration Approved - [Registration Number]',
+            content: 'Dear [Owner Name],\n\nCongratulations! Your TVR registration for [Property Address] has been approved.\n\nRegistration Details:\n- Registration Number: [Registration Number]\n- Property Type: [Property Type]\n- Maximum Occupancy: [Max Occupancy]\n- Registration Date: [Registration Date]\n- Expiry Date: [Expiry Date]\n\nPlease ensure compliance with all county regulations. Your registration will expire on [Expiry Date].\n\nSincerely,\nCounty of Hawaii Planning Department',
+            active: true,
+            usageCount: 32
+        },
+        { 
+            id: 3, 
+            name: 'Rejection Letter', 
+            type: 'rejection', 
+            subject: 'TVR Registration Denied - [Registration Number]',
+            content: 'Dear [Owner Name],\n\nWe regret to inform you that your TVR registration for [Property Address] has been denied.\n\n[Rejection Reason]\n\nYou may appeal this decision within 30 days by submitting a written appeal to our office.\n\nSincerely,\nCounty of Hawaii Planning Department',
+            active: true,
+            usageCount: 18
+        },
+        { 
+            id: 4, 
+            name: 'Renewal Reminder', 
+            type: 'reminder', 
+            subject: 'TVR Registration Renewal Due - [Registration Number]',
+            content: 'Dear [Owner Name],\n\nThis is a reminder that your TVR registration for [Property Address] is due for renewal.\n\nCurrent Registration: [Registration Number]\nExpiry Date: [Expiry Date]\n\nPlease submit your renewal application at least 30 days before the expiry date to avoid interruption.\n\nSincerely,\nCounty of Hawaii Planning Department',
+            active: false,
+            usageCount: 0
+        }
     ]);
 
 
@@ -184,30 +211,63 @@ const AdminConfiguration = () => {
 
     });
 
+    const [isSaving, setIsSaving] = useState(false);
+    const [showSaveSuccess, setShowSaveSuccess] = useState(false);
+
+    // Load from SessionStorage
+    useEffect(() => {
+        const savedData = sessionStorage.getItem('adminConfigSettings');
+        if (savedData) {
+            try {
+                const parsed = JSON.parse(savedData);
+                if (parsed.fees) setFees(parsed.fees);
+                if (parsed.useTypes) setUseTypes(parsed.useTypes);
+                if (parsed.operationalStandards) setOperationalStandards(parsed.operationalStandards);
+                if (parsed.letterTemplates) setLetterTemplates(parsed.letterTemplates);
+                if (parsed.violationThresholds) setViolationThresholds(parsed.violationThresholds);
+                if (parsed.contactInfo) setContactInfo(parsed.contactInfo);
+                if (parsed.hostingPlatform) setHostingPlatform(parsed.hostingPlatform);
+            } catch (error) {
+                console.error('Error loading admin settings from session:', error);
+            }
+        }
+    }, []);
+
 
 
     const tabs = [
-
         { id: 'fees', label: 'Fee Management', icon: DollarSign },
-
         { id: 'useTypes', label: 'Use Types', icon: Building },
-
         { id: 'operational', label: 'Operational Standards', icon: Settings },
-
         { id: 'contact', label: 'Contact Info', icon: Mail },
-
-        { id: 'thresholds', label: 'Violation Thresholds', icon: AlertTriangle }
-
+        { id: 'thresholds', label: 'Violation Thresholds', icon: AlertTriangle },
+        { id: 'templates', label: 'Letter Templates', icon: FileText }
     ];
 
 
 
     const handleSave = () => {
+        setIsSaving(true);
+        
+        const configData = {
+            fees,
+            useTypes,
+            operationalStandards,
+            letterTemplates,
+            violationThresholds,
+            contactInfo,
+            hostingPlatform
+        };
 
-        // Save configuration logic here
+        // Persist to session storage
+        sessionStorage.setItem('adminConfigSettings', JSON.stringify(configData));
 
-        alert('Configuration saved successfully!');
-
+        // Simulate API call and provide feedback
+        setTimeout(() => {
+            setIsSaving(false);
+            setShowSaveSuccess(true);
+            setTimeout(() => setShowSaveSuccess(false), 3000);
+        }, 800);
     };
 
 
@@ -1175,25 +1235,26 @@ const AdminConfiguration = () => {
                         
 
                         <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Content</label>
+                            <textarea
+                                defaultValue={initialData.content}
+                                id="templateContent"
+                                rows={8}
+                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent font-serif text-sm"
+                                placeholder="Letter content with [Placeholders]..."
+                            />
+                        </div>
 
-                            <label className="flex items-center gap-2">
-
+                        <div>
+                            <label className="flex items-center gap-2 cursor-pointer">
                                 <input
-
                                     type="checkbox"
-
                                     defaultChecked={initialData.active}
-
                                     id="templateActive"
-
-                                    className="rounded border-slate-300 text-hawaii-ocean focus:ring-hawaii-ocean"
-
+                                    className="rounded border-slate-300 text-hawaii-ocean focus:ring-hawaii-ocean w-4 h-4"
                                 />
-
-                                <span className="text-sm font-medium text-slate-700">Active</span>
-
+                                <span className="text-sm font-medium text-slate-700">Active / Enabled</span>
                             </label>
-
                         </div>
 
                     </div>
@@ -1217,21 +1278,14 @@ const AdminConfiguration = () => {
                         <button
 
                             onClick={() => {
-
                                 const templateData = {
-
                                     name: document.getElementById('templateName').value,
-
                                     subject: document.getElementById('templateSubject').value,
-
                                     type: document.getElementById('templateType').value,
-
+                                    content: document.getElementById('templateContent').value,
                                     active: document.getElementById('templateActive').checked
-
                                 };
-
                                 handleSaveTemplate(templateData);
-
                             }}
 
                             className="flex items-center gap-2 px-6 py-2 text-white rounded-lg font-medium hover:opacity-90 min-w-[120px]"
@@ -2486,6 +2540,82 @@ const AdminConfiguration = () => {
 
 
 
+                {/* Contact Info */}
+                {activeTab === 'contact' && (
+                    <div>
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl font-semibold text-slate-800">Contact Information</h2>
+                            <button onClick={handleAddContact} className="flex items-center gap-2 px-4 py-2 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+                            style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
+                            <Plus className="w-4 h-4" />
+                            Add New Contact
+                        </button>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">Department Name</label>
+                                <input
+                                    type="text"
+                                    value={contactInfo.departmentName}
+                                    onChange={(e) => setContactInfo({...contactInfo, departmentName: e.target.value})}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">Phone</label>
+                                <input
+                                    type="tel"
+                                    value={contactInfo.phone}
+                                    onChange={(e) => setContactInfo({...contactInfo, phone: e.target.value})}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
+                                <input
+                                    type="email"
+                                    value={contactInfo.email}
+                                    onChange={(e) => setContactInfo({...contactInfo, email: e.target.value})}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">Website</label>
+                                <input
+                                    type="url"
+                                    value={contactInfo.website}
+                                    onChange={(e) => setContactInfo({...contactInfo, website: e.target.value})}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">Emergency Contact</label>
+                                <input
+                                    type="tel"
+                                    value={contactInfo.emergencyContact}
+                                    onChange={(e) => setContactInfo({...contactInfo, emergencyContact: e.target.value})}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                />
+                            </div>
+                            
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-slate-700 mb-2">Address</label>
+                                <textarea
+                                    value={contactInfo.address}
+                                    onChange={(e) => setContactInfo({...contactInfo, address: e.target.value})}
+                                    rows={3}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Operational Standards */}
 
                 {activeTab === 'operational' && (
@@ -2656,178 +2786,123 @@ const AdminConfiguration = () => {
 
 
 
-                {/* Contact Info */}
-
-                {activeTab === 'contact' && (
-
+                {/* Letter Templates */}
+                {activeTab === 'templates' && (
                     <div>
-
                         <div className="flex justify-between items-center mb-6">
-
-                            <h2 className="text-xl font-semibold text-slate-800">Contact Information</h2>
-
-                            <button onClick={handleAddContact} className="flex items-center gap-2 px-4 py-2 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
-
-                            style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
-
-                            <Plus className="w-4 h-4" />
-
-                            Add New Contact
-
-                        </button>
-
+                            <div>
+                                <h2 className="text-xl font-semibold text-slate-800">Letter Templates</h2>
+                                <p className="text-sm text-slate-500 mt-1">Manage automated correspondence templates and placeholders</p>
+                            </div>
+                            <button 
+                                onClick={handleAddTemplate} 
+                                className="flex items-center gap-2 px-4 py-2 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+                                style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
+                            >
+                                <Plus className="w-4 h-4" />
+                                Add Template
+                            </button>
                         </div>
-
                         
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {letterTemplates.map((template) => (
+                                <div key={template.id} className="bg-white border border-slate-200 rounded-xl p-5 hover:shadow-md transition-all group">
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <h3 className="font-bold text-slate-800">{template.name}</h3>
+                                                {!template.active && (
+                                                    <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded-full uppercase">Inactive</span>
+                                                )}
+                                            </div>
+                                            <p className="text-xs text-slate-500 line-clamp-1 italic">{template.subject}</p>
+                                        </div>
+                                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button 
+                                                onClick={() => handleEditTemplate(template.id)}
+                                                className="p-1.5 text-slate-400 hover:text-hawaii-ocean hover:bg-hawaii-ocean/10 rounded-lg transition-colors"
+                                                title="Edit Template"
+                                            >
+                                                <Edit2 className="w-4 h-4" />
+                                            </button>
+                                            <button 
+                                                onClick={() => handleToggleTemplate(template.id)}
+                                                className={`p-1.5 rounded-lg transition-colors ${template.active ? 'text-green-500 hover:bg-green-50' : 'text-slate-400 hover:bg-slate-50'}`}
+                                                title={template.active ? "Deactivate" : "Activate"}
+                                            >
+                                                <Eye className="w-4 h-4" />
+                                            </button>
+                                            <button 
+                                                onClick={() => handleDeleteTemplate(template.id)}
+                                                className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                                title="Delete Template"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="bg-slate-50 rounded-lg p-3 mb-4 h-24 overflow-hidden relative">
+                                        <p className="text-[11px] text-slate-600 whitespace-pre-wrap line-clamp-4 font-serif leading-relaxed">
+                                            {template.content}
+                                        </p>
+                                        <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-slate-50 to-transparent"></div>
+                                    </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                            <div>
-
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Department Name</label>
-
-                                <input
-
-                                    type="text"
-
-                                    value={contactInfo.departmentName}
-
-                                    onChange={(e) => setContactInfo({...contactInfo, departmentName: e.target.value})}
-
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-
-                                />
-
-                            </div>
-
-                            
-
-                            <div>
-
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Phone</label>
-
-                                <input
-
-                                    type="tel"
-
-                                    value={contactInfo.phone}
-
-                                    onChange={(e) => setContactInfo({...contactInfo, phone: e.target.value})}
-
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-
-                                />
-
-                            </div>
-
-                            
-
-                            <div>
-
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
-
-                                <input
-
-                                    type="email"
-
-                                    value={contactInfo.email}
-
-                                    onChange={(e) => setContactInfo({...contactInfo, email: e.target.value})}
-
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-
-                                />
-
-                            </div>
-
-                            
-
-                            <div>
-
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Website</label>
-
-                                <input
-
-                                    type="url"
-
-                                    value={contactInfo.website}
-
-                                    onChange={(e) => setContactInfo({...contactInfo, website: e.target.value})}
-
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-
-                                />
-
-                            </div>
-
-                            
-
-                            <div>
-
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Emergency Contact</label>
-
-                                <input
-
-                                    type="tel"
-
-                                    value={contactInfo.emergencyContact}
-
-                                    onChange={(e) => setContactInfo({...contactInfo, emergencyContact: e.target.value})}
-
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-
-                                />
-
-                            </div>
-
-                            
-
-                            <div className="md:col-span-2">
-
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Address</label>
-
-                                <textarea
-
-                                    value={contactInfo.address}
-
-                                    onChange={(e) => setContactInfo({...contactInfo, address: e.target.value})}
-
-                                    rows={3}
-
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-
-                                />
-
-                            </div>
-
+                                    <div className="flex justify-between items-center text-[11px]">
+                                        <span className="px-2 py-1 bg-slate-100 text-slate-600 rounded font-medium uppercase tracking-wider">
+                                            {template.type}
+                                        </span>
+                                        <div className="flex items-center gap-3 text-slate-500">
+                                            <span className="flex items-center gap-1">
+                                                <FileText className="w-3 h-3" />
+                                                {template.usageCount || 0} uses
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-
+                        
+                        {letterTemplates.length === 0 && (
+                            <div className="text-center py-12 border-2 border-dashed border-slate-200 rounded-xl">
+                                <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                                <p className="text-slate-500">No letter templates configured. Click "Add Template" to get started.</p>
+                            </div>
+                        )}
                     </div>
-
                 )}
 
 
 
             {/* Save Button */}
 
-            <div className="mt-6 flex justify-end">
-
+            <div className="mt-6 flex justify-end items-center gap-4">
+                {showSaveSuccess && (
+                    <div className="flex items-center gap-2 text-green-600 font-medium animate-in fade-in slide-in-from-right-4">
+                        <Check className="w-5 h-5" />
+                        <span>Changes saved to session</span>
+                    </div>
+                )}
+                
                 <button
-
                     onClick={handleSave}
-
-                    className="flex items-center gap-2 px-6 py-3 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
-
+                    disabled={isSaving}
+                    className={`flex items-center gap-2 px-6 py-3 text-white rounded-lg font-medium transition-all ${isSaving ? 'opacity-70 cursor-wait' : 'hover:opacity-90 active:scale-95'}`}
                     style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
-
                 >
-
-                    <Save className="w-4 h-4" />
-
-                    Save Configuration
-
+                    {isSaving ? (
+                        <>
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            Saving...
+                        </>
+                    ) : (
+                        <>
+                            <Save className="w-4 h-4" />
+                            Save Configuration
+                        </>
+                    )}
                 </button>
-
             </div>
 
 
@@ -2847,6 +2922,8 @@ const AdminConfiguration = () => {
             <ThresholdModal />
 
             <ContactModal />
+
+            <OperationalModal />
 
         </div>
 
