@@ -54,6 +54,26 @@ const InspectionScheduler = () => {
             inspector: selectedInspection?.inspector
         };
         
+        // Format for ViolationCases
+        const caseToSave = {
+            id: Date.now(),
+            caseNumber,
+            property: newCase.propertyAddress,
+            tmk: 'Pending',
+            owner: newCase.ownerName,
+            violationType: newCase.violationType,
+            status: 'under-investigation',
+            priority: newCase.severity,
+            created: new Date().toISOString().split('T')[0],
+            dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            fine: `$${newCase.severity === 'high' ? '1,000' : newCase.severity === 'medium' ? '500' : '250'}`,
+            slaStatus: 'on-track'
+        };
+
+        // Persist to session storage
+        const existingCases = JSON.parse(sessionStorage.getItem('newViolationCases') || '[]');
+        sessionStorage.setItem('newViolationCases', JSON.stringify([caseToSave, ...existingCases]));
+        
         // In a real app, this would save to a database
         console.log('Creating case from inspection:', caseData);
         
@@ -96,7 +116,7 @@ const InspectionScheduler = () => {
                     <p className="text-slate-500">Schedule and manage property inspections</p>
                 </div>
                 <div className="flex gap-3">
-                    <button 
+                    {/* <button 
                         onClick={() => {
                             setNewCase({
                                 propertyAddress: '',
@@ -113,7 +133,7 @@ const InspectionScheduler = () => {
                     >
                         <Plus className="w-4 h-4" />
                         Create Case from Inspection
-                    </button>
+                    </button> */}
                     <button className="px-6 py-3 bg-hawaii-ocean text-white rounded-lg font-medium hover:bg-blue-800"
                     style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
                         Schedule Inspection

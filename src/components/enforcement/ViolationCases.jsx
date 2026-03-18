@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Filter, Clock, AlertTriangle, CheckCircle, XCircle, FileText, Calendar, DollarSign, Eye, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import WorkflowStatusBadge from '../workflows/WorkflowStatusBadge';
@@ -8,7 +8,7 @@ const ViolationCases = () => {
     const [statusFilter, setStatusFilter] = useState('all');
 
     // Mock violation cases data
-    const cases = [
+    const initialCases = [
         {
             id: 1,
             caseNumber: 'VC-2026-001',
@@ -67,6 +67,23 @@ const ViolationCases = () => {
         },
     ];
 
+    const [cases, setCases] = useState(initialCases);
+
+    useEffect(() => {
+        const savedNewCases = sessionStorage.getItem('newViolationCases');
+        if (savedNewCases) {
+            try {
+                const parsedCases = JSON.parse(savedNewCases);
+                if (Array.isArray(parsedCases)) {
+                    // Prepend new cases to the list
+                    setCases([...parsedCases, ...initialCases]);
+                }
+            } catch (error) {
+                console.error("Failed to parse new violation cases from session storage", error);
+            }
+        }
+    }, []);
+
     const getStatusBadge = (status) => {
         const badges = {
             'under-investigation': { color: 'bg-blue-100 text-blue-700 border-blue-200', icon: Clock, label: 'Under Investigation' },
@@ -97,6 +114,7 @@ const ViolationCases = () => {
         };
         return badges[slaStatus] || badges['on-track'];
     };
+
 
     const filteredCases = cases.filter(c => {
         const matchesSearch = c.property.toLowerCase().includes(searchTerm.toLowerCase()) ||

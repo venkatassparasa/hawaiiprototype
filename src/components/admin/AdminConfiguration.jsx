@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import { Settings, DollarSign, Clock, Mail, FileText, Building, Save, Plus, Edit2, Trash2, Eye, EyeOff, AlertTriangle, Database, X, Check } from 'lucide-react';
+import { Settings, DollarSign, Clock, Mail, FileText, Building, Save, Plus, Edit2, Trash2, Eye, EyeOff, AlertTriangle, Database, X, Check, Globe } from 'lucide-react';
 
 import { useSearchParams } from 'react-router-dom';
 
@@ -76,37 +76,27 @@ const AdminConfiguration = () => {
 
 
 
-    const [contactInfo, setContactInfo] = useState({
-
-        departmentName: 'County of Hawaii Planning Department',
-
-        address: '101 Aupuni Center, 101 Pauahi Street, Hilo, HI 96720',
-
-        phone: '(808) 961-8285',
-
-        email: 'planning@hawaiicounty.gov',
-
-        website: 'www.hawaiicounty.gov/planning',
-
-        emergencyContact: '(808) 935-3333',
-
-    });
+    const [contacts, setContacts] = useState([
+        {
+            id: 1,
+            departmentName: 'County of Hawaii Planning Department',
+            address: '101 Aupuni Center, 101 Pauahi Street, Hilo, HI 96720',
+            phone: '(808) 961-8285',
+            email: 'planning@hawaiicounty.gov',
+            website: 'www.hawaiicounty.gov/planning',
+            emergencyContact: '(808) 935-3333',
+        }
+    ]);
 
 
 
     // Violation Payment Thresholds
-
-    const [violationThresholds, setViolationThresholds] = useState({
-
-        warningThreshold: 500,
-
-        fineThreshold: 1000,
-
-        lienThreshold: 5000,
-
-        suspensionThreshold: 10000,
-
-    });
+    const [violationThresholds, setViolationThresholds] = useState([
+        { id: 1, name: 'Warning Threshold', amount: 500, description: 'Amount to trigger first warning notice' },
+        { id: 2, name: 'Fine Threshold', amount: 1000, description: 'Amount to trigger official fine assessment' },
+        { id: 3, name: 'Lien Threshold', amount: 5000, description: 'Amount to initiate property lien procedures' },
+        { id: 4, name: 'Suspension Threshold', amount: 10000, description: 'Amount to trigger automatic registration suspension' }
+    ]);
 
 
 
@@ -224,8 +214,28 @@ const AdminConfiguration = () => {
                 if (parsed.useTypes) setUseTypes(parsed.useTypes);
                 if (parsed.operationalStandards) setOperationalStandards(parsed.operationalStandards);
                 if (parsed.letterTemplates) setLetterTemplates(parsed.letterTemplates);
-                if (parsed.violationThresholds) setViolationThresholds(parsed.violationThresholds);
-                if (parsed.contactInfo) setContactInfo(parsed.contactInfo);
+                if (parsed.violationThresholds) {
+                    if (Array.isArray(parsed.violationThresholds)) {
+                        setViolationThresholds(parsed.violationThresholds);
+                    } else {
+                        setViolationThresholds([
+                            { id: 1, name: 'Warning Threshold', amount: parsed.violationThresholds.warningThreshold || 500, description: 'Amount to trigger first warning notice' },
+                            { id: 2, name: 'Fine Threshold', amount: parsed.violationThresholds.fineThreshold || 1000, description: 'Amount to trigger official fine assessment' },
+                            { id: 3, name: 'Lien Threshold', amount: parsed.violationThresholds.lienThreshold || 5000, description: 'Amount to initiate property lien procedures' },
+                            { id: 4, name: 'Suspension Threshold', amount: parsed.violationThresholds.suspensionThreshold || 10000, description: 'Amount to trigger automatic registration suspension' }
+                        ]);
+                    }
+                }
+                if (parsed.contacts && parsed.contacts.length > 0) {
+                    setContacts(parsed.contacts);
+                } else if (parsed.contactInfo) {
+                    setContacts([{
+                        id: 1,
+                        ...parsed.contactInfo,
+                        active: true
+                    }]);
+                }
+
                 if (parsed.hostingPlatform) setHostingPlatform(parsed.hostingPlatform);
             } catch (error) {
                 console.error('Error loading admin settings from session:', error);
@@ -255,7 +265,7 @@ const AdminConfiguration = () => {
             operationalStandards,
             letterTemplates,
             violationThresholds,
-            contactInfo,
+            contacts,
             hostingPlatform
         };
 
@@ -476,112 +486,63 @@ const AdminConfiguration = () => {
 
 
 
-    // Threshold Management Handlers
-
+    // Threshold Handlers
     const handleAddThreshold = () => {
-
         setThresholdModal({ isOpen: true, editingThreshold: null });
-
     };
 
+    const handleEditThreshold = (id) => {
+        const thresholdToEdit = violationThresholds.find(t => t.id === id);
+        setThresholdModal({ isOpen: true, editingThreshold: thresholdToEdit });
+    };
 
+    const handleDeleteThreshold = (id) => {
+        if (window.confirm('Are you sure you want to delete this threshold setting?')) {
+            setViolationThresholds(violationThresholds.filter(t => t.id !== id));
+        }
+    };
 
     const handleSaveThreshold = (thresholdData) => {
-
         if (thresholdModal.editingThreshold) {
-
-            // Update existing threshold
-
-            setViolationThresholds({
-
-                ...violationThresholds,
-
-                ...thresholdData
-
-            });
-
+            setViolationThresholds(violationThresholds.map(t => 
+                t.id === thresholdModal.editingThreshold.id ? { ...thresholdData, id: t.id } : t
+            ));
         } else {
-
-            // Add new threshold type
-
-            const newThreshold = {
-
-                id: Math.max(1, 2, 3, 4) + 1, // Generate new ID
-
-                ...thresholdData,
-
-                active: true
-
-            };
-
-            // For now, we'll just update the main thresholds object
-
-            setViolationThresholds({
-
-                ...violationThresholds,
-
-                ...thresholdData
-
-            });
-
+            setViolationThresholds([...violationThresholds, { ...thresholdData, id: Date.now() }]);
         }
-
         setThresholdModal({ isOpen: false, editingThreshold: null });
-
     };
-
-
 
     // Contact Info Handlers
 
     const handleAddContact = () => {
-
         setContactModal({ isOpen: true, editingContact: null });
-
     };
 
-
+    const handleEditContact = (id) => {
+        const contactToEdit = contacts.find(c => c.id === id);
+        setContactModal({ isOpen: true, editingContact: contactToEdit });
+    };
 
     const handleSaveContact = (contactData) => {
-
         if (contactModal.editingContact) {
-
-            // Update existing contact
-
-            setContactInfo({
-
-                ...contactInfo,
-
-                ...contactData
-
-            });
-
+            setContacts(contacts.map(c => 
+                c.id === contactModal.editingContact.id ? { ...contactData, id: c.id } : c
+            ));
         } else {
-
-            // Add new contact
-
             const newContact = {
-
-                id: Math.max(1, 2, 3, 4, 5) + 1, // Generate new ID
-
                 ...contactData,
-
-                active: true
-
+                id: Math.max(0, ...contacts.map(c => c.id)) + 1
             };
-
-            setContactInfo({
-
-                ...contactInfo,
-
-                ...contactData
-
-            });
-
+            setContacts([...contacts, newContact]);
         }
-
         setContactModal({ isOpen: false, editingContact: null });
+    };
 
+    const handleDeleteContact = (id) => {
+        if (confirm('Are you sure you want to delete this contact?')) {
+            setContacts(contacts.filter(c => c.id !== id));
+        }
     };
 
 
@@ -1583,253 +1544,150 @@ const AdminConfiguration = () => {
 
 
     const ContactModal = () => {
-
         if (!contactModal.isOpen) return null;
 
-        
-
         const initialData = contactModal.editingContact || {
-
             departmentName: '',
-
             phone: '',
-
             email: '',
-
             website: '',
-
             emergencyContact: '',
-
             address: ''
-
         };
 
-
-
         return (
-
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-
-                <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
-
-                    <div className="flex justify-between items-center p-6 border-b">
-
-                        <h3 className="text-lg font-semibold text-slate-800">
-
-                            {contactModal.editingContact ? 'Edit Contact' : 'Add New Contact'}
-
-                        </h3>
-
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] animate-in fade-in duration-300">
+                <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 overflow-hidden animate-in zoom-in-95 duration-300 border border-slate-200">
+                    <div className="flex justify-between items-center p-6 bg-slate-50 border-b border-slate-200">
+                        <div>
+                            <h3 className="text-xl font-bold text-slate-800">
+                                {contactModal.editingContact ? 'Edit Contact' : 'Add New Contact'}
+                            </h3>
+                            <p className="text-sm text-slate-500 mt-0.5">Enter department contact details below</p>
+                        </div>
                         <button 
-
                             onClick={() => setContactModal({ isOpen: false, editingContact: null })}
-
-                            className="text-slate-400 hover:text-slate-600"
-
+                            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 rounded-full transition-all"
                         >
-
                             <X className="w-5 h-5" />
-
                         </button>
-
                     </div>
-
                     
+                    <div className="p-8 space-y-6">
+                        <div className="grid grid-cols-1 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                                    <Building className="w-4 h-4 text-hawaii-ocean" />
+                                    Department Name
+                                </label>
+                                <input
+                                    type="text"
+                                    defaultValue={initialData.departmentName}
+                                    id="contactDepartmentName"
+                                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-hawaii-ocean/20 focus:border-hawaii-ocean transition-all placeholder:text-slate-400"
+                                    placeholder="e.g., Planning Department"
+                                />
+                            </div>
 
-                    <div className="p-6 space-y-4">
+                            <div className="grid grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                                        <Mail className="w-4 h-4 text-hawaii-ocean" />
+                                        Email Address
+                                    </label>
+                                    <input
+                                        type="email"
+                                        defaultValue={initialData.email}
+                                        id="contactEmail"
+                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-hawaii-ocean/20 focus:border-hawaii-ocean transition-all"
+                                        placeholder="dept@hawaiicounty.gov"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                                        <Globe className="w-4 h-4 text-hawaii-ocean" />
+                                        Website URL
+                                    </label>
+                                    <input
+                                        type="url"
+                                        defaultValue={initialData.website}
+                                        id="contactWebsite"
+                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-hawaii-ocean/20 focus:border-hawaii-ocean transition-all"
+                                        placeholder="https://hawaiicounty.gov"
+                                    />
+                                </div>
+                            </div>
 
-                        <div>
+                            <div className="grid grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                                        <Clock className="w-4 h-4 text-hawaii-ocean" />
+                                        Office Phone
+                                    </label>
+                                    <input
+                                        type="tel"
+                                        defaultValue={initialData.phone}
+                                        id="contactPhone"
+                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-hawaii-ocean/20 focus:border-hawaii-ocean transition-all"
+                                        placeholder="(808) 000-0000"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                                        <AlertTriangle className="w-4 h-4 text-amber-500" />
+                                        Emergency Contact
+                                    </label>
+                                    <input
+                                        type="tel"
+                                        defaultValue={initialData.emergencyContact}
+                                        id="contactEmergency"
+                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all font-medium text-amber-700"
+                                        placeholder="Emergency hotline"
+                                    />
+                                </div>
+                            </div>
 
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Department Name</label>
-
-                            <input
-
-                                type="text"
-
-                                defaultValue={initialData.departmentName}
-
-                                id="contactDepartmentName"
-
-                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-
-                                placeholder="e.g., Planning Department"
-
-                            />
-
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-slate-700">Office Address</label>
+                                <textarea
+                                    defaultValue={initialData.address}
+                                    id="contactAddress"
+                                    rows={3}
+                                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-hawaii-ocean/20 focus:border-hawaii-ocean transition-all resize-none"
+                                    placeholder="Full mailing address..."
+                                />
+                            </div>
                         </div>
-
-                        
-
-                        <div>
-
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Phone</label>
-
-                            <input
-
-                                type="tel"
-
-                                defaultValue={initialData.phone}
-
-                                id="contactPhone"
-
-                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-
-                                placeholder="+1 (808) 123-4567"
-
-                            />
-
-                        </div>
-
-                        
-
-                        <div>
-
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
-
-                            <input
-
-                                type="email"
-
-                                defaultValue={initialData.email}
-
-                                id="contactEmail"
-
-                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-
-                                placeholder="contact@hawaiicounty.gov"
-
-                            />
-
-                        </div>
-
-                        
-
-                        <div>
-
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Website</label>
-
-                            <input
-
-                                type="url"
-
-                                defaultValue={initialData.website}
-
-                                id="contactWebsite"
-
-                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-
-                                placeholder="https://hawaiicounty.gov"
-
-                            />
-
-                        </div>
-
-                        
-
-                        <div>
-
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Emergency Contact</label>
-
-                            <input
-
-                                type="tel"
-
-                                defaultValue={initialData.emergencyContact}
-
-                                id="contactEmergency"
-
-                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-
-                                placeholder="+1 (808) 987-6543"
-
-                            />
-
-                        </div>
-
-                        
-
-                        <div className="md:col-span-2">
-
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Address</label>
-
-                            <textarea
-
-                                defaultValue={initialData.address}
-
-                                id="contactAddress"
-
-                                rows={3}
-
-                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-
-                                placeholder="123 County Building, Hilo, HI 96720"
-
-                            />
-
-                        </div>
-
                     </div>
-
                     
-
-                    <div className="flex justify-end gap-3 p-6 border-t">
-
+                    <div className="flex justify-end gap-3 p-6 bg-slate-50 border-t border-slate-200">
                         <button
-
                             onClick={() => setContactModal({ isOpen: false, editingContact: null })}
-
-                            className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50"
-
+                            className="px-6 py-2.5 border border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-white hover:border-slate-400 transition-all active:scale-95"
                         >
-
                             Cancel
-
                         </button>
-
                         <button
-
                             onClick={() => {
-
                                 const contactData = {
-
                                     departmentName: document.getElementById('contactDepartmentName').value,
-
                                     phone: document.getElementById('contactPhone').value,
-
                                     email: document.getElementById('contactEmail').value,
-
                                     website: document.getElementById('contactWebsite').value,
-
                                     emergencyContact: document.getElementById('contactEmergency').value,
-
                                     address: document.getElementById('contactAddress').value
-
                                 };
-
                                 handleSaveContact(contactData);
-
                             }}
-
-                            className="flex items-center gap-2 px-6 py-2 text-white rounded-lg font-medium hover:opacity-90 min-w-[120px]"
-
-                            style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
-
+                            className="flex items-center gap-2 px-8 py-2.5 bg-hawaii-ocean text-white rounded-xl font-bold hover:bg-hawaii-ocean/90 transition-all active:scale-95 shadow-md shadow-hawaii-ocean/20"
                         >
-
-                            <Save className="w-4 h-4 mr-2" />
-
-                            Save
-
+                            <Save className="w-4 h-4" />
+                            {contactModal.editingContact ? 'Update Contact' : 'Create Contact'}
                         </button>
-
                     </div>
-
                 </div>
-
             </div>
-
         );
-
     };
 
 
@@ -2304,239 +2162,7 @@ const AdminConfiguration = () => {
 
 
 
-                {/* Violation Thresholds */}
 
-                {activeTab === 'thresholds' && (
-
-                    <div>
-
-                        <div className="flex justify-between items-center mb-6">
-
-                            <h2 className="text-xl font-semibold text-slate-800">Violation Payment Thresholds</h2>
-
-                            <button onClick={handleAddThreshold} className="flex items-center gap-2 px-4 py-2 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
-
-                            style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
-
-                            <Plus className="w-4 h-4" />
-
-                            Add New Threshold
-
-                        </button>
-
-                        </div>
-
-                        
-
-                        <div className="space-y-4">
-
-                            <div className="bg-white border border-slate-200 rounded-lg p-4">
-
-                                <h3 className="font-medium text-slate-800 mb-4">Warning Threshold</h3>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                                    <div>
-
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">Amount ($)</label>
-
-                                        <input
-
-                                            type="number"
-
-                                            value={violationThresholds.warningThreshold}
-
-                                            onChange={(e) => setViolationThresholds({...violationThresholds, warningThreshold: parseInt(e.target.value)})}
-
-                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-
-                                        />
-
-                                    </div>
-
-                                    <div>
-
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">Triggers</label>
-
-                                        <select
-
-                                            value={violationThresholds.warningTrigger || 'multiple_violations'}
-
-                                            onChange={(e) => setViolationThresholds({...violationThresholds, warningTrigger: e.target.value})}
-
-                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-
-                                        >
-
-                                            <option value="single_violation">Single Violation</option>
-
-                                            <option value="multiple_violations">Multiple Violations</option>
-
-                                            <option value="complaint_based">Complaint Based</option>
-
-                                            <option value="time_based">Time Based</option>
-
-                                        </select>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                            
-
-                            <div className="bg-white border border-slate-200 rounded-lg p-4">
-
-                                <h3 className="font-medium text-slate-800 mb-4">Fine Threshold</h3>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                                    <div>
-
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">Amount ($)</label>
-
-                                        <input
-
-                                            type="number"
-
-                                            value={violationThresholds.fineThreshold}
-
-                                            onChange={(e) => setViolationThresholds({...violationThresholds, fineThreshold: parseInt(e.target.value)})}
-
-                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-
-                                        />
-
-                                    </div>
-
-                                    <div>
-
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">Auto-Issue At</label>
-
-                                        <select
-
-                                            value={violationThresholds.fineAutoIssue || 'manual'}
-
-                                            onChange={(e) => setViolationThresholds({...violationThresholds, fineAutoIssue: e.target.value})}
-
-                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-
-                                        >
-
-                                            <option value="manual">Manual Review</option>
-
-                                            <option value="auto">Automatic</option>
-
-                                        </select>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                            
-
-                            <div className="bg-white border border-slate-200 rounded-lg p-4">
-
-                                <h3 className="font-medium text-slate-800 mb-4">Lien Threshold</h3>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                                    <div>
-
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">Amount ($)</label>
-
-                                        <input
-
-                                            type="number"
-
-                                            value={violationThresholds.lienThreshold}
-
-                                            onChange={(e) => setViolationThresholds({...violationThresholds, lienThreshold: parseInt(e.target.value)})}
-
-                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-
-                                        />
-
-                                    </div>
-
-                                    <div>
-
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">Required Days</label>
-
-                                        <input
-
-                                            type="number"
-
-                                            value={violationThresholds.lienDays}
-
-                                            onChange={(e) => setViolationThresholds({...violationThresholds, lienDays: parseInt(e.target.value)})}
-
-                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-
-                                        />
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                            
-
-                            <div className="bg-white border border-slate-200 rounded-lg p-4">
-
-                                <h3 className="font-medium text-slate-800 mb-4">Suspension Threshold</h3>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                                    <div>
-
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">Violations Count</label>
-
-                                        <input
-
-                                            type="number"
-
-                                            value={violationThresholds.suspensionThreshold}
-
-                                            onChange={(e) => setViolationThresholds({...violationThresholds, suspensionThreshold: parseInt(e.target.value)})}
-
-                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-
-                                        />
-
-                                    </div>
-
-                                    <div>
-
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">Time Period (days)</label>
-
-                                        <input
-
-                                            type="number"
-
-                                            value={violationThresholds.suspensionDays}
-
-                                            onChange={(e) => setViolationThresholds({...violationThresholds, suspensionDays: parseInt(e.target.value)})}
-
-                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-
-                                        />
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                )}
 
 
 
@@ -2553,66 +2179,85 @@ const AdminConfiguration = () => {
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Department Name</label>
-                                <input
-                                    type="text"
-                                    value={contactInfo.departmentName}
-                                    onChange={(e) => setContactInfo({...contactInfo, departmentName: e.target.value})}
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-                                />
-                            </div>
-                            
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Phone</label>
-                                <input
-                                    type="tel"
-                                    value={contactInfo.phone}
-                                    onChange={(e) => setContactInfo({...contactInfo, phone: e.target.value})}
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-                                />
-                            </div>
-                            
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
-                                <input
-                                    type="email"
-                                    value={contactInfo.email}
-                                    onChange={(e) => setContactInfo({...contactInfo, email: e.target.value})}
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-                                />
-                            </div>
-                            
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Website</label>
-                                <input
-                                    type="url"
-                                    value={contactInfo.website}
-                                    onChange={(e) => setContactInfo({...contactInfo, website: e.target.value})}
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-                                />
-                            </div>
-                            
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Emergency Contact</label>
-                                <input
-                                    type="tel"
-                                    value={contactInfo.emergencyContact}
-                                    onChange={(e) => setContactInfo({...contactInfo, emergencyContact: e.target.value})}
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-                                />
-                            </div>
-                            
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Address</label>
-                                <textarea
-                                    value={contactInfo.address}
-                                    onChange={(e) => setContactInfo({...contactInfo, address: e.target.value})}
-                                    rows={3}
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
-                                />
-                            </div>
+                            {contacts.map((contact) => (
+                                <div key={contact.id} className="bg-slate-50 border border-slate-200 rounded-xl p-5 hover:border-hawaii-ocean/30 transition-colors group">
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div>
+                                            <h3 className="font-bold text-slate-800 text-lg">{contact.departmentName}</h3>
+                                            <div className="flex items-center gap-2 text-slate-500 text-sm mt-1">
+                                                <Globe className="w-3 h-3" />
+                                                <a href={contact.website} target="_blank" rel="noopener noreferrer" className="hover:text-hawaii-ocean underline">
+                                                    {contact.website?.replace(/^https?:\/\//, '')}
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button 
+                                                onClick={() => handleEditContact(contact.id)}
+                                                className="p-2 text-slate-600 hover:text-hawaii-ocean hover:bg-hawaii-ocean/10 rounded-lg transition-colors"
+                                            >
+                                                <Edit2 className="w-4 h-4" />
+                                            </button>
+                                            <button 
+                                                onClick={() => handleDeleteContact(contact.id)}
+                                                className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <div className="flex items-start gap-3">
+                                            <div className="mt-1 p-1.5 bg-white border border-slate-100 rounded text-slate-400">
+                                                <Mail className="w-3.5 h-3.5" />
+                                            </div>
+                                            <div>
+                                                <span className="block text-xs text-slate-400 font-medium uppercase tracking-wider">Email</span>
+                                                <span className="text-slate-700">{contact.email}</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-start gap-3">
+                                            <div className="mt-1 p-1.5 bg-white border border-slate-100 rounded text-slate-400">
+                                                <Clock className="w-3.5 h-3.5" />
+                                            </div>
+                                            <div>
+                                                <span className="block text-xs text-slate-400 font-medium uppercase tracking-wider">Phone</span>
+                                                <span className="text-slate-700">{contact.phone}</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-start gap-3">
+                                            <div className="mt-1 p-1.5 bg-white border border-slate-100 rounded text-slate-400">
+                                                <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
+                                            </div>
+                                            <div>
+                                                <span className="block text-xs text-slate-400 font-medium uppercase tracking-wider">Emergency</span>
+                                                <span className="text-slate-700 font-medium">{contact.emergencyContact}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-4 pt-4 border-t border-slate-200/60">
+                                        <p className="text-sm text-slate-500 leading-relaxed italic">
+                                            {contact.address}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
+
+                        {contacts.length === 0 && (
+                            <div className="text-center py-20 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/50">
+                                <Mail className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                                <h3 className="text-lg font-medium text-slate-800">No Contact Info Found</h3>
+                                <p className="text-slate-500 max-w-xs mx-auto mb-6">Add department contact information to help users reach out for assistance.</p>
+                                <button onClick={handleAddContact} className="px-6 py-2.5 bg-hawaii-ocean text-white rounded-lg font-semibold hover:bg-hawaii-ocean/90 transition-all shadow-sm shadow-hawaii-ocean/20">
+                                    Add First Contact
+                                </button>
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -2784,6 +2429,48 @@ const AdminConfiguration = () => {
 
                 )}
 
+                {/* Violation Thresholds */}
+                {activeTab === 'thresholds' && (
+                    <div>
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl font-semibold text-slate-800">Violation Payment Thresholds</h2>
+                            <button onClick={handleAddThreshold} className="flex items-center gap-2 px-4 py-2 text-white rounded-lg font-medium hover:opacity-90 transition-opacity" style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
+                                <Plus className="w-4 h-4" />
+                                Add Threshold
+                            </button>
+                        </div>
+                        
+                        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+                            <p className="text-slate-500 text-sm mb-6 pb-6 border-b border-slate-100">Configure the dollar amounts that trigger various enforcement actions and notifications within the system.</p>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {violationThresholds.map(threshold => (
+                                    <div key={threshold.id} className="border border-slate-200 rounded-lg p-4 group">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <label className="block text-sm font-medium text-slate-700">{threshold.name} ($)</label>
+                                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button onClick={() => handleEditThreshold(threshold.id)} className="p-1 text-slate-400 hover:text-hawaii-ocean hover:bg-hawaii-ocean/10 rounded">
+                                                    <Edit2 className="w-4 h-4" />
+                                                </button>
+                                                <button onClick={() => handleDeleteThreshold(threshold.id)} className="p-1 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded">
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <input
+                                            type="number"
+                                            value={threshold.amount}
+                                            readOnly
+                                            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-slate-700 bg-slate-50"
+                                        />
+                                        <p className="text-xs text-slate-400 mt-1">{threshold.description}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
 
 
                 {/* Letter Templates */}
@@ -2919,7 +2606,14 @@ const AdminConfiguration = () => {
 
             <TemplateModal />
 
-            <ThresholdModal />
+            {thresholdModal.isOpen && (
+                <ThresholdModal
+                    isOpen={thresholdModal.isOpen}
+                    onClose={() => setThresholdModal({ isOpen: false, editingThreshold: null })}
+                    onSave={handleSaveThreshold}
+                    initialData={thresholdModal.editingThreshold}
+                />
+            )}
 
             <ContactModal />
 
@@ -2931,7 +2625,85 @@ const AdminConfiguration = () => {
 
 };
 
+const ThresholdModal = ({ isOpen, onClose, onSave, initialData }) => {
+    const [formData, setFormData] = useState(initialData || {
+        name: '',
+        amount: '',
+        description: ''
+    });
 
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        onSave({ 
+            ...formData,
+            amount: parseInt(formData.amount) || 0 
+        });
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
+                <div className="flex justify-between items-center p-6 border-b border-slate-100">
+                    <h3 className="text-lg font-bold text-slate-800">
+                        {initialData ? 'Edit Threshold Setting' : 'Add New Threshold'}
+                    </h3>
+                    <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-50 transition-colors">
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
+                
+                <form onSubmit={handleSubmit} className="p-6">
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Threshold Name *</label>
+                            <input
+                                type="text"
+                                required
+                                value={formData.name}
+                                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean/20 text-slate-700"
+                                placeholder="e.g. Action Threshold"
+                            />
+                        </div>
+                        
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Amount ($) *</label>
+                            <input
+                                type="number"
+                                required
+                                value={formData.amount}
+                                onChange={(e) => setFormData({...formData, amount: e.target.value})}
+                                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean/20 text-slate-700"
+                                placeholder="e.g. 500"
+                            />
+                        </div>
+                        
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Description</label>
+                            <textarea
+                                value={formData.description}
+                                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean/20 text-slate-700 min-h-[100px]"
+                                placeholder="What enforcement action does this amount trigger?"
+                            />
+                        </div>
+                    </div>
+                    
+                    <div className="flex justify-end gap-3 mt-8">
+                        <button type="button" onClick={onClose} className="px-5 py-2.5 text-slate-600 font-medium hover:bg-slate-50 rounded-lg transition-colors">
+                            Cancel
+                        </button>
+                        <button type="submit" className="px-5 py-2.5 bg-hawaii-ocean text-white font-medium rounded-lg hover:bg-hawaii-ocean/90 shadow-sm shadow-hawaii-ocean/20 transition-all">
+                            {initialData ? 'Save Changes' : 'Add Threshold'}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+};
 
 export default AdminConfiguration;
 
