@@ -590,8 +590,127 @@ const Reports = () => {
                                         <TrendingUp className="w-4 h-4 text-hawaii-ocean" />
                                         {activeReport === 'trends' ? 'Monthly Compliance Velocity' : 'Data Distribution Analysis'}
                                     </h3>
-                                    <div className="h-64 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-center italic text-slate-400">
-                                        [Interactive Visualizer for {activeReport} - Loading high-fidelity telemetry...]
+                                    <div className="h-72 bg-slate-50/50 rounded-2xl border border-slate-100 p-4">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            {(() => {
+                                                const sharedProps = {
+                                                    margin: { top: 10, right: 10, left: -20, bottom: 0 }
+                                                };
+                                                
+                                                if (activeReport === 'region') {
+                                                    const data = [
+                                                        { name: 'Hilo', value: 245 },
+                                                        { name: 'Kona', value: 189 },
+                                                        { name: 'Puna', value: 127 },
+                                                        { name: 'Kohala', value: 203 },
+                                                        { name: 'Hamakua', value: 92 }
+                                                    ];
+                                                    return (
+                                                        <BarChart data={data} {...sharedProps}>
+                                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                                            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
+                                                            <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
+                                                            <Tooltip cursor={{fill: '#f1f5f9'}} contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} />
+                                                            <Bar dataKey="value" fill="#0f4c81" radius={[6, 6, 0, 0]} name="Active Cases" />
+                                                        </BarChart>
+                                                    );
+                                                }
+                                                
+                                                if (activeReport === 'type') {
+                                                    const data = [
+                                                        { name: 'Single Family', value: 342 },
+                                                        { name: 'Condo/Apt', value: 278 },
+                                                        { name: 'Vacation Home', value: 156 },
+                                                        { name: 'Other', value: 89 }
+                                                    ];
+                                                    return (
+                                                        <PieChart>
+                                                            <Pie data={data} innerRadius={60} outerRadius={90} paddingAngle={5} dataKey="value">
+                                                                {data.map((_, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
+                                                            </Pie>
+                                                            <Tooltip contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} />
+                                                        </PieChart>
+                                                    );
+                                                }
+
+                                                if (activeReport === 'tat') {
+                                                    const data = [
+                                                        { name: 'Paid', value: 423 },
+                                                        { name: 'Late', value: 87 },
+                                                        { name: 'Delinquent', value: 34 },
+                                                        { name: 'Not Filed', value: 156 }
+                                                    ];
+                                                    return (
+                                                        <BarChart data={data} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
+                                                            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
+                                                            <XAxis type="number" hide />
+                                                            <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 11}} />
+                                                            <Tooltip cursor={{fill: 'transparent'}} contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} />
+                                                            <Bar dataKey="value" fill="#f59e0b" radius={[0, 4, 4, 0]} barSize={20} />
+                                                        </BarChart>
+                                                    );
+                                                }
+
+                                                if (activeReport === 'enforcement') {
+                                                    const data = [
+                                                        { name: 'Jan', resolved: 45, averageTime: 3.2 },
+                                                        { name: 'Feb', resolved: 52, averageTime: 2.8 },
+                                                        { name: 'Mar', resolved: 61, averageTime: 2.3 }
+                                                    ];
+                                                    return (
+                                                        <AreaChart data={data} {...sharedProps}>
+                                                            <defs>
+                                                                <linearGradient id="colorRes" x1="0" y1="0" x2="0" y2="1">
+                                                                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
+                                                                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                                                                </linearGradient>
+                                                            </defs>
+                                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                                            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b'}} />
+                                                            <YAxis axisLine={false} tickLine={false} />
+                                                            <Tooltip contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} />
+                                                            <Area type="monotone" dataKey="resolved" stroke="#8b5cf6" fillOpacity={1} fill="url(#colorRes)" strokeWidth={3} />
+                                                        </AreaChart>
+                                                    );
+                                                }
+
+                                                if (activeReport === 'trends') {
+                                                    const data = [
+                                                        { name: 'Jan', rate: 82 },
+                                                        { name: 'Feb', rate: 85 },
+                                                        { name: 'Mar', rate: 94 }
+                                                    ];
+                                                    return (
+                                                        <LineChart data={data} {...sharedProps}>
+                                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                                            <XAxis dataKey="name" axisLine={false} tickLine={false} />
+                                                            <YAxis domain={[80, 100]} axisLine={false} tickLine={false} />
+                                                            <Tooltip contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} />
+                                                            <Line type="monotone" dataKey="rate" stroke="#ef4444" strokeWidth={4} dot={{r: 6, fill: '#ef4444', strokeWidth: 2, stroke: '#fff'}} activityDot={{r: 8}} />
+                                                        </LineChart>
+                                                    );
+                                                }
+
+                                                if (activeReport === 'revenue') {
+                                                    const data = [
+                                                        { name: 'Fines', value: 234.5 },
+                                                        { name: 'TAT', value: 567.8 },
+                                                        { name: 'Fees', value: 45.2 }
+                                                    ];
+                                                    return (
+                                                        <BarChart data={data} {...sharedProps}>
+                                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                                            <XAxis dataKey="name" axisLine={false} tickLine={false} />
+                                                            <YAxis axisLine={false} tickLine={false} />
+                                                            <Tooltip cursor={{fill: '#f1f5f9'}} contentStyle={{borderRadius: '12px', border: 'none'}} />
+                                                            <Bar dataKey="value" fill="#10b981" radius={[6, 6, 0, 0]} name="Amount ($K)" />
+                                                        </BarChart>
+                                                    );
+                                                }
+
+                                                return <div className="flex items-center justify-center h-full text-slate-400 italic">No visualization available for this category.</div>;
+                                            })()}
+                                        </ResponsiveContainer>
                                     </div>
                                 </div>
 
