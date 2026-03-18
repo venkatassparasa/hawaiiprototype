@@ -25,28 +25,34 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
 
 
         if(!isPublic) {
-            items.push({ icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' });
+            // For Admin users, show County Dashboard instead of regular Dashboard
+            if(user?.role === 'Admin') {
+                items.push({ icon: LayoutDashboard, label: 'County Dashboard', path: '/admin/dashboard' });
+            } else {
+                items.push({ icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' });
+            }
         }
 
-        if (isFinance || isPlanning) {
+        if ((isFinance || isPlanning) && user?.role !== 'Admin') {
             items.push({ icon: Building2, label: 'Property Registry', path: '/registrations' },
                 // { icon: ClipboardList, label: 'Registrations', path: '/registrations' }
         );
         }
 
 
-        if (isPlanning) {
+        if (isPlanning && user?.role !== 'Admin') {
             items.push(
                 { icon: ShieldCheck, label: 'NCUC Certificates', path: '/ncuc' },
                 // { icon: ClipboardList, label: 'Registrations', path: '/registrations' }
             );
         }
 
-        if (!isPublic) {
+        // Show Enforcement section for non-Admin users only
+        if (!isPublic && user?.role !== 'Admin') {
             items.push({ label: 'ENFORCEMENT', header: true });
         }
 
-        if (isLegal) {
+        if (isLegal && user?.role !== 'Admin') {
             items.push(
                 { icon: AlertTriangle, label: 'Violation Cases', path: '/violations' },
                 { icon: MessageSquare, label: 'Complaints', path: '/complaints' },
@@ -55,11 +61,11 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
             );
         }
 
-        if (isFinance) {
+        if (isFinance && user?.role !== 'Admin') {
             items.push({ icon: DollarSign, label: 'Payments', path: '/payments' });
         }
 
-        if (!isPublic) {
+        if (!isPublic && user?.role !== 'Admin') {
             items.push({ icon: ClipboardList, label: 'Inspections', path: '/inspections' });
         }
 
@@ -75,7 +81,7 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
             );
         }
 
-        if (!isPublic) {
+        if (!isPublic && user?.role !== 'Admin') {
             items.push({ icon: MapIcon, label: 'Compliance Map', path: '/map' });
             items.push({ label: 'SYSTEM', header: true });
         }
@@ -93,12 +99,10 @@ const Sidebar = ({ isOpen, onClose, onLogout }) => {
             // Configuration & Admin Controls - Only for Admin
             if (user?.role === 'Admin') {
                 items.push({ icon: Settings, label: 'Configuration', path: '/admin/config' });
-                items.push({ icon: FileText, label: 'County Dashboard', path: '/admin/dashboard' });
                 // items.push({ icon: Database, label: 'Data Migration', path: '/admin/data-migration' });
                 items.push({ icon: Globe, label: 'Hosting Portal', path: '/hosting-portal' });
+                items.push({ icon: Settings, label: 'Settings', path: '/settings' });
             }
-            
-            items.push({ icon: Settings, label: 'Settings', path: '/settings' });
         }
 
 

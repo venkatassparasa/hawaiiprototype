@@ -58,7 +58,7 @@ const Login = ({ onLogin }) => {
                 role: role,
                 avatar: null // No avatar for public users
             });
-            navigate('/dashboard');
+            // Remove manual navigation - let App.jsx handle redirect
         } else {
             // For all other roles, check email domain for RBAC
             const userEmail = email || '';
@@ -90,7 +90,7 @@ const Login = ({ onLogin }) => {
                 role: userRole,
                 avatar: userName ? userName.split(' ').map(n => n[0]).join('') : ''
             });
-            navigate('/dashboard');
+            // Remove manual navigation - let App.jsx handle redirect
         }
     };
 
@@ -216,7 +216,7 @@ const Login = ({ onLogin }) => {
                                                 role: 'Public',
                                                 avatar: null
                                             });
-                                            navigate('/dashboard');
+                                            // Remove manual navigation - let App.jsx handle redirect
                                         }}
                                         className="text-hawaii-ocean hover:underline font-medium"
                                     >

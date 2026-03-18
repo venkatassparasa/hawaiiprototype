@@ -67,6 +67,17 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   return children;
 };
 
+// Role-based redirect component
+const RoleBasedRedirect = () => {
+  const { user } = useContext(RoleContext);
+  
+  if (user?.role === 'Admin') {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+  
+  return <Navigate to="/dashboard" replace />;
+};
+
 function App() {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -93,7 +104,7 @@ function App() {
         ) : (
           <Layout user={user} onLogout={handleLogout}>
             <Routes>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/" element={<RoleBasedRedirect />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<UserProfile user={user} />} />
 

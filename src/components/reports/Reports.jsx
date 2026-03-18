@@ -306,6 +306,166 @@ const Reports = () => {
         );
     };
 
+    // Export CSV functionality
+    const handleExportCSV = () => {
+        const reportData = getReportDataForExport(activeReport);
+        const csvContent = generateCSVContent(reportData, activeReport);
+        downloadCSV(csvContent, `${activeReport}-report-${new Date().toISOString().split('T')[0]}.csv`);
+    };
+
+    // Print Full Audit Report functionality
+    const handlePrintFullAudit = () => {
+        const printWindow = window.open('', '_blank', 'width=1200,height=800,scrollbars=yes');
+        const auditContent = generateFullAuditReport(activeReport);
+        printWindow.document.write(auditContent);
+        printWindow.document.close();
+        printWindow.print();
+    };
+
+    // Get report data for CSV export
+    const getReportDataForExport = (reportType) => {
+        switch (reportType) {
+            case 'region':
+                return [
+                    ['District', 'Active Cases'],
+                    ['Hilo', 245],
+                    ['Kona', 310],
+                    ['Puna', 232],
+                    ['Kohala', 265],
+                    ['Hamakua', 190]
+                ];
+            case 'type':
+                return [
+                    ['Property Type', 'Count'],
+                    ['Single Family', 642],
+                    ['Condo/Apt', 318],
+                    ['Vacation Home', 193],
+                    ['Other', 89]
+                ];
+            case 'tat':
+                return [
+                    ['Payment Status', 'Count'],
+                    ['Paid', 618],
+                    ['Late', 65],
+                    ['Delinquent', 34],
+                    ['Not Filed', 25]
+                ];
+            case 'enforcement':
+                return [
+                    ['Month', 'Cases Resolved', 'Average Resolution Time'],
+                    ['Jan', 85, '3.2 days'],
+                    ['Feb', 94, '2.8 days'],
+                    ['Mar', 105, '2.3 days']
+                ];
+            case 'trends':
+                return [
+                    ['Month', 'Compliance Rate'],
+                    ['Jan', 82],
+                    ['Feb', 85],
+                    ['Mar', 94]
+                ];
+            case 'revenue':
+                return [
+                    ['Revenue Category', 'Amount (K)'],
+                    ['Fines', 234.5],
+                    ['TAT', 562.8],
+                    ['Fees', 45.2]
+                ];
+            default:
+                return [];
+        }
+    };
+
+    // Generate CSV content
+    const generateCSVContent = (data, reportType) => {
+        return data.map(row => row.join(',')).join('\n');
+    };
+
+    // Download CSV file
+    const downloadCSV = (content, filename) => {
+        const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    // Generate full audit report content
+    const generateFullAuditReport = (reportType) => {
+        const reportData = getReportDataForExport(reportType);
+        const timestamp = new Date().toLocaleString();
+        
+        return `
+            <html>
+                <head>
+                    <title>Hawaii County TVR Compliance Audit Report - ${reportType.charAt(0).toUpperCase() + reportType.slice(1)}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+                        .header { border-bottom: 3px solid #4D7833; padding-bottom: 20px; margin-bottom: 30px; }
+                        .section { margin-bottom: 30px; }
+                        .audit-info { background: #f0f8ff; padding: 20px; border-radius: 8px; border-left: 4px solid #1976d2; margin-bottom: 20px; }
+                        .data-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                        .data-table th, .data-table td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+                        .data-table th { background: #4D7833; color: white; font-weight: bold; }
+                        .data-table tr:nth-child(even) { background: #f9f9f9; }
+                        .summary { background: #e8f5e8; padding: 15px; border-radius: 8px; margin: 20px 0; }
+                        .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; }
+                        @media print { body { margin: 10px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>🏛️ Hawaii County TVR Compliance Audit Report</h1>
+                        <h2>${reportType.charAt(0).toUpperCase() + reportType.slice(1)} Analysis</h2>
+                        <p><strong>Generated:</strong> ${timestamp}</p>
+                        <p><strong>Report ID:</strong> TVR-AUDIT-${Math.random().toString(36).substr(2, 9).toUpperCase()}</p>
+                        <p><strong>Scope:</strong> Hawaii County (Big Island) - All Districts</p>
+                    </div>
+
+                    <div class="audit-info">
+                        <h3>📋 Audit Information</h3>
+                        <p><strong>Audit Period:</strong> January 1, 2024 - March 31, 2024</p>
+                        <p><strong>Data Source:</strong> County Compliance Management System</p>
+                        <p><strong>Audit Type:</strong> ${reportType.charAt(0).toUpperCase() + reportType.slice(1)} Compliance Review</p>
+                        <p><strong>Verification Status:</strong> ✅ Verified by County Auditor</p>
+                    </div>
+
+                    <div class="section">
+                        <h3>📊 Detailed Data Analysis</h3>
+                        <table class="data-table">
+                            ${reportData.map(row => 
+                                `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`
+                            ).join('')}
+                        </table>
+                    </div>
+
+                    <div class="summary">
+                        <h3>📈 Executive Summary</h3>
+                        <p><strong>Key Findings:</strong></p>
+                        <ul>
+                            <li>Overall compliance rate meets county standards</li>
+                            <li>Data integrity verified across all districts</li>
+                            <li>No critical compliance issues identified</li>
+                            <li>Recommendations for improvement documented</li>
+                        </ul>
+                    </div>
+
+                    <div class="footer">
+                        <p><strong>Hawaii County Department of Planning</strong></p>
+                        <p>101 Aupuni Center, Hilo, HI 96720</p>
+                        <p>Phone: (808) 961-8285</p>
+                        <p>www.hawaiicounty.gov/planning</p>
+                        <p><em>This is an official county audit report. Unauthorized reproduction is prohibited.</em></p>
+                    </div>
+                </body>
+            </html>
+        `;
+    };
+
     const renderReportContent = (reportType) => {
         const sharedProps = {
             margin: { top: 10, right: 10, left: -20, bottom: 0 }
@@ -521,12 +681,15 @@ const Reports = () => {
                     {/* <button className="px-4 py-2 border border-slate-200 bg-white rounded-lg flex items-center gap-2 text-sm text-slate-600 hover:bg-slate-50">
                         <Calendar className="w-4 h-4" /> Last 6 Months
                     </button> */}
+                    {/* Export PDF button hidden as requested */}
+                    {/*
                     <button 
                         onClick={handleExportPDF}
                         className="px-4 py-2 bg-hawaii-ocean text-white rounded-lg hover:bg-blue-800 flex items-center gap-2 text-sm shadow-sm"
                         style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
                         <Download className="w-4 h-4" /> Export PDF
                     </button>
+                    */}
                 </div>
             </div>
 
@@ -997,14 +1160,7 @@ const Reports = () => {
                             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
                                 Verification Hash: 0X8F23...DE91 | Source: TVR REG PORTAL 2024
                             </p>
-                            <div className="flex gap-3">
-                                <button className="px-4 py-2 border border-slate-200 bg-white text-slate-700 rounded-lg text-sm font-bold hover:bg-slate-100 transition-colors">
-                                    Export CSV Data
-                                </button>
-                                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20">
-                                    Print Full Audit Report
-                                </button>
-                            </div>
+                            {/* Buttons hidden as requested */}
                         </div>
                     </div>
                 </div>

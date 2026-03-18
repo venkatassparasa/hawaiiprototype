@@ -79,14 +79,17 @@ const Header = ({ user, onLogout, onMenuToggle }) => {
                                         <User className="w-4 h-4" />
                                         My Profile
                                     </Link>
-                                    <Link
-                                        to="/settings"
-                                        onClick={() => setShowUserMenu(false)}
-                                        className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-3"
-                                    >
-                                        <Settings className="w-4 h-4" />
-                                        Settings
-                                    </Link>
+                                    {/* Only show Settings for Admin users */}
+                                    {user?.role === 'Admin' && (
+                                        <Link
+                                            to="/settings"
+                                            onClick={() => setShowUserMenu(false)}
+                                            className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-3"
+                                        >
+                                            <Settings className="w-4 h-4" />
+                                            Settings
+                                        </Link>
+                                    )}
 
                                     <div className="border-t border-slate-100 mt-2 pt-2">
                                         <button
