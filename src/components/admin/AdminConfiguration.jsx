@@ -66,6 +66,7 @@ const AdminConfiguration = () => {
     const [useTypeModal, setUseTypeModal] = useState({ isOpen: false, editingUseType: null });
     const [templateModal, setTemplateModal] = useState({ isOpen: false, editingTemplate: null });
     const [thresholdModal, setThresholdModal] = useState({ isOpen: false, editingThreshold: null });
+    const [contactModal, setContactModal] = useState({ isOpen: false, editingContact: null });
 
     // Hosting Platform Registration Data
     const [hostingPlatform, setHostingPlatform] = useState({
@@ -95,8 +96,7 @@ const AdminConfiguration = () => {
         { id: 'useTypes', label: 'Use Types', icon: Building },
         { id: 'operational', label: 'Operational Standards', icon: Settings },
         { id: 'contact', label: 'Contact Info', icon: Mail },
-        { id: 'thresholds', label: 'Violation Thresholds', icon: AlertTriangle },
-        { id: 'templates', label: 'Letter Templates', icon: FileText }
+        { id: 'thresholds', label: 'Violation Thresholds', icon: AlertTriangle }
     ];
 
     const handleSave = () => {
@@ -232,6 +232,33 @@ const AdminConfiguration = () => {
             });
         }
         setThresholdModal({ isOpen: false, editingThreshold: null });
+    };
+
+    // Contact Info Handlers
+    const handleAddContact = () => {
+        setContactModal({ isOpen: true, editingContact: null });
+    };
+
+    const handleSaveContact = (contactData) => {
+        if (contactModal.editingContact) {
+            // Update existing contact
+            setContactInfo({
+                ...contactInfo,
+                ...contactData
+            });
+        } else {
+            // Add new contact
+            const newContact = {
+                id: Math.max(1, 2, 3, 4, 5) + 1, // Generate new ID
+                ...contactData,
+                active: true
+            };
+            setContactInfo({
+                ...contactInfo,
+                ...contactData
+            });
+        }
+        setContactModal({ isOpen: false, editingContact: null });
     };
 
     const handleDeleteTemplate = (id) => {
@@ -718,6 +745,132 @@ const AdminConfiguration = () => {
         );
     };
 
+    const ContactModal = () => {
+        if (!contactModal.isOpen) return null;
+        
+        const initialData = contactModal.editingContact || {
+            departmentName: '',
+            phone: '',
+            email: '',
+            website: '',
+            emergencyContact: '',
+            address: ''
+        };
+
+        return (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+                    <div className="flex justify-between items-center p-6 border-b">
+                        <h3 className="text-lg font-semibold text-slate-800">
+                            {contactModal.editingContact ? 'Edit Contact' : 'Add New Contact'}
+                        </h3>
+                        <button 
+                            onClick={() => setContactModal({ isOpen: false, editingContact: null })}
+                            className="text-slate-400 hover:text-slate-600"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+                    </div>
+                    
+                    <div className="p-6 space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Department Name</label>
+                            <input
+                                type="text"
+                                defaultValue={initialData.departmentName}
+                                id="contactDepartmentName"
+                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                placeholder="e.g., Planning Department"
+                            />
+                        </div>
+                        
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Phone</label>
+                            <input
+                                type="tel"
+                                defaultValue={initialData.phone}
+                                id="contactPhone"
+                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                placeholder="+1 (808) 123-4567"
+                            />
+                        </div>
+                        
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
+                            <input
+                                type="email"
+                                defaultValue={initialData.email}
+                                id="contactEmail"
+                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                placeholder="contact@hawaiicounty.gov"
+                            />
+                        </div>
+                        
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Website</label>
+                            <input
+                                type="url"
+                                defaultValue={initialData.website}
+                                id="contactWebsite"
+                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                placeholder="https://hawaiicounty.gov"
+                            />
+                        </div>
+                        
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Emergency Contact</label>
+                            <input
+                                type="tel"
+                                defaultValue={initialData.emergencyContact}
+                                id="contactEmergency"
+                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                placeholder="+1 (808) 987-6543"
+                            />
+                        </div>
+                        
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Address</label>
+                            <textarea
+                                defaultValue={initialData.address}
+                                id="contactAddress"
+                                rows={3}
+                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                placeholder="123 County Building, Hilo, HI 96720"
+                            />
+                        </div>
+                    </div>
+                    
+                    <div className="flex justify-end gap-3 p-6 border-t">
+                        <button
+                            onClick={() => setContactModal({ isOpen: false, editingContact: null })}
+                            className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={() => {
+                                const contactData = {
+                                    departmentName: document.getElementById('contactDepartmentName').value,
+                                    phone: document.getElementById('contactPhone').value,
+                                    email: document.getElementById('contactEmail').value,
+                                    website: document.getElementById('contactWebsite').value,
+                                    emergencyContact: document.getElementById('contactEmergency').value,
+                                    address: document.getElementById('contactAddress').value
+                                };
+                                handleSaveContact(contactData);
+                            }}
+                            className="flex items-center gap-2 px-6 py-2 text-white rounded-lg font-medium hover:opacity-90 min-w-[120px]"
+                            style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
+                        >
+                            <Save className="w-4 h-4 mr-2" />
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     return (
         <div className="p-6 max-w-7xl mx-auto">
             <div className="mb-6">
@@ -1034,7 +1187,14 @@ const AdminConfiguration = () => {
                 {/* Contact Info */}
                 {activeTab === 'contact' && (
                     <div>
-                        <h2 className="text-xl font-semibold text-slate-800 mb-6">Contact Information</h2>
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl font-semibold text-slate-800">Contact Information</h2>
+                            <button onClick={handleAddContact} className="flex items-center gap-2 px-4 py-2 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+                            style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
+                            <Plus className="w-4 h-4" />
+                            Add New Contact
+                        </button>
+                        </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
@@ -1100,54 +1260,6 @@ const AdminConfiguration = () => {
                     </div>
                 )}
 
-                {/* Letter Templates */}
-                {activeTab === 'templates' && (
-                    <div>
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-xl font-semibold text-slate-800">Letter Templates</h2>
-                            <button onClick={handleAddTemplate} className="flex items-center gap-2 px-4 py-2 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
-                            style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
-                            <Plus className="w-4 h-4" />
-                            Add Template
-                        </button>
-                        </div>
-                        
-                        <div className="space-y-4">
-                            {letterTemplates.map((template) => (
-                                <div key={template.id} className="border border-slate-200 rounded-lg p-4 hover:bg-slate-50 transition-colors">
-                                    <div className="flex justify-between items-start">
-                                        <div className="flex-1">
-                                            <h3 className="font-medium text-slate-800">{template.name}</h3>
-                                            <p className="text-sm text-slate-600 mt-1">Subject: {template.subject}</p>
-                                            <div className="flex items-center gap-4 mt-2">
-                                                <span className="text-sm text-slate-500 bg-slate-100 px-2 py-1 rounded">{template.type}</span>
-                                                <span className={`text-sm px-2 py-1 rounded ${
-                                                    template.active 
-                                                        ? 'bg-green-100 text-green-800' 
-                                                        : 'bg-slate-100 text-slate-600'
-                                                }`}>
-                                                    {template.active ? 'Active' : 'Inactive'}
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <button onClick={() => handleToggleTemplate(template.id)} className="p-2 text-slate-600 hover:text-hawaii-ocean hover:bg-hawaii-ocean/10 rounded transition-colors">
-                                                {template.active ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                            </button>
-                                            <button onClick={() => handleEditTemplate(template.id)} className="p-2 text-slate-600 hover:text-hawaii-ocean hover:bg-hawaii-ocean/10 rounded transition-colors">
-                                                <Edit2 className="w-4 h-4" />
-                                            </button>
-                                            <button onClick={() => handleDeleteTemplate(template.id)} className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
             {/* Save Button */}
             <div className="mt-6 flex justify-end">
                 <button
@@ -1167,6 +1279,7 @@ const AdminConfiguration = () => {
             <UseTypeModal />
             <TemplateModal />
             <ThresholdModal />
+            <ContactModal />
         </div>
     );
 };

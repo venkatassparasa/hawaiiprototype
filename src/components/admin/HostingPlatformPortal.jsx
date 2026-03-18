@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Building2, Users, DollarSign, FileText, CheckCircle, AlertTriangle, Upload, Eye, EyeOff, Save, Plus, Search, Filter, Calendar, Globe, ShieldCheck, Clock } from 'lucide-react';
 
 const HostingPlatformPortal = () => {
-    const [activeTab, setActiveTab] = useState('registration');
+    const [activeTab, setActiveTab] = useState('compliance');
     const [showPassword, setShowPassword] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
@@ -93,9 +93,9 @@ const HostingPlatformPortal = () => {
     ]);
 
     const tabs = [
-        { id: 'registration', label: 'Platform Registration', icon: Plus },
-        { id: 'registered', label: 'Registered Platforms', icon: Building2 },
         { id: 'compliance', label: 'Compliance Dashboard', icon: ShieldCheck },
+        { id: 'registered', label: 'Registered Platforms', icon: Building2 },
+        { id: 'registration', label: 'Platform Registration', icon: Plus }
     ];
 
     const platformTypes = [
