@@ -436,13 +436,18 @@ const Reports = () => {
             </div>
 
             <div ref={reportsRef} className="space-y-8 p-4 bg-slate-50/30 rounded-2xl">
-                <div id="pdf-dashboard-reports" className="relative grid grid-cols-1 lg:grid-cols-2 gap-8 bg-[#f8fafc] p-6 pt-24 rounded-2xl">
-                    {/* Logo for PDF Export */}
-                    <div className="absolute top-6 left-6 flex items-center gap-4">
-                        <img src="/h_logo.png" alt="County logo" className="h-16 w-16 object-contain" />
+                <div id="pdf-dashboard-reports" className="relative grid grid-cols-1 lg:grid-cols-2 gap-8 bg-[#f8fafc] p-6 pt-40 rounded-2xl border border-slate-200 overflow-hidden">
+                    {/* Branded Header Ribbon for PDF Export */}
+                    <div className="absolute top-0 left-0 right-0 h-32 flex items-center px-8 gap-6 shadow-md" 
+                         style={{background: 'transparent linear-gradient(180deg, #2D6065 0%, #19484D 100%) 0% 0% no-repeat padding-box'}}>
+                        <img 
+                            src="/h_logo.png" 
+                            alt="County logo" 
+                            className="h-24 w-auto object-contain filter sepia-[30%] saturate-150 brightness-110 contrast-105" 
+                        />
                         <div>
-                            <h3 className="text-xl font-bold text-slate-800">County of Hawaii</h3>
-                            <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Compliance Analytics Overview</p>
+                            <h3 className="text-3xl font-black text-white leading-tight">County of Hawaii</h3>
+                            <p className="text-sm text-white/70 font-bold uppercase tracking-widest">Compliance Analytics Overview | System Audit</p>
                         </div>
                     </div>
 
@@ -773,13 +778,18 @@ const Reports = () => {
                     <div className="p-12 space-y-16 bg-[#f8fafc] w-[1400px] mx-auto">
 
                         {['region', 'type', 'tat', 'enforcement', 'trends', 'revenue'].map(type => (
-                            <div key={type} id={`pdf-report-${type}`} className="relative bg-white rounded-3xl p-10 pt-28 shadow-sm border border-slate-100">
-                                {/* Logo for PDF Export */}
-                                <div className="absolute top-8 left-10 flex items-center gap-4">
-                                    <img src="/h_logo.png" alt="County logo" className="h-20 w-20 object-contain" />
+                            <div key={type} id={`pdf-report-${type}`} className="relative bg-white rounded-3xl p-10 pt-48 shadow-sm border border-slate-200 overflow-hidden">
+                                {/* Branded Header Ribbon for Detailed PDF Export */}
+                                <div className="absolute top-0 left-0 right-0 h-40 flex items-center px-10 gap-8 shadow-md"
+                                     style={{background: 'transparent linear-gradient(180deg, #2D6065 0%, #19484D 100%) 0% 0% no-repeat padding-box'}}>
+                                    <img 
+                                        src="/h_logo.png" 
+                                        alt="County logo" 
+                                        className="h-28 w-auto object-contain filter sepia-[30%] saturate-150 brightness-110 contrast-105" 
+                                    />
                                     <div>
-                                        <h3 className="text-2xl font-black text-slate-800 leading-tight">County of Hawaii</h3>
-                                        <p className="text-sm text-hawaii-ocean font-bold uppercase tracking-widest">Department of Finance | Compliance Division</p>
+                                        <h3 className="text-4xl font-black text-white leading-tight">County of Hawaii</h3>
+                                        <p className="text-lg text-white/70 font-bold uppercase tracking-widest">Department of Finance | Compliance Division</p>
                                     </div>
                                 </div>
 
@@ -922,21 +932,29 @@ const Reports = () => {
             {showReportDetail && (
                 <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
-                        <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                            <div>
-                                <h2 className="text-xl font-bold text-slate-800 capitalize">
-                                    {activeReport === 'region' && 'Regional Compliance Deep-Dive'}
-                                    {activeReport === 'type' && 'Property Type Analysis Detail'}
-                                    {activeReport === 'tat' && 'TAT Revenue & Payment Audit'}
-                                    {activeReport === 'enforcement' && 'Enforcement Efficiency Metrics'}
-                                    {activeReport === 'trends' && 'Compliance Velocity Tracking'}
-                                    {activeReport === 'revenue' && 'Economic Impact Assessment'}
-                                </h2>
-                                <p className="text-sm text-slate-500 mt-1">Detailed breakdown from TVR Registration historical data.</p>
+                        <div className="p-6 flex justify-between items-center shadow-lg"
+                             style={{background: 'transparent linear-gradient(180deg, #2D6065 0%, #19484D 100%) 0% 0% no-repeat padding-box'}}>
+                            <div className="flex items-center gap-6">
+                                <img 
+                                    src="/h_logo.png" 
+                                    alt="County logo" 
+                                    className="h-20 w-auto object-contain filter sepia-[30%] saturate-150 brightness-110 contrast-105" 
+                                />
+                                <div>
+                                    <h2 className="text-2xl font-black text-white capitalize leading-tight">
+                                        {activeReport === 'region' && 'Regional Compliance Deep-Dive'}
+                                        {activeReport === 'type' && 'Property Type Analysis Detail'}
+                                        {activeReport === 'tat' && 'TAT Revenue & Payment Audit'}
+                                        {activeReport === 'enforcement' && 'Enforcement Efficiency Metrics'}
+                                        {activeReport === 'trends' && 'Compliance Velocity Tracking'}
+                                        {activeReport === 'revenue' && 'Economic Impact Assessment'}
+                                    </h2>
+                                    <p className="text-sm text-white/70 font-bold uppercase tracking-widest mt-0.5">County of Hawaii | Finance Division</p>
+                                </div>
                             </div>
                             <button
                                 onClick={() => setShowReportDetail(false)}
-                                className="p-2 hover:bg-slate-200 rounded-full text-slate-400 hover:text-slate-600 transition-colors"
+                                className="p-2 hover:bg-white/10 rounded-full text-white/70 hover:text-white transition-colors"
                             >
                                 <X className="w-6 h-6" />
                             </button>
