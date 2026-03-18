@@ -19,12 +19,12 @@ const Reports = () => {
     });
 
     const complianceData = [
-        { name: 'Aug', compliant: 2000, nonCompliant: 400 },
-        { name: 'Sep', compliant: 2100, nonCompliant: 350 },
-        { name: 'Oct', compliant: 2200, nonCompliant: 300 },
-        { name: 'Nov', compliant: 2350, nonCompliant: 280 },
-        { name: 'Dec', compliant: 2500, nonCompliant: 200 },
-        { name: 'Jan', compliant: 2800, nonCompliant: 150 },
+        { name: 'Aug', compliant: 3120, nonCompliant: 640 },
+        { name: 'Sep', compliant: 3250, nonCompliant: 580 },
+        { name: 'Oct', compliant: 3410, nonCompliant: 510 },
+        { name: 'Nov', compliant: 3580, nonCompliant: 440 },
+        { name: 'Dec', compliant: 3720, nonCompliant: 405 },
+        { name: 'Jan', compliant: 3842, nonCompliant: 375 },
     ];
 
     const [activeReport, setActiveReport] = useState(null);
@@ -219,10 +219,10 @@ const Reports = () => {
     };
 
     const violationsData = [
-        { name: 'Noise', value: 35 },
-        { name: 'Parking', value: 25 },
-        { name: 'Unpermitted', value: 30 },
-        { name: 'Safety', value: 10 },
+        { name: 'Noise', value: 310 },
+        { name: 'Parking', value: 248 },
+        { name: 'Unpermitted', value: 497 },
+        { name: 'Safety', value: 187 },
     ];
 
     const COLORS = ['#0f4c81', '#ff7f50', '#f59e0b', '#ef4444'];
@@ -347,10 +347,10 @@ const Reports = () => {
                                 if (reportType === 'region') {
                                     const data = [
                                         { name: 'Hilo', value: 245 },
-                                        { name: 'Kona', value: 189 },
-                                        { name: 'Puna', value: 127 },
-                                        { name: 'Kohala', value: 203 },
-                                        { name: 'Hamakua', value: 92 }
+                                        { name: 'Kona', value: 310 },
+                                        { name: 'Puna', value: 232 },
+                                        { name: 'Kohala', value: 265 },
+                                        { name: 'Hamakua', value: 190 }
                                     ];
                                     return (
                                         <BarChart data={data} {...sharedProps}>
@@ -365,9 +365,9 @@ const Reports = () => {
                                 
                                 if (reportType === 'type') {
                                     const data = [
-                                        { name: 'Single Family', value: 342 },
-                                        { name: 'Condo/Apt', value: 278 },
-                                        { name: 'Vacation Home', value: 156 },
+                                        { name: 'Single Family', value: 642 },
+                                        { name: 'Condo/Apt', value: 318 },
+                                        { name: 'Vacation Home', value: 193 },
                                         { name: 'Other', value: 89 }
                                     ];
                                     return (
@@ -382,10 +382,10 @@ const Reports = () => {
 
                                 if (reportType === 'tat') {
                                     const data = [
-                                        { name: 'Paid', value: 423 },
-                                        { name: 'Late', value: 87 },
+                                        { name: 'Paid', value: 618 },
+                                        { name: 'Late', value: 65 },
                                         { name: 'Delinquent', value: 34 },
-                                        { name: 'Not Filed', value: 156 }
+                                        { name: 'Not Filed', value: 25 }
                                     ];
                                     return (
                                         <BarChart data={data} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
@@ -400,9 +400,9 @@ const Reports = () => {
 
                                 if (reportType === 'enforcement') {
                                     const data = [
-                                        { name: 'Jan', resolved: 45, averageTime: 3.2 },
-                                        { name: 'Feb', resolved: 52, averageTime: 2.8 },
-                                        { name: 'Mar', resolved: 61, averageTime: 2.3 }
+                                        { name: 'Jan', resolved: 85, averageTime: 3.2 },
+                                        { name: 'Feb', resolved: 94, averageTime: 2.8 },
+                                        { name: 'Mar', resolved: 105, averageTime: 2.3 }
                                     ];
                                     return (
                                         <AreaChart data={data} {...sharedProps}>
@@ -441,7 +441,7 @@ const Reports = () => {
                                 if (reportType === 'revenue') {
                                     const data = [
                                         { name: 'Fines', value: 234.5 },
-                                        { name: 'TAT', value: 567.8 },
+                                        { name: 'TAT', value: 562.8 },
                                         { name: 'Fees', value: 45.2 }
                                     ];
                                     return (
