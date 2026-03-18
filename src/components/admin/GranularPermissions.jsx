@@ -10,6 +10,8 @@ const GranularPermissions = () => {
     const [editingTemplate, setEditingTemplate] = useState(null);
     const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
     const [roleFormData, setRoleFormData] = useState({ id: null, name: '', description: '', templateId: 'null' });
+    const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
+    const [templateFormData, setTemplateFormData] = useState({ id: null, name: '', description: '' });
 
     // Initial Data
     const initialTemplates = [
@@ -183,32 +185,51 @@ const GranularPermissions = () => {
     ];
 
     const handleCreateTemplate = () => {
-        const newTemplate = {
-            id: Math.max(...permissionTemplates.map(t => t.id)) + 1,
-            name: 'New Permission Template',
-            description: 'Custom permission template',
-            permissions: {
-                modules: [],
-                actions: ['read'],
-                records: ['own']
-            },
-            active: true
-        };
-        setPermissionTemplates([...permissionTemplates, newTemplate]);
+        setTemplateFormData({ id: null, name: '', description: '' });
+        setIsTemplateModalOpen(true);
     };
 
     const handleEditTemplate = (id) => {
         const template = permissionTemplates.find(t => t.id === id);
-        const newName = prompt('Edit template name:', template.name);
-        const newDescription = prompt('Edit description:', template.description);
-        
-        if (newName && newDescription) {
+        if (template) {
+            setTemplateFormData({
+                id: template.id,
+                name: template.name,
+                description: template.description
+            });
+            setIsTemplateModalOpen(true);
+        }
+    };
+
+    const handleSaveTemplate = () => {
+        if (!templateFormData.name.trim()) {
+            alert('Please enter a template name.');
+            return;
+        }
+
+        if (templateFormData.id === null) {
+            const newTemplate = {
+                id: Math.max(...permissionTemplates.map(t => t.id), 0) + 1,
+                name: templateFormData.name,
+                description: templateFormData.description,
+                permissions: {
+                    modules: [],
+                    actions: ['read'],
+                    records: ['own']
+                },
+                active: true
+            };
+            setPermissionTemplates([...permissionTemplates, newTemplate]);
+        } else {
             setPermissionTemplates(permissionTemplates.map(t => 
-                t.id === id 
-                    ? { ...t, name: newName, description: newDescription }
+                t.id === templateFormData.id 
+                    ? { ...t, name: templateFormData.name, description: templateFormData.description }
                     : t
             ));
         }
+
+        setIsTemplateModalOpen(false);
+        setHasUnsavedChanges(true);
     };
 
     const handleDeleteTemplate = (id) => {
@@ -975,6 +996,71 @@ const GranularPermissions = () => {
                                 style={{background: '#4D7833'}}
                             >
                                 {roleFormData.id ? 'Update Role' : 'Create Role'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Template Creation/Editing Modal */}
+            {isTemplateModalOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform animate-in zoom-in-95 duration-200">
+                        {/* Modal Header */}
+                        <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                            <div>
+                                <h3 className="text-lg font-bold text-slate-800">
+                                    {templateFormData.id ? 'Edit Permission Template' : 'Create New Template'}
+                                </h3>
+                                <p className="text-xs text-slate-500">Define template details</p>
+                            </div>
+                            <button 
+                                onClick={() => setIsTemplateModalOpen(false)}
+                                className="p-2 hover:bg-slate-200 rounded-full transition-colors"
+                            >
+                                <X className="w-5 h-5 text-slate-400" />
+                            </button>
+                        </div>
+
+                        {/* Modal Body */}
+                        <div className="p-6 space-y-5">
+                            <div className="space-y-1.5">
+                                <label className="text-sm font-bold text-slate-700">Template Name</label>
+                                <input 
+                                    type="text"
+                                    value={templateFormData.name}
+                                    onChange={(e) => setTemplateFormData({...templateFormData, name: e.target.value})}
+                                    placeholder="e.g. Zoning Inspector Defaults"
+                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-hawaii-ocean/20 focus:border-hawaii-ocean outline-none transition-all placeholder:text-slate-400 font-medium"
+                                />
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <label className="text-sm font-bold text-slate-700">Description</label>
+                                <textarea 
+                                    value={templateFormData.description}
+                                    onChange={(e) => setTemplateFormData({...templateFormData, description: e.target.value})}
+                                    placeholder="Briefly describe what this template does..."
+                                    rows={3}
+                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-hawaii-ocean/20 focus:border-hawaii-ocean outline-none transition-all placeholder:text-slate-400 font-medium resize-none"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Modal Footer */}
+                        <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+                            <button 
+                                onClick={() => setIsTemplateModalOpen(false)}
+                                className="px-5 py-2 text-sm font-bold text-slate-600 hover:bg-slate-200 rounded-xl transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                onClick={handleSaveTemplate}
+                                className="px-6 py-2 text-sm font-bold text-white rounded-xl shadow-lg shadow-green-200 active:scale-95 transition-all"
+                                style={{background: '#4D7833'}}
+                            >
+                                {templateFormData.id ? 'Save Changes' : 'Create Template'}
                             </button>
                         </div>
                     </div>
