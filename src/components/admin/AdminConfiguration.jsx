@@ -65,6 +65,7 @@ const AdminConfiguration = () => {
     const [feeModal, setFeeModal] = useState({ isOpen: false, editingFee: null });
     const [useTypeModal, setUseTypeModal] = useState({ isOpen: false, editingUseType: null });
     const [templateModal, setTemplateModal] = useState({ isOpen: false, editingTemplate: null });
+    const [thresholdModal, setThresholdModal] = useState({ isOpen: false, editingThreshold: null });
 
     // Hosting Platform Registration Data
     const [hostingPlatform, setHostingPlatform] = useState({
@@ -203,6 +204,34 @@ const AdminConfiguration = () => {
             setLetterTemplates([...letterTemplates, newTemplate]);
         }
         setTemplateModal({ isOpen: false, editingTemplate: null });
+    };
+
+    // Threshold Management Handlers
+    const handleAddThreshold = () => {
+        setThresholdModal({ isOpen: true, editingThreshold: null });
+    };
+
+    const handleSaveThreshold = (thresholdData) => {
+        if (thresholdModal.editingThreshold) {
+            // Update existing threshold
+            setViolationThresholds({
+                ...violationThresholds,
+                ...thresholdData
+            });
+        } else {
+            // Add new threshold type
+            const newThreshold = {
+                id: Math.max(1, 2, 3, 4) + 1, // Generate new ID
+                ...thresholdData,
+                active: true
+            };
+            // For now, we'll just update the main thresholds object
+            setViolationThresholds({
+                ...violationThresholds,
+                ...thresholdData
+            });
+        }
+        setThresholdModal({ isOpen: false, editingThreshold: null });
     };
 
     const handleDeleteTemplate = (id) => {
@@ -554,6 +583,141 @@ const AdminConfiguration = () => {
         );
     };
 
+    const ThresholdModal = () => {
+        if (!thresholdModal.isOpen) return null;
+        
+        const initialData = thresholdModal.editingThreshold || {
+            name: '',
+            type: 'warning',
+            amount: 0,
+            trigger: 'multiple_violations',
+            autoIssue: false,
+            days: 30
+        };
+
+        return (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+                    <div className="flex justify-between items-center p-6 border-b">
+                        <h3 className="text-lg font-semibold text-slate-800">
+                            {thresholdModal.editingThreshold ? 'Edit Threshold' : 'Add New Threshold'}
+                        </h3>
+                        <button 
+                            onClick={() => setThresholdModal({ isOpen: false, editingThreshold: null })}
+                            className="text-slate-400 hover:text-slate-600"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+                    </div>
+                    
+                    <div className="p-6 space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Threshold Name</label>
+                            <input
+                                type="text"
+                                defaultValue={initialData.name}
+                                id="thresholdName"
+                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                placeholder="e.g., High Risk Violations"
+                            />
+                        </div>
+                        
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Type</label>
+                            <select
+                                defaultValue={initialData.type}
+                                id="thresholdType"
+                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                            >
+                                <option value="warning">Warning</option>
+                                <option value="fine">Fine</option>
+                                <option value="lien">Lien</option>
+                                <option value="suspension">Suspension</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Amount ($)</label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                defaultValue={initialData.amount}
+                                id="thresholdAmount"
+                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                placeholder="e.g., 500.00"
+                            />
+                        </div>
+                        
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Trigger Condition</label>
+                            <select
+                                defaultValue={initialData.trigger}
+                                id="thresholdTrigger"
+                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                            >
+                                <option value="single_violation">Single Violation</option>
+                                <option value="multiple_violations">Multiple Violations</option>
+                                <option value="complaint_based">Complaint Based</option>
+                                <option value="time_based">Time Based</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Auto-Issue</label>
+                            <select
+                                defaultValue={initialData.autoIssue ? 'auto' : 'manual'}
+                                id="thresholdAutoIssue"
+                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                            >
+                                <option value="manual">Manual Review</option>
+                                <option value="auto">Automatic</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Days/Count</label>
+                            <input
+                                type="number"
+                                defaultValue={initialData.days}
+                                id="thresholdDays"
+                                min="1"
+                                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-hawaii-ocean focus:border-transparent"
+                                placeholder="e.g., 30"
+                            />
+                        </div>
+                    </div>
+                    
+                    <div className="flex justify-end gap-3 p-6 border-t">
+                        <button
+                            onClick={() => setThresholdModal({ isOpen: false, editingThreshold: null })}
+                            className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={() => {
+                                const thresholdData = {
+                                    name: document.getElementById('thresholdName').value,
+                                    type: document.getElementById('thresholdType').value,
+                                    amount: parseFloat(document.getElementById('thresholdAmount').value),
+                                    trigger: document.getElementById('thresholdTrigger').value,
+                                    autoIssue: document.getElementById('thresholdAutoIssue').value === 'auto',
+                                    days: parseInt(document.getElementById('thresholdDays').value)
+                                };
+                                handleSaveThreshold(thresholdData);
+                            }}
+                            className="flex items-center gap-2 px-6 py-2 text-white rounded-lg font-medium hover:opacity-90 min-w-[120px]"
+                            style={{background: '#4D7833 0% 0% no-repeat padding-box'}}
+                        >
+                            <Save className="w-4 h-4 mr-2" />
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     return (
         <div className="p-6 max-w-7xl mx-auto">
             <div className="mb-6">
@@ -666,7 +830,7 @@ const AdminConfiguration = () => {
                     <div>
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-xl font-semibold text-slate-800">Violation Payment Thresholds</h2>
-                            <button onClick={() => alert('Add new threshold functionality coming soon!')} className="flex items-center gap-2 px-4 py-2 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+                            <button onClick={handleAddThreshold} className="flex items-center gap-2 px-4 py-2 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
                             style={{background: '#4D7833 0% 0% no-repeat padding-box'}}>
                             <Plus className="w-4 h-4" />
                             Add New Threshold
@@ -1002,6 +1166,7 @@ const AdminConfiguration = () => {
             <FeeModal />
             <UseTypeModal />
             <TemplateModal />
+            <ThresholdModal />
         </div>
     );
 };
