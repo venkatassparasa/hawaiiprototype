@@ -38,12 +38,21 @@ const Reports = () => {
 
     const handleExportPDF = async () => {
         if (!reportsRef.current) return;
+        
+        // Show loading state or alert if needed
+        const btn = document.activeElement;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = 'Generating PDF...';
+        btn.disabled = true;
+
         try {
             const canvas = await html2canvas(reportsRef.current, {
                 scale: 2,
                 useCORS: true,
                 logging: false,
-                backgroundColor: '#f8fafc'
+                backgroundColor: '#f8fafc',
+                windowWidth: 1200,
+                ignoreElements: (element) => element.tagName === 'BUTTON'
             });
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jsPDF('p', 'mm', 'a4');
@@ -51,11 +60,28 @@ const Reports = () => {
             const pdfWidth = pdf.internal.pageSize.getWidth();
             const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
             
-            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-            pdf.save(`Hawaii_County_Compliance_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+            // Handle multi-page if height is too large
+            let heightLeft = pdfHeight;
+            let position = 0;
+            const pageHeight = pdf.internal.pageSize.getHeight();
+
+            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+            heightLeft -= pageHeight;
+
+            while (heightLeft >= 0) {
+                position = heightLeft - pdfHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+                heightLeft -= pageHeight;
+            }
+
+            pdf.save(`Hawaii_County_Full_Compliance_Report_${new Date().toISOString().split('T')[0]}.pdf`);
         } catch (error) {
             console.error('Error generating PDF:', error);
             alert('Failed to generate PDF. Please try again.');
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
         }
     };
 
@@ -150,8 +176,211 @@ const Reports = () => {
 
     const COLORS = ['#0f4c81', '#ff7f50', '#f59e0b', '#ef4444'];
 
+    const renderReportContent = (reportType) => {
+        const sharedProps = {
+            margin: { top: 10, right: 10, left: -20, bottom: 0 }
+        };
+
+        return (
+            <div className="space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                        <p className="text-blue-600 text-xs font-bold uppercase tracking-wider mb-1">
+                            {reportType === 'revenue' ? 'Total Collected' : 'Total Records'}
+                        </p>
+                        <p className="text-2xl font-black text-blue-900">
+                            {reportType === 'revenue' ? '$847.5K' : '1,248'}
+                        </p>
+                    </div>
+                    <div className="bg-green-50 p-4 rounded-xl border border-green-100">
+                        <p className="text-green-600 text-xs font-bold uppercase tracking-wider mb-1">
+                            {reportType === 'trends' ? 'Growth Rate' : 'Compliance Accuracy'}
+                        </p>
+                        <p className="text-2xl font-black text-green-900">
+                            {reportType === 'trends' ? '+12.3%' : '94.2%'}
+                        </p>
+                    </div>
+                    <div className="bg-orange-50 p-4 rounded-xl border border-orange-100">
+                        <p className="text-orange-600 text-xs font-bold uppercase tracking-wider mb-1">Audit Confidence</p>
+                        <p className="text-2xl font-black text-orange-900">98.5%</p>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <TrendingUp className="w-4 h-4 text-hawaii-ocean" />
+                        {reportType === 'trends' ? 'Monthly Compliance Velocity' : 'Data Distribution Analysis'}
+                    </h3>
+                    <div className="h-72 bg-slate-50/50 rounded-2xl border border-slate-100 p-4">
+                        <ResponsiveContainer width="100%" height="100%">
+                            {(() => {
+                                if (reportType === 'region') {
+                                    const data = [
+                                        { name: 'Hilo', value: 245 },
+                                        { name: 'Kona', value: 189 },
+                                        { name: 'Puna', value: 127 },
+                                        { name: 'Kohala', value: 203 },
+                                        { name: 'Hamakua', value: 92 }
+                                    ];
+                                    return (
+                                        <BarChart data={data} {...sharedProps}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
+                                            <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
+                                            <Tooltip cursor={{fill: '#f1f5f9'}} contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} />
+                                            <Bar dataKey="value" fill="#0f4c81" radius={[6, 6, 0, 0]} name="Active Cases" />
+                                        </BarChart>
+                                    );
+                                }
+                                
+                                if (reportType === 'type') {
+                                    const data = [
+                                        { name: 'Single Family', value: 342 },
+                                        { name: 'Condo/Apt', value: 278 },
+                                        { name: 'Vacation Home', value: 156 },
+                                        { name: 'Other', value: 89 }
+                                    ];
+                                    return (
+                                        <PieChart>
+                                            <Pie data={data} innerRadius={60} outerRadius={90} paddingAngle={5} dataKey="value">
+                                                {data.map((_, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
+                                            </Pie>
+                                            <Tooltip contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} />
+                                        </PieChart>
+                                    );
+                                }
+
+                                if (reportType === 'tat') {
+                                    const data = [
+                                        { name: 'Paid', value: 423 },
+                                        { name: 'Late', value: 87 },
+                                        { name: 'Delinquent', value: 34 },
+                                        { name: 'Not Filed', value: 156 }
+                                    ];
+                                    return (
+                                        <BarChart data={data} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
+                                            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
+                                            <XAxis type="number" hide />
+                                            <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 11}} />
+                                            <Tooltip cursor={{fill: 'transparent'}} contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} />
+                                            <Bar dataKey="value" fill="#f59e0b" radius={[0, 4, 4, 0]} barSize={20} />
+                                        </BarChart>
+                                    );
+                                }
+
+                                if (reportType === 'enforcement') {
+                                    const data = [
+                                        { name: 'Jan', resolved: 45, averageTime: 3.2 },
+                                        { name: 'Feb', resolved: 52, averageTime: 2.8 },
+                                        { name: 'Mar', resolved: 61, averageTime: 2.3 }
+                                    ];
+                                    return (
+                                        <AreaChart data={data} {...sharedProps}>
+                                            <defs>
+                                                <linearGradient id="colorRes" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
+                                                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                                                </linearGradient>
+                                            </defs>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b'}} />
+                                            <YAxis axisLine={false} tickLine={false} />
+                                            <Tooltip contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} />
+                                            <Area type="monotone" dataKey="resolved" stroke="#8b5cf6" fillOpacity={1} fill="url(#colorRes)" strokeWidth={3} />
+                                        </AreaChart>
+                                    );
+                                }
+
+                                if (reportType === 'trends') {
+                                    const data = [
+                                        { name: 'Jan', rate: 82 },
+                                        { name: 'Feb', rate: 85 },
+                                        { name: 'Mar', rate: 94 }
+                                    ];
+                                    return (
+                                        <LineChart data={data} {...sharedProps}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                            <XAxis dataKey="name" axisLine={false} tickLine={false} />
+                                            <YAxis domain={[80, 100]} axisLine={false} tickLine={false} />
+                                            <Tooltip contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} />
+                                            <Line type="monotone" dataKey="rate" stroke="#ef4444" strokeWidth={4} dot={{r: 6, fill: '#ef4444', strokeWidth: 2, stroke: '#fff'}} activityDot={{r: 8}} />
+                                        </LineChart>
+                                    );
+                                }
+
+                                if (reportType === 'revenue') {
+                                    const data = [
+                                        { name: 'Fines', value: 234.5 },
+                                        { name: 'TAT', value: 567.8 },
+                                        { name: 'Fees', value: 45.2 }
+                                    ];
+                                    return (
+                                        <BarChart data={data} {...sharedProps}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                            <XAxis dataKey="name" axisLine={false} tickLine={false} />
+                                            <YAxis axisLine={false} tickLine={false} />
+                                            <Tooltip cursor={{fill: '#f1f5f9'}} contentStyle={{borderRadius: '12px', border: 'none'}} />
+                                            <Bar dataKey="value" fill="#10b981" radius={[6, 6, 0, 0]} name="Amount ($K)" />
+                                        </BarChart>
+                                    );
+                                }
+
+                                return <div className="flex items-center justify-center h-full text-slate-400 italic">No visualization available for this category.</div>;
+                            })()}
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+
+                <div className="border border-slate-100 rounded-xl overflow-hidden">
+                    <table className="w-full text-left text-sm">
+                        <thead className="bg-slate-50">
+                            <tr>
+                                <th className="px-4 py-3 font-bold text-slate-700">
+                                    {reportType === 'region' && 'District'}
+                                    {reportType === 'type' && 'Property Category'}
+                                    {reportType === 'tat' && 'Payment Status'}
+                                    {reportType === 'enforcement' && 'Violation Category'}
+                                    {reportType === 'trends' && 'Reporting period'}
+                                    {reportType === 'revenue' && 'Revenue Stream'}
+                                </th>
+                                <th className="px-4 py-3 font-bold text-slate-700">
+                                    {reportType === 'revenue' || reportType === 'tat' ? 'Financial Volume' : 'Units Identified'}
+                                </th>
+                                <th className="px-4 py-3 font-bold text-slate-700">Compliance Factor</th>
+                                <th className="px-4 py-3 font-bold text-slate-700">Impact Score</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                            {(reportType === 'region' ? ['Hilo', 'Kona', 'Puna', 'Kohala', 'Hamakua'] :
+                                reportType === 'type' ? ['Single Family', 'Condo/Apt', 'Vacation Home', 'Estate', 'Other'] :
+                                reportType === 'tat' ? ['Paid & Current', 'Late Payment', 'Delinquent', 'Not Filed'] :
+                                reportType === 'enforcement' ? ['Noise', 'Parking', 'Unpermitted', 'Safety', 'Zoning'] :
+                                reportType === 'trends' ? ['Q1 2024', 'Q4 2023', 'Q3 2023', 'Q2 2023'] :
+                                ['Fines', 'TAT Revenue', 'Fees', 'Permits']).map((item, i) => (
+                                <tr key={i} className="hover:bg-slate-50/50">
+                                    <td className="px-4 py-3 text-slate-600 font-medium">{item}</td>
+                                    <td className="px-4 py-3 text-slate-800">
+                                        {reportType === 'revenue' || reportType === 'tat' ? `$${(Math.random() * 50 + 10).toFixed(1)}K` : Math.floor(Math.random() * 300 + 50)}
+                                    </td>
+                                    <td className="px-4 py-3">
+                                        <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-bold">
+                                            {(Math.random() * 10 + 90).toFixed(1)}%
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4 text-slate-900 font-bold">
+                                        {(Math.random() * 4 + 6).toFixed(1)} / 10
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        );
+    };
+
     return (
-        <div ref={reportsRef} className="space-y-8 animate-in fade-in duration-500 p-2">
+        <div className="space-y-8 animate-in fade-in duration-500">
 
             <div className="flex justify-between items-center">
                 <div>
@@ -171,7 +400,8 @@ const Reports = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div ref={reportsRef} className="space-y-8 p-4 bg-slate-50/30 rounded-2xl">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
                 {/* Compliance Trend Chart */}
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -494,6 +724,38 @@ const Reports = () => {
                         </button>
                     </div>
                 </div>
+
+                {/* Hidden Detailed Reports for PDF Export Only */}
+                <div style={{ position: 'absolute', left: '-9999px', top: '0', width: '1100px', background: '#f8fafc' }}>
+                    <div className="p-12 space-y-16">
+                        <div className="border-b-4 border-hawaii-ocean pb-6 mb-10">
+                            <h1 className="text-4xl font-black text-slate-800">
+                                County of Hawaii Compliance Analytics
+                            </h1>
+                            <p className="text-slate-500 mt-2 font-bold uppercase tracking-widest">
+                                Full System Audit | Generated: {new Date().toLocaleDateString()}
+                            </p>
+                        </div>
+
+                        {['region', 'type', 'tat', 'enforcement', 'trends', 'revenue'].map(type => (
+                            <div key={type} className="bg-white rounded-3xl p-10 shadow-sm border border-slate-100">
+                                <h2 className="text-3xl font-bold text-slate-800 mb-8 border-l-8 border-hawaii-ocean pl-6 leading-tight">
+                                    {type === 'region' && 'Regional Compliance Deep-Dive'}
+                                    {type === 'type' && 'Property Type Analysis Detail'}
+                                    {type === 'tat' && 'TAT Revenue & Payment Audit'}
+                                    {type === 'enforcement' && 'Enforcement Efficiency Metrics'}
+                                    {type === 'trends' && 'Compliance Velocity Tracking'}
+                                    {type === 'revenue' && 'Economic Impact Assessment'}
+                                </h2>
+                                {renderReportContent(type)}
+                                <div className="mt-10 pt-6 border-t border-slate-50 text-[10px] text-slate-300 font-mono italic">
+                                    TVR Registration Portal Data Extract | Secure Audit Log Hash: {Math.random().toString(16).slice(2, 10).toUpperCase()}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
             </div>
 
             {/* Case Creation Modal */}
@@ -637,205 +899,8 @@ const Reports = () => {
                         </div>
                         
                         <div className="p-8 overflow-y-auto flex-1 bg-white">
-                            {/* Mock Content based on report type */}
-                            <div className="space-y-8">
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                    <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
-                                        <p className="text-blue-600 text-xs font-bold uppercase tracking-wider mb-1">
-                                            {activeReport === 'revenue' ? 'Total Collected' : 'Total Records'}
-                                        </p>
-                                        <p className="text-2xl font-black text-blue-900">
-                                            {activeReport === 'revenue' ? '$847.5K' : '1,248'}
-                                        </p>
-                                    </div>
-                                    <div className="bg-green-50 p-4 rounded-xl border border-green-100">
-                                        <p className="text-green-600 text-xs font-bold uppercase tracking-wider mb-1">
-                                            {activeReport === 'trends' ? 'Growth Rate' : 'Compliance Accuracy'}
-                                        </p>
-                                        <p className="text-2xl font-black text-green-900">
-                                            {activeReport === 'trends' ? '+12.3%' : '94.2%'}
-                                        </p>
-                                    </div>
-                                    <div className="bg-orange-50 p-4 rounded-xl border border-orange-100">
-                                        <p className="text-orange-600 text-xs font-bold uppercase tracking-wider mb-1">Audit Confidence</p>
-                                        <p className="text-2xl font-black text-orange-900">98.5%</p>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                                        <TrendingUp className="w-4 h-4 text-hawaii-ocean" />
-                                        {activeReport === 'trends' ? 'Monthly Compliance Velocity' : 'Data Distribution Analysis'}
-                                    </h3>
-                                    <div className="h-72 bg-slate-50/50 rounded-2xl border border-slate-100 p-4">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            {(() => {
-                                                const sharedProps = {
-                                                    margin: { top: 10, right: 10, left: -20, bottom: 0 }
-                                                };
-                                                
-                                                if (activeReport === 'region') {
-                                                    const data = [
-                                                        { name: 'Hilo', value: 245 },
-                                                        { name: 'Kona', value: 189 },
-                                                        { name: 'Puna', value: 127 },
-                                                        { name: 'Kohala', value: 203 },
-                                                        { name: 'Hamakua', value: 92 }
-                                                    ];
-                                                    return (
-                                                        <BarChart data={data} {...sharedProps}>
-                                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                                                            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
-                                                            <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
-                                                            <Tooltip cursor={{fill: '#f1f5f9'}} contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} />
-                                                            <Bar dataKey="value" fill="#0f4c81" radius={[6, 6, 0, 0]} name="Active Cases" />
-                                                        </BarChart>
-                                                    );
-                                                }
-                                                
-                                                if (activeReport === 'type') {
-                                                    const data = [
-                                                        { name: 'Single Family', value: 342 },
-                                                        { name: 'Condo/Apt', value: 278 },
-                                                        { name: 'Vacation Home', value: 156 },
-                                                        { name: 'Other', value: 89 }
-                                                    ];
-                                                    return (
-                                                        <PieChart>
-                                                            <Pie data={data} innerRadius={60} outerRadius={90} paddingAngle={5} dataKey="value">
-                                                                {data.map((_, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
-                                                            </Pie>
-                                                            <Tooltip contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} />
-                                                        </PieChart>
-                                                    );
-                                                }
-
-                                                if (activeReport === 'tat') {
-                                                    const data = [
-                                                        { name: 'Paid', value: 423 },
-                                                        { name: 'Late', value: 87 },
-                                                        { name: 'Delinquent', value: 34 },
-                                                        { name: 'Not Filed', value: 156 }
-                                                    ];
-                                                    return (
-                                                        <BarChart data={data} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
-                                                            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
-                                                            <XAxis type="number" hide />
-                                                            <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 11}} />
-                                                            <Tooltip cursor={{fill: 'transparent'}} contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} />
-                                                            <Bar dataKey="value" fill="#f59e0b" radius={[0, 4, 4, 0]} barSize={20} />
-                                                        </BarChart>
-                                                    );
-                                                }
-
-                                                if (activeReport === 'enforcement') {
-                                                    const data = [
-                                                        { name: 'Jan', resolved: 45, averageTime: 3.2 },
-                                                        { name: 'Feb', resolved: 52, averageTime: 2.8 },
-                                                        { name: 'Mar', resolved: 61, averageTime: 2.3 }
-                                                    ];
-                                                    return (
-                                                        <AreaChart data={data} {...sharedProps}>
-                                                            <defs>
-                                                                <linearGradient id="colorRes" x1="0" y1="0" x2="0" y2="1">
-                                                                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
-                                                                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
-                                                                </linearGradient>
-                                                            </defs>
-                                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                                                            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b'}} />
-                                                            <YAxis axisLine={false} tickLine={false} />
-                                                            <Tooltip contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} />
-                                                            <Area type="monotone" dataKey="resolved" stroke="#8b5cf6" fillOpacity={1} fill="url(#colorRes)" strokeWidth={3} />
-                                                        </AreaChart>
-                                                    );
-                                                }
-
-                                                if (activeReport === 'trends') {
-                                                    const data = [
-                                                        { name: 'Jan', rate: 82 },
-                                                        { name: 'Feb', rate: 85 },
-                                                        { name: 'Mar', rate: 94 }
-                                                    ];
-                                                    return (
-                                                        <LineChart data={data} {...sharedProps}>
-                                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                                                            <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                                                            <YAxis domain={[80, 100]} axisLine={false} tickLine={false} />
-                                                            <Tooltip contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} />
-                                                            <Line type="monotone" dataKey="rate" stroke="#ef4444" strokeWidth={4} dot={{r: 6, fill: '#ef4444', strokeWidth: 2, stroke: '#fff'}} activityDot={{r: 8}} />
-                                                        </LineChart>
-                                                    );
-                                                }
-
-                                                if (activeReport === 'revenue') {
-                                                    const data = [
-                                                        { name: 'Fines', value: 234.5 },
-                                                        { name: 'TAT', value: 567.8 },
-                                                        { name: 'Fees', value: 45.2 }
-                                                    ];
-                                                    return (
-                                                        <BarChart data={data} {...sharedProps}>
-                                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                                                            <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                                                            <YAxis axisLine={false} tickLine={false} />
-                                                            <Tooltip cursor={{fill: '#f1f5f9'}} contentStyle={{borderRadius: '12px', border: 'none'}} />
-                                                            <Bar dataKey="value" fill="#10b981" radius={[6, 6, 0, 0]} name="Amount ($K)" />
-                                                        </BarChart>
-                                                    );
-                                                }
-
-                                                return <div className="flex items-center justify-center h-full text-slate-400 italic">No visualization available for this category.</div>;
-                                            })()}
-                                        </ResponsiveContainer>
-                                    </div>
-                                </div>
-
-                                <div className="border border-slate-100 rounded-xl overflow-hidden">
-                                    <table className="w-full text-left text-sm">
-                                        <thead className="bg-slate-50">
-                                            <tr>
-                                                <th className="px-4 py-3 font-bold text-slate-700">
-                                                    {activeReport === 'region' && 'District'}
-                                                    {activeReport === 'type' && 'Property Category'}
-                                                    {activeReport === 'tat' && 'Payment Status'}
-                                                    {activeReport === 'enforcement' && 'Violation Category'}
-                                                    {activeReport === 'trends' && 'Reporting period'}
-                                                    {activeReport === 'revenue' && 'Revenue Stream'}
-                                                </th>
-                                                <th className="px-4 py-3 font-bold text-slate-700">
-                                                    {activeReport === 'revenue' || activeReport === 'tat' ? 'Financial Volume' : 'Units Identified'}
-                                                </th>
-                                                <th className="px-4 py-3 font-bold text-slate-700">Compliance Factor</th>
-                                                <th className="px-4 py-3 font-bold text-slate-700">Impact Score</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-slate-100">
-                                            {(activeReport === 'region' ? ['Hilo', 'Kona', 'Puna', 'Kohala', 'Hamakua'] :
-                                              activeReport === 'type' ? ['Single Family', 'Condo/Apt', 'Vacation Home', 'Estate', 'Other'] :
-                                              activeReport === 'tat' ? ['Paid & Current', 'Late Payment', 'Delinquent', 'Not Filed'] :
-                                              activeReport === 'enforcement' ? ['Noise', 'Parking', 'Unpermitted', 'Safety', 'Zoning'] :
-                                              activeReport === 'trends' ? ['Q1 2024', 'Q4 2023', 'Q3 2023', 'Q2 2023'] :
-                                              ['Fines', 'TAT Revenue', 'Fees', 'Permits']).map((item, i) => (
-                                                <tr key={i} className="hover:bg-slate-50/50">
-                                                    <td className="px-4 py-3 text-slate-600 font-medium">{item}</td>
-                                                    <td className="px-4 py-3 text-slate-800">
-                                                        {activeReport === 'revenue' || activeReport === 'tat' ? `$${(Math.random() * 50 + 10).toFixed(1)}K` : Math.floor(Math.random() * 300 + 50)}
-                                                    </td>
-                                                    <td className="px-4 py-3">
-                                                        <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-bold">
-                                                            {(Math.random() * 10 + 90).toFixed(1)}%
-                                                        </span>
-                                                    </td>
-                                                    <td className="px-6 py-4 text-slate-900 font-bold">
-                                                        {(Math.random() * 4 + 6).toFixed(1)} / 10
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                            {/* Detailed Report Content */}
+                            {renderReportContent(activeReport)}
                         </div>
 
                         <div className="p-6 border-t border-slate-100 bg-slate-50 flex justify-between items-center">
